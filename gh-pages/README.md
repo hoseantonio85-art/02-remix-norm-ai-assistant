@@ -1,18 +1,42 @@
-# Сборка для GitHub Pages
+# Норм — сборка для GitHub Pages
 
-Этот прототип в Lovable работает на TanStack Start. Для публикации на GitHub Pages
-используйте автономную чистую Vite + React + TS сборку:
+Эта папка — **полностью автономный** Vite + React + TypeScript + React Router v6 проект.
+Превью внутри Lovable работает на TanStack Start, поэтому корень репозитория его не трогает;
+вся "чистая" сборка для GitHub Pages живёт здесь.
 
-1. Создайте пустой репозиторий, скопируйте в него:
-   - `gh-pages/vite.config.ts` → `vite.config.ts`
-   - `gh-pages/package.json` → `package.json`
-   - `gh-pages/tsconfig.json` → `tsconfig.json`
-   - `gh-pages/index.html` → `index.html`
-   - `.github/workflows/deploy.yml` → `.github/workflows/deploy.yml`
-   - `src/main.tsx`, `src/App.tsx`, `src/components/NormPrototype.tsx`, `src/styles/norm-prototype.css`
-2. `npm install`
-3. `npm run dev` — локально
-4. `npm run build` — сборка в `dist/`
-5. Push в `main` → GitHub Actions автоматически опубликует на Pages.
+## Что внутри
 
-В Settings → Pages выберите Source: **GitHub Actions**.
+```
+gh-pages/
+├── .github/workflows/deploy.yml   # CI: build + deploy на Pages
+├── index.html
+├── package.json                   # react, react-dom, react-router-dom, vite
+├── tsconfig.json
+├── vite.config.ts                 # base: '/norm-ai-assistant/'
+└── src/
+    ├── main.tsx
+    ├── App.tsx                    # BrowserRouter с basename
+    ├── index.css
+    ├── components/NormPrototype.tsx
+    └── styles/norm-prototype.css
+```
+
+## Деплой
+
+1. Создайте на GitHub пустой репозиторий `norm-ai-assistant`.
+2. Скопируйте **содержимое папки `gh-pages/`** (не саму папку) в корень нового репозитория.
+3. Локально:
+   ```
+   npm install
+   npm run dev      # http://localhost:5173
+   npm run build    # сборка в dist/
+   npm run preview
+   ```
+4. `git push` в ветку `main`.
+5. GitHub → **Settings → Pages → Source: GitHub Actions**.
+6. Сайт: `https://<user>.github.io/norm-ai-assistant/`.
+
+## Другое имя репозитория
+
+Поменяйте `base` в `vite.config.ts` и `basename` в `src/App.tsx`
+на `/<имя-репозитория>/`.
