@@ -571,7 +571,7 @@ function PlaceholderTab({ title, text }: { title: string; text: string }) {
   );
 }
 
-export default function KnowledgeBase() {
+export default function KnowledgeBase({ onOpenChat }: { onOpenChat?: (q: string) => void }) {
   const [tab, setTab] = useState<"profile" | "docs" | "method">("profile");
   return (
     <div className="np-kb">
@@ -584,7 +584,7 @@ export default function KnowledgeBase() {
         </div>
       </header>
 
-      {tab === "profile" && <ProfileTab />}
+      {tab === "profile" && <ProfileTab onOpenChat={onOpenChat} />}
       {tab === "docs" && <PlaceholderTab title="Документы компании" text="Здесь будут категории документов: индикатор зрелости, стандарты, оргструктура, финансовое состояние, аудиты и проверки, прочее." />}
       {tab === "method" && <PlaceholderTab title="Методология" text="Здесь будет описание методологии: политики, методики, регламенты и рекомендации, которыми пользуется Норм." />}
     </div>
