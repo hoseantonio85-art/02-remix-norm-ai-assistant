@@ -392,16 +392,9 @@ function IndexWidget({
   onTransfer, onAdd, toast,
 }: { onTransfer: () => void; onAdd: (t: string) => void; toast: (m: string) => void }) {
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
-  }, [open]);
   return (
-    <div className="np-index-widget-wrap" ref={ref}>
-      <button className="np-index-widget" onClick={() => setOpen((o) => !o)}>
+    <div className="np-index-widget-wrap">
+      <button className="np-index-widget" onClick={() => setOpen(true)}>
         <Ring percent={INDEX_PERCENT} size={64} stroke={6} />
         <div className="np-index-widget-text">
           <div className="np-index-widget-title">Индекс знания</div>
@@ -410,27 +403,38 @@ function IndexWidget({
         </div>
       </button>
       {open && (
-        <div className="np-index-popover" role="dialog">
-          <div className="np-index-pop-head">
-            <h4>Как улучшить профиль</h4>
-            <p>Добавление этих знаний сильнее всего повлияет на индекс</p>
+        <div className="np-drawer-backdrop" onClick={() => setOpen(false)}>
+          <div className="np-drawer np-improve-drawer" onClick={(e) => e.stopPropagation()} role="dialog">
+            <div className="np-drawer-head">
+              <div>
+                <div className="np-drawer-eyebrow">Индекс знания · {INDEX_PERCENT}%</div>
+                <h3 className="np-drawer-title">Как улучшить профиль</h3>
+                <p className="np-drawer-summary">Добавление этих знаний сильнее всего повлияет на индекс компании.</p>
+              </div>
+              <button className="np-icon-btn" onClick={() => setOpen(false)} aria-label="Закрыть">✕</button>
+            </div>
+            <div className="np-drawer-body">
+              <ul className="np-improve-list">
+                {IMPROVE_ITEMS.map((it, i) => (
+                  <li key={i} className="np-improve-item">
+                    <div className="np-improve-main">
+                      <div className="np-improve-title">{it.title}</div>
+                      <div className="np-improve-meta">
+                        <span className={`np-improve-badge ${it.importance === "Высокая" ? "high" : "mid"}`}>{it.importance} важность</span>
+                        <span className="np-improve-gain">+{it.gain}%</span>
+                      </div>
+                      <div className="np-improve-why">{it.why}</div>
+                    </div>
+                    <button className="np-btn np-btn-primary np-improve-cta" onClick={() => { setOpen(false); onAdd(it.title); }}>Добавить</button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="np-drawer-foot">
+              <button className="np-btn" onClick={() => setOpen(false)}>Закрыть</button>
+              <button className="np-btn np-btn-primary" onClick={() => { setOpen(false); onTransfer(); }}>Передать знания Норму</button>
+            </div>
           </div>
-          <ul className="np-improve-list">
-            {IMPROVE_ITEMS.map((it, i) => (
-              <li key={i} className="np-improve-item">
-                <div className="np-improve-main">
-                  <div className="np-improve-title">{it.title}</div>
-                  <div className="np-improve-meta">
-                    <span className={`np-improve-badge ${it.importance === "Высокая" ? "high" : "mid"}`}>{it.importance} важность</span>
-                    <span className="np-improve-gain">+{it.gain}%</span>
-                  </div>
-                  <div className="np-improve-why">{it.why}</div>
-                </div>
-                <button className="np-btn np-btn-primary np-improve-cta" onClick={() => { setOpen(false); onAdd(it.title); }}>Добавить знания</button>
-              </li>
-            ))}
-          </ul>
-          <button className="np-btn np-btn-primary" style={{ width: "100%" }} onClick={() => { setOpen(false); onTransfer(); }}>Передать новые знания Норму</button>
         </div>
       )}
     </div>
