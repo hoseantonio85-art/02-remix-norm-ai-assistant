@@ -459,3 +459,8 @@
   .np-area-layout { grid-template-columns: 1fr; }
   .np-area-left, .np-area-right { position: static; }
 }
+
+.np-kb-summary-extra { margin-top: 8px; font-size: 13px; color: #4b5563; font-style: italic; }
+.np-section-groups { display: flex; flex-direction: column; gap: 18px; }
+.np-section-group-title { font-size: 13px; font-weight: 700; color: var(--np-mint, #22c4a3); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; }
+.np-fact-label { font-weight: 600; color: #1f2937; }
