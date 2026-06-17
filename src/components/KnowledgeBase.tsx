@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 type Status = "low" | "some" | "enough" | "good";
 type FieldState = "known" | "partial" | "unknown" | "na";
@@ -610,7 +610,7 @@ function AreaPage({
 
 function ProfilePage({
   onOpenChat, header,
-}: { onOpenChat?: (q: string) => void; header: React.ReactNode }) {
+}: { onOpenChat?: (q: string) => void; header: ReactNode }) {
   const [areas] = useState<Area[]>(AREAS_INITIAL);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
