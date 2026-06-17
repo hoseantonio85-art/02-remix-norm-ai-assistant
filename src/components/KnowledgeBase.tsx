@@ -503,7 +503,7 @@ function ImproveDrawer({ onClose, onTransfer, toast }: { onClose: () => void; on
                     <span className="np-improve-gain">+{it.gain}% к индексу</span>
                   </div>
                 </div>
-                <button className="np-btn np-btn-primary np-improve-cta" onClick={() => toast("Сценарий добавления знаний будет реализован через чат")}>Добавить знания</button>
+                <button className="np-btn np-btn-primary np-improve-cta" onClick={() => toast("Добавление знаний будет реализовано через чат Норма.")}>Добавить знания</button>
               </li>
             ))}
           </ul>
