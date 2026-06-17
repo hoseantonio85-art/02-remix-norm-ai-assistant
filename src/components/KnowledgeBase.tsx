@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Status = "low" | "some" | "enough" | "good";
+type FieldState = "known" | "partial" | "unknown" | "na";
 
 const STATUS_LABEL: Record<Status, string> = {
   low: "почти не знаю",
@@ -16,279 +17,348 @@ function statusFromPercent(p: number): Status {
   return "good";
 }
 
+interface BaseField {
+  label: string;
+  state: FieldState;
+  value?: string;
+  source?: string;
+  date?: string;
+}
+
+interface FieldGroup {
+  title: string;
+  fields: BaseField[];
+}
+
 interface Area {
   id: string;
   title: string;
   percent: number;
-  summary: string;
   insight: string;
-  sources: number;
-  knowledge: string[];
-  sourceList: string[];
-  usedIn: string[];
   why: string;
   aiSummary: string;
-  facts: { text: string; source: string; date: string }[];
-  risks: string[];
-  gaps: string[];
   sourcesDetailed: { name: string; type: string }[];
-  sections?: { title: string; items: { label: string; value: string }[] }[];
-  riskCount?: number;
-  riskDelta?: string;
-  influence?: { label: string; value: number }[];
+  groups: FieldGroup[];
+  groupCoverage: { label: string; percent: number }[];
+  missing: string[];
 }
 
-const mk = (
-  id: string,
-  title: string,
-  percent: number,
-  insight: string,
-  sources: number,
-  knowledge: number,
-  why: string,
-  aiSummary: string,
-  facts: { text: string; source: string; date: string }[],
-  risks: string[],
-  gaps: string[],
-  sourcesDetailed: { name: string; type: string }[],
-  extras: Partial<Area> = {},
-): Area => ({
-  id,
-  title,
-  percent,
-  insight,
-  summary: insight,
-  sources,
-  knowledge: [],
-  sourceList: sourcesDetailed.map((s) => s.name),
-  usedIn: [],
-  why,
-  aiSummary,
-  facts: facts.length ? facts : Array.from({ length: knowledge }).map((_, i) => ({
-    text: `Знание ${i + 1}`,
-    source: sourcesDetailed[0]?.name ?? "Источник",
-    date: "—",
-  })),
-  risks,
-  gaps,
-  sourcesDetailed,
-  ...extras,
-});
+function f(label: string, state: FieldState, value?: string, source?: string, date?: string): BaseField {
+  return { label, state, value, source, date };
+}
 
 const AREAS_INITIAL: Area[] = [
-  mk(
-    "general",
-    "Общая информация",
-    82,
-    "Помогает понять, кто компания, где работает, в какой отрасли находится и какой контекст учитывать при анализе рисков.",
-    6,
-    8,
-    "Эта область помогает понять базовый контекст компании: кто она, где работает, в какой отрасли находится и какие регуляторные рамки могут быть важны.",
-    "Я уверенно понимаю профиль компании: знаю юридическое лицо, отрасль, регион присутствия и основные виды деятельности. Этого достаточно, чтобы строить корректный контекст для большинства рисков.",
-    [],
-    ["Репутационные риски бренда", "Регуляторные риски в РФ", "Отраслевые риски AI-индустрии"],
-    [
-      "Добавь данные о хранении клиентских данных",
-      "Добавь описание архитектуры AI-продукта",
-      "Укажи владельцев каналов продаж",
-    ],
-    [
+  {
+    id: "general",
+    title: "Общая информация",
+    percent: 82,
+    insight: "Базовый контекст: кто компания, где работает, в какой отрасли и какой масштаб учитывать при анализе рисков.",
+    why: "Базовый контекст компании: кто она, где работает, в какой отрасли находится и какой масштаб деятельности нужно учитывать при анализе.",
+    aiSummary: "Я уверенно понимаю профиль компании: знаю юридическое лицо, отрасль, регион присутствия и основные виды деятельности. Этого достаточно для корректного контекста большинства рисков.",
+    sourcesDetailed: [
       { name: "Устав компании.pdf", type: "PDF" },
-      { name: "Сайт компании", type: "Веб-источник" },
+      { name: "Сайт компании", type: "Веб" },
       { name: "Регистрационная выписка.pdf", type: "PDF" },
     ],
-    {
-      riskCount: 3,
-      riskDelta: "+1 за месяц",
-      influence: [{ label: "Оценка рисков", value: 10 }, { label: "AI-рекомендации", value: 65 }],
-      sections: [
-        {
-          title: "Регистрационные данные",
-          items: [
-            { label: "Сокращённое название", value: "СамИздат" },
-            { label: "Полное название", value: "ООО «Сам Издат Инкорпорейтед»" },
-            { label: "ИНН", value: "772335154264" },
-            { label: "ОГРН", value: "1177847261602" },
-            { label: "Дата основания", value: "02.08.2017" },
-          ],
-        },
-        {
-          title: "Юридический адрес",
-          items: [{ label: "Адрес", value: "21087, Москва, ул. Барклая, д. 6, стр. 3, помещ. 8/28" }],
-        },
-        {
-          title: "Профиль деятельности",
-          items: [
-            { label: "Основная отрасль", value: "Разработка AI-продуктов" },
-            { label: "Основной вид деятельности", value: "AI-рекомендации для e-commerce и корпоративных систем" },
-          ],
-        },
-        {
-          title: "Ключевые ОКВЭД",
-          items: [
-            { label: "62.01", value: "Разработка компьютерного программного обеспечения" },
-            { label: "63.11", value: "Деятельность по обработке данных" },
-            { label: "73.20", value: "Исследование конъюнктуры рынка" },
-          ],
-        },
-      ],
-    },
-  ),
-  mk(
-    "structure",
-    "Структура и управление",
-    46,
-    "Помогает определить владельцев рисков, зоны ответственности, узкие места управления и зависимость от ключевых руководителей.",
-    3,
-    5,
-    "Эта область показывает, кто принимает решения, кто отвечает за направления и где могут быть узкие места управления.",
-    "Я знаю генерального директора и понимаю, что выделены блоки ИТ и операционных рисков. Полной оргструктуры и матрицы ответственности пока нет — это мешает корректно назначать владельцев рисков.",
-    [
-      { text: "Генеральный директор — Семён Петрович Колбасников.", source: "ФИО директора и прочая инфа.pdf", date: "15.01.2026" },
-      { text: "Выделен блок ИТ и кибербезопасности.", source: "ФИО директора и прочая инфа.pdf", date: "15.01.2026" },
-      { text: "Выделен блок операционных рисков.", source: "ФИО директора и прочая инфа.pdf", date: "15.01.2026" },
+    groups: [
+      {
+        title: "Идентификация компании",
+        fields: [
+          f("Сокращённое название", "known", "СамИздат", "Сайт компании", "03.02.2026"),
+          f("Полное название", "known", "ООО «Сам Издат Инкорпорейтед»", "Устав компании.pdf", "12.01.2026"),
+          f("ИНН", "known", "772335154264", "Регистрационная выписка.pdf", "10.01.2026"),
+          f("ОГРН", "known", "1177847261602", "Регистрационная выписка.pdf", "10.01.2026"),
+          f("Страна регистрации", "known", "Россия", "Регистрационная выписка.pdf", "10.01.2026"),
+        ],
+      },
+      {
+        title: "Профиль деятельности",
+        fields: [
+          f("Отрасль", "known", "Разработка ПО и AI-продуктов", "Сайт компании", "03.02.2026"),
+          f("Краткое описание", "known", "AI-рекомендации для e-commerce и корпоративных систем.", "Сайт компании", "03.02.2026"),
+        ],
+      },
+      {
+        title: "География и масштаб",
+        fields: [
+          f("Основной регион", "known", "Россия", "Сайт компании", "03.02.2026"),
+          f("Головной офис", "known", "Москва", "Устав компании.pdf", "12.01.2026"),
+          f("Численность", "unknown"),
+          f("Размер компании", "partial", "Средняя компания", "Оценка Норма", "—"),
+        ],
+      },
     ],
-    ["Единая точка отказа в управлении", "Размытая ответственность за инциденты"],
-    ["Полная оргструктура", "Владельцы ключевых направлений", "Матрица RACI"],
-    [
+    groupCoverage: [
+      { label: "Регистрационные данные", percent: 100 },
+      { label: "Деятельность", percent: 100 },
+      { label: "География", percent: 75 },
+      { label: "Масштаб", percent: 50 },
+    ],
+    missing: ["точной численности сотрудников", "полного списка регионов присутствия"],
+  },
+  {
+    id: "structure",
+    title: "Структура и управление",
+    percent: 46,
+    insight: "Помогает понимать, кто принимает решения, кто отвечает за критичные направления и где есть единые точки отказа.",
+    why: "Структура и владельцы процессов помогают корректно назначать ответственных за риски и инциденты.",
+    aiSummary: "Я знаю генерального директора и понимаю наличие блоков ИТ и операционных рисков. Полной оргструктуры и матрицы ответственности пока нет.",
+    sourcesDetailed: [
       { name: "ФИО директора и прочая инфа.pdf", type: "PDF" },
       { name: "Внутренний регламент.docx", type: "DOCX" },
-      { name: "Сайт компании", type: "Веб-источник" },
     ],
-  ),
-  mk(
-    "owners",
-    "Собственники и связи",
-    28,
-    "Помогает видеть связанных лиц, группы влияния, зависимые компании, конфликты интересов и концентрацию контроля.",
-    1,
-    2,
-    "Эта область раскрывает, кто реально контролирует компанию, какие есть связанные структуры и где могут быть конфликты интересов.",
-    "О собственниках и связанных лицах у меня пока очень мало данных. Это ограничивает оценку рисков концентрации контроля и конфликтов интересов.",
-    [
-      { text: "Единственный известный бенефициар — упоминание в выписке.", source: "Регистрационная выписка.pdf", date: "10.01.2026" },
-      { text: "Связанные компании не описаны.", source: "—", date: "—" },
+    groups: [
+      {
+        title: "Руководство",
+        fields: [
+          f("Руководитель / исп. орган", "known", "Семён Петрович Колбасников", "ФИО директора и прочая инфа.pdf", "15.01.2026"),
+          f("Модель управления", "partial", "Единоличный исполнительный орган", "Внутренний регламент.docx", "20.01.2026"),
+        ],
+      },
+      {
+        title: "Подразделения и ответственность",
+        fields: [
+          f("Основные подразделения", "partial", "Выделены ИТ и операционные риски", "Внутренний регламент.docx", "20.01.2026"),
+          f("Ответственные за критичные направления", "unknown"),
+          f("Зависимость от ключевых лиц", "unknown"),
+        ],
+      },
     ],
-    ["Концентрация контроля", "Скрытые связанные стороны"],
-    ["Список собственников и долей", "Карта связанных компаний", "Декларация конфликтов интересов"],
-    [{ name: "Регистрационная выписка.pdf", type: "PDF" }],
-  ),
-  mk(
-    "products",
-    "Продукты и бизнес-модель",
-    68,
-    "Показывает, на чём компания зарабатывает, какие продукты критичны и где сбой может сильнее всего повлиять на бизнес.",
-    5,
-    7,
-    "Эта область объясняет, как устроена выручка, какие продукты ключевые и где сбой ударит по бизнесу сильнее всего.",
-    "Я понимаю продуктовую линейку и основной фокус на AI-рекомендациях для ритейла. Знаю про внутреннего ассистента и аналитический модуль для партнёров.",
-    [
-      { text: "AI-рекомендации товаров — ключевой продукт.", source: "Сайт компании", date: "03.02.2026" },
-      { text: "Внутренний AI-ассистент используется сотрудниками.", source: "Отчёт внутреннего аудита 2026.pdf", date: "20.01.2026" },
-      { text: "Аналитический модуль поставляется партнёрам по API.", source: "Сайт компании", date: "03.02.2026" },
-      { text: "Основной рынок сбыта — e-commerce в РФ.", source: "Отчёт внутреннего аудита 2026.pdf", date: "20.01.2026" },
+    groupCoverage: [
+      { label: "Руководство", percent: 80 },
+      { label: "Подразделения", percent: 40 },
+      { label: "Зависимости от лиц", percent: 0 },
     ],
-    ["Концентрация выручки на одном продукте", "Рыночные риски в e-commerce"],
-    ["Доли рынка и конкурентный анализ", "Карта клиентских сегментов", "Описание unit-экономики"],
-    [
-      { name: "Сайт компании", type: "Веб-источник" },
+    missing: ["полной оргструктуры", "матрицы ответственности (RACI)", "карты зависимости от ключевых лиц"],
+  },
+  {
+    id: "owners",
+    title: "Собственники и связи",
+    percent: 28,
+    insight: "Раскрывает, кто реально контролирует компанию, есть ли связанные структуры и где могут быть конфликты интересов.",
+    why: "Помогает оценивать риски концентрации контроля, скрытых связанных лиц и конфликтов интересов.",
+    aiSummary: "О собственниках и связанных лицах данных пока очень мало. Это ограничивает оценку рисков концентрации контроля и конфликтов интересов.",
+    sourcesDetailed: [{ name: "Регистрационная выписка.pdf", type: "PDF" }],
+    groups: [
+      {
+        title: "Контроль и владение",
+        fields: [
+          f("Контролирующий собственник", "partial", "Упоминание единственного бенефициара", "Регистрационная выписка.pdf", "10.01.2026"),
+          f("Основные владельцы и доли", "unknown"),
+          f("Дочерние и зависимые общества", "unknown"),
+        ],
+      },
+      {
+        title: "Связанные стороны",
+        fields: [
+          f("Ключевые связанные организации", "unknown"),
+          f("Существенные сделки со связанными лицами", "unknown"),
+        ],
+      },
+    ],
+    groupCoverage: [
+      { label: "Контроль и владение", percent: 35 },
+      { label: "Связанные стороны", percent: 0 },
+    ],
+    missing: ["полного списка собственников и долей", "карты связанных компаний", "декларации конфликтов интересов"],
+  },
+  {
+    id: "products",
+    title: "Продукты и бизнес-модель",
+    percent: 68,
+    insight: "Показывает, на чём компания зарабатывает, какие продукты критичны и где сбой сильнее всего ударит по бизнесу.",
+    why: "Эта область объясняет, как устроена выручка, какие продукты ключевые и где сбой ударит по бизнесу сильнее всего.",
+    aiSummary: "Я понимаю продуктовую линейку и фокус на AI-рекомендациях для ритейла. Знаю про внутреннего ассистента и аналитический модуль для партнёров.",
+    sourcesDetailed: [
+      { name: "Сайт компании", type: "Веб" },
       { name: "Отчёт внутреннего аудита 2026.pdf", type: "PDF" },
     ],
-  ),
-  mk(
-    "ops",
-    "Операционная деятельность",
-    41,
-    "Помогает понять ключевые процессы, поставщиков, клиентов, каналы продаж и точки, где может нарушиться работа компании.",
-    3,
-    4,
-    "Эта область описывает повседневные процессы, точки взаимодействия с клиентами и поставщиками, где чаще всего возникают сбои.",
-    "Я частично понимаю операционные процессы: знаю про каналы продаж и часть ключевых поставщиков. Полной карты процессов и SLA пока нет.",
-    [
-      { text: "Основные каналы продаж — прямые корпоративные сделки.", source: "Отчёт внутреннего аудита 2026.pdf", date: "20.01.2026" },
-      { text: "Часть поставок оборудования зависит от одного вендора.", source: "Отчёт внутреннего аудита 2026.pdf", date: "20.01.2026" },
-      { text: "Поддержка клиентов осуществляется собственной командой.", source: "Сайт компании", date: "03.02.2026" },
+    groups: [
+      {
+        title: "Продукты",
+        fields: [
+          f("Основные продукты", "known", "AI-рекомендации, AI-ассистент, аналитический модуль", "Сайт компании", "03.02.2026"),
+          f("Критичный продукт", "known", "AI-рекомендации товаров", "Отчёт внутреннего аудита 2026.pdf", "20.01.2026"),
+        ],
+      },
+      {
+        title: "Бизнес-модель",
+        fields: [
+          f("Клиентские сегменты", "partial", "E-commerce РФ, корпоративные клиенты", "Сайт компании", "03.02.2026"),
+          f("Модель получения дохода", "partial", "Лицензии + API", "Сайт компании", "03.02.2026"),
+          f("Основные каналы продаж", "known", "Прямые корпоративные сделки", "Отчёт внутреннего аудита 2026.pdf", "20.01.2026"),
+        ],
+      },
     ],
-    ["Сбой в канале продаж", "Зависимость от ключевого вендора"],
-    ["Карта операционных процессов", "Список ключевых поставщиков", "SLA с клиентами"],
-    [
+    groupCoverage: [
+      { label: "Продукты", percent: 100 },
+      { label: "Бизнес-модель", percent: 60 },
+    ],
+    missing: ["долей рынка и конкурентного анализа", "unit-экономики по продуктам"],
+  },
+  {
+    id: "ops",
+    title: "Операционная деятельность",
+    percent: 41,
+    insight: "Помогает понять ключевые процессы, поставщиков, клиентов, каналы продаж и точки, где может нарушиться работа.",
+    why: "Операционные процессы и зависимости показывают, где чаще всего возникают сбои и какие площадки критичны.",
+    aiSummary: "Я частично понимаю операционные процессы: знаю каналы продаж и часть ключевых поставщиков. Карты процессов и SLA пока нет.",
+    sourcesDetailed: [
       { name: "Отчёт внутреннего аудита 2026.pdf", type: "PDF" },
-      { name: "Сайт компании", type: "Веб-источник" },
       { name: "Внутренний регламент.docx", type: "DOCX" },
     ],
-  ),
-  mk(
-    "it",
-    "ИТ, данные и технологии",
-    54,
-    "Показывает технологические зависимости, ИТ-системы, данные, кибербезопасность и инфраструктуру, от которых зависит устойчивость компании.",
-    4,
-    6,
-    "Эта область описывает технологический фундамент: ИТ-системы, данные, кибербезопасность и зависимость от инфраструктуры.",
-    "Я знаю про зависимость от GPU-инфраструктуры и часть политик ИБ. При этом карта ИТ-систем, владельцы сервисов и SLA пока не описаны.",
-    [
-      { text: "GPU-ресурсы загружены до 90% в пиковые периоды.", source: "Отчёт внутреннего аудита 2026.pdf", date: "20.01.2026" },
-      { text: "Закупка новых мощностей инициирована в Q1 2026.", source: "Отчёт внутреннего аудита 2026.pdf", date: "20.01.2026" },
-      { text: "Политика кибербезопасности описана для филиалов.", source: "Политика кибербезопасности для филиалов.docx", date: "10.10.2025" },
-      { text: "Есть акт проверки ИБ-защищённости филиала №14.", source: "Акт проверки ИБ-защищённости филиала №14.pdf", date: "12.05.2024" },
+    groups: [
+      {
+        title: "Процессы и площадки",
+        fields: [
+          f("Ключевые бизнес-процессы", "unknown"),
+          f("Цепочка создания ценности", "unknown"),
+          f("Критичные площадки", "partial", "Головной офис в Москве", "Внутренний регламент.docx", "20.01.2026"),
+        ],
+      },
+      {
+        title: "Зависимости и особенности",
+        fields: [
+          f("Основные операционные зависимости", "partial", "Зависимость от одного вендора оборудования", "Отчёт внутреннего аудита 2026.pdf", "20.01.2026"),
+          f("Особенности работы", "known", "Непрерывный режим работы AI-сервисов", "Отчёт внутреннего аудита 2026.pdf", "20.01.2026"),
+        ],
+      },
     ],
-    ["Недоступность AI-рекомендаций", "Срыв сроков запуска продукта", "Слабая ИБ-защищённость филиалов"],
-    ["Карта ИТ-систем", "Владельцы ключевых сервисов", "SLA по критичным системам", "План восстановления после сбоев"],
-    [
+    groupCoverage: [
+      { label: "Процессы", percent: 20 },
+      { label: "Площадки", percent: 50 },
+      { label: "Зависимости", percent: 55 },
+    ],
+    missing: ["карты операционных процессов", "списка ключевых поставщиков", "SLA с клиентами"],
+  },
+  {
+    id: "it",
+    title: "ИТ, данные и технологии",
+    percent: 54,
+    insight: "Технологический фундамент: ИТ-системы, данные, кибербезопасность и зависимость от инфраструктуры.",
+    why: "Технологический контур определяет устойчивость и восстановление при сбоях и инцидентах.",
+    aiSummary: "Я знаю про зависимость от GPU-инфраструктуры и часть политик ИБ. Карта ИТ-систем, владельцы сервисов и SLA пока не описаны.",
+    sourcesDetailed: [
       { name: "Отчёт внутреннего аудита 2026.pdf", type: "PDF" },
       { name: "Политика кибербезопасности для филиалов.docx", type: "DOCX" },
       { name: "Акт проверки ИБ-защищённости филиала №14.pdf", type: "PDF" },
-      { name: "Сайт компании", type: "Веб-источник" },
     ],
-  ),
-  mk(
-    "finance",
-    "Финансы и контрагенты",
-    25,
-    "Помогает оценивать финансовую устойчивость, долговую нагрузку, зависимость от крупных клиентов, поставщиков и контрагентов.",
-    1,
-    2,
-    "Эта область помогает понять, насколько компания финансово устойчива и где у неё критичные зависимости от контрагентов.",
-    "Я почти не знаю финансовое состояние компании. Есть только косвенные упоминания выручки, нет официальной отчётности и перечня контрагентов.",
-    [
-      { text: "Косвенное упоминание выручки в отчёте внутреннего аудита.", source: "Отчёт внутреннего аудита 2026.pdf", date: "20.01.2026" },
-      { text: "Перечень ключевых контрагентов не загружен.", source: "—", date: "—" },
+    groups: [
+      {
+        title: "ИТ-системы и инфраструктура",
+        fields: [
+          f("Критичные ИТ-системы", "unknown"),
+          f("Модель инфраструктуры", "partial", "GPU-кластеры, своя инфраструктура", "Отчёт внутреннего аудита 2026.pdf", "20.01.2026"),
+        ],
+      },
+      {
+        title: "Данные и владельцы",
+        fields: [
+          f("Типы обрабатываемых данных", "partial", "Клиентские поведенческие данные", "Политика кибербезопасности для филиалов.docx", "10.10.2025"),
+          f("Владельцы систем и данных", "unknown"),
+        ],
+      },
+      {
+        title: "Устойчивость",
+        fields: [
+          f("Резервирование и восстановление", "partial", "План восстановления частично описан", "Акт проверки ИБ-защищённости филиала №14.pdf", "12.05.2024"),
+        ],
+      },
     ],
-    ["Кредитные риски", "Концентрация поставщиков", "Зависимость от ключевых клиентов"],
-    ["Финансовая отчётность за 2024–2025", "Список ключевых контрагентов", "Структура выручки по продуктам"],
-    [{ name: "Отчёт внутреннего аудита 2026.pdf", type: "PDF" }],
-  ),
-  mk(
-    "regulatory",
-    "Регуляторика и риск-сигналы",
-    57,
-    "Собирает проверки, нарушения, инциденты, судебные и регуляторные сигналы, которые могут указывать на будущие риски.",
-    5,
-    6,
-    "Эта область собирает внешние сигналы — проверки, инциденты, регуляторные требования и судебные дела, которые могут указывать на будущие риски.",
-    "У меня есть данные по внутренним аудитам ИБ и описание инцидента с DDoS-атакой. Внешних независимых аудитов и сертификаций пока нет.",
-    [
-      { text: "Акт проверки ИБ-защищённости филиала №14 от 05.2024.", source: "Акт проверки ИБ-защищённости филиала №14.pdf", date: "12.05.2024" },
-      { text: "Чек-лист аудита рисков поставщика версии 1.2.", source: "Чек-лист аудита рисков поставщика v.1.2.xlsx", date: "08.11.2025" },
-      { text: "Инцидент DDoS-атаки 12.05.2024 задокументирован.", source: "Описание инцидента с DDoS-атакой.pdf", date: "14.05.2024" },
+    groupCoverage: [
+      { label: "ИТ-системы", percent: 30 },
+      { label: "Данные", percent: 50 },
+      { label: "Устойчивость", percent: 60 },
     ],
-    ["Операционные риски", "Риски поставщиков", "Риски доступности сервисов"],
-    ["Внешний аудит ИБ", "Сертификация ISO/SOC", "План регулярных проверок"],
-    [
+    missing: ["карты ИТ-систем", "владельцев ключевых сервисов", "плана восстановления после сбоев"],
+  },
+  {
+    id: "finance",
+    title: "Финансы и контрагенты",
+    percent: 25,
+    insight: "Помогает оценивать финансовую устойчивость, долговую нагрузку, концентрацию клиентов и поставщиков.",
+    why: "Финансовое состояние и контрагенты определяют кредитные риски и риски концентрации.",
+    aiSummary: "Я почти не знаю финансовое состояние компании. Есть только косвенные упоминания выручки, нет официальной отчётности и перечня контрагентов.",
+    sourcesDetailed: [{ name: "Отчёт внутреннего аудита 2026.pdf", type: "PDF" }],
+    groups: [
+      {
+        title: "Финансовый масштаб",
+        fields: [
+          f("Финансовый масштаб", "partial", "Средняя компания (оценка)", "Оценка Норма", "—"),
+          f("Выручка", "unknown"),
+          f("Прибыль / убыток", "unknown"),
+          f("Долговая нагрузка", "unknown"),
+        ],
+      },
+      {
+        title: "Контрагенты",
+        fields: [
+          f("Ключевые клиенты и поставщики", "unknown"),
+          f("Концентрация контрагентов", "unknown"),
+        ],
+      },
+    ],
+    groupCoverage: [
+      { label: "Финансовый масштаб", percent: 35 },
+      { label: "Контрагенты", percent: 0 },
+    ],
+    missing: ["финансовой отчётности за 2024–2025", "перечня ключевых контрагентов", "структуры выручки по продуктам"],
+  },
+  {
+    id: "regulatory",
+    title: "Регуляторика и риск-сигналы",
+    percent: 57,
+    insight: "Внешние сигналы — проверки, инциденты, регуляторные требования и судебные дела, указывающие на риски.",
+    why: "Эта область собирает регуляторные сигналы и события, которые могут указывать на будущие риски.",
+    aiSummary: "У меня есть данные по внутренним аудитам ИБ и инциденту с DDoS. Внешних аудитов и сертификаций пока нет.",
+    sourcesDetailed: [
       { name: "Акт проверки ИБ-защищённости филиала №14.pdf", type: "PDF" },
       { name: "Чек-лист аудита рисков поставщика v.1.2.xlsx", type: "XLSX" },
       { name: "Описание инцидента с DDoS-атакой.pdf", type: "PDF" },
-      { name: "Внутренний регламент.docx", type: "DOCX" },
-      { name: "Сайт компании", type: "Веб-источник" },
     ],
-  ),
+    groups: [
+      {
+        title: "Регуляторы и требования",
+        fields: [
+          f("Основные регуляторы", "partial", "ФСТЭК, Роскомнадзор (предположительно)", "Оценка Норма", "—"),
+          f("Лицензии и разрешения", "unknown"),
+          f("Ключевые обязательные требования", "partial", "Требования по защите ПДн", "Политика кибербезопасности для филиалов.docx", "10.10.2025"),
+        ],
+      },
+      {
+        title: "Аудиты и проверки",
+        fields: [
+          f("Последние аудиты", "known", "Акт проверки ИБ филиала №14", "Акт проверки ИБ-защищённости филиала №14.pdf", "12.05.2024"),
+          f("Существенные замечания", "partial", "Замечания по филиалу №14", "Акт проверки ИБ-защищённости филиала №14.pdf", "12.05.2024"),
+        ],
+      },
+      {
+        title: "Инциденты и сигналы",
+        fields: [
+          f("Известные инциденты", "known", "DDoS-атака 12.05.2024", "Описание инцидента с DDoS-атакой.pdf", "14.05.2024"),
+          f("Текущие риск-сигналы", "partial", "Зависимость от единственного вендора", "Отчёт внутреннего аудита 2026.pdf", "20.01.2026"),
+        ],
+      },
+    ],
+    groupCoverage: [
+      { label: "Регуляторы и требования", percent: 45 },
+      { label: "Аудиты и проверки", percent: 70 },
+      { label: "Инциденты и сигналы", percent: 60 },
+    ],
+    missing: ["перечня лицензий и разрешений", "внешнего аудита ИБ", "сертификации ISO/SOC"],
+  },
 ];
 
 const INDEX_PERCENT = 64;
 
-function statusClass(s: Status) {
-  return `np-kb-status np-kb-status-${s}`;
+function countFilled(a: Area) {
+  const all = a.groups.flatMap((g) => g.fields);
+  const total = all.length;
+  const filled = all.filter((x) => x.state === "known" || x.state === "partial").length;
+  return { total, filled };
 }
+
+function statusClass(s: Status) { return `np-kb-status np-kb-status-${s}`; }
 
 function Ring({ percent, size = 56, stroke = 6 }: { percent: number; size?: number; stroke?: number }) {
   const r = (size - stroke) / 2;
@@ -311,40 +381,140 @@ function KbToast({ message, onDone }: { message: string; onDone: () => void }) {
   return <div className="np-toast">{message}</div>;
 }
 
+const IMPROVE_ITEMS = [
+  { title: "Карта ИТ-систем", importance: "Высокая", gain: 8, why: "Поможет видеть критичные сервисы и технологические зависимости." },
+  { title: "Оргструктура и владельцы процессов", importance: "Высокая", gain: 7, why: "Поможет связывать риски, инциденты и меры с ответственными." },
+  { title: "Финансовая отчётность", importance: "Средняя", gain: 6, why: "Нужна для оценки финансовой устойчивости." },
+  { title: "Ключевые контрагенты", importance: "Средняя", gain: 5, why: "Поможет выявлять концентрацию поставщиков и клиентов." },
+] as const;
+
+function IndexWidget({
+  onTransfer, onAdd, toast,
+}: { onTransfer: () => void; onAdd: (t: string) => void; toast: (m: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, [open]);
+  return (
+    <div className="np-index-widget-wrap" ref={ref}>
+      <button className="np-index-widget" onClick={() => setOpen((o) => !o)}>
+        <Ring percent={INDEX_PERCENT} size={64} stroke={6} />
+        <div className="np-index-widget-text">
+          <div className="np-index-widget-title">Индекс знания</div>
+          <div className="np-index-widget-sub">8 областей</div>
+          <div className="np-index-widget-meta">3 области требуют внимания</div>
+        </div>
+      </button>
+      {open && (
+        <div className="np-index-popover" role="dialog">
+          <div className="np-index-pop-head">
+            <h4>Как улучшить профиль</h4>
+            <p>Добавление этих знаний сильнее всего повлияет на индекс</p>
+          </div>
+          <ul className="np-improve-list">
+            {IMPROVE_ITEMS.map((it, i) => (
+              <li key={i} className="np-improve-item">
+                <div className="np-improve-main">
+                  <div className="np-improve-title">{it.title}</div>
+                  <div className="np-improve-meta">
+                    <span className={`np-improve-badge ${it.importance === "Высокая" ? "high" : "mid"}`}>{it.importance} важность</span>
+                    <span className="np-improve-gain">+{it.gain}%</span>
+                  </div>
+                  <div className="np-improve-why">{it.why}</div>
+                </div>
+                <button className="np-btn np-btn-primary np-improve-cta" onClick={() => { setOpen(false); onAdd(it.title); }}>Добавить знания</button>
+              </li>
+            ))}
+          </ul>
+          <button className="np-btn np-btn-primary" style={{ width: "100%" }} onClick={() => { setOpen(false); onTransfer(); }}>Передать новые знания Норму</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const FIELD_STATE_LABEL: Record<FieldState, string> = {
+  known: "Известно",
+  partial: "Частично",
+  unknown: "Пока не знаю",
+  na: "Не применимо",
+};
+
+function FactItem({ field, onEdit, onDelete, onAdd }: {
+  field: BaseField; onEdit: () => void; onDelete: () => void; onAdd: () => void;
+}) {
+  const [menu, setMenu] = useState(false);
+  if (field.state === "unknown" || field.state === "na") {
+    return (
+      <li className="np-fact np-fact-empty">
+        <div className="np-fact-row">
+          <div className="np-fact-text">
+            <span className="np-fact-label">{field.label}</span>
+            <div className="np-fact-empty-note">{FIELD_STATE_LABEL[field.state]}</div>
+          </div>
+          {field.state === "unknown" && (
+            <button className="np-btn np-btn-ghost np-fact-add-cta" onClick={onAdd}>Добавить знание</button>
+          )}
+        </div>
+      </li>
+    );
+  }
+  return (
+    <li className="np-fact">
+      <div className="np-fact-row">
+        <div className="np-fact-text">
+          <span className="np-fact-label">{field.label}:</span> {field.value}
+          {field.state === "partial" && <span className="np-pill-partial">частично</span>}
+        </div>
+        <div className="np-fact-menu-wrap">
+          <button className="np-icon-btn" onClick={() => setMenu((m) => !m)} aria-label="Меню">⋯</button>
+          {menu && (
+            <div className="np-fact-menu" onMouseLeave={() => setMenu(false)}>
+              <button onClick={() => { setMenu(false); onEdit(); }}>Изменить</button>
+              <button onClick={() => { setMenu(false); onDelete(); }} className="danger">Удалить</button>
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="np-fact-meta">
+        {field.source && <span className="np-source-badge">📄 {field.source}</span>}
+        {field.date && field.date !== "—" && <span>· обновлено {field.date}</span>}
+      </div>
+    </li>
+  );
+}
+
 function AreaPage({
-  area,
-  areas,
-  onSelect,
-  onBack,
-  onAddFact,
-  toast,
-  onOpenChat,
+  area, areas, onSelect, onBack, toast, onOpenChat,
 }: {
-  area: Area;
-  areas: Area[];
-  onSelect: (id: string) => void;
-  onBack: () => void;
-  onAddFact: () => void;
-  toast: (m: string) => void;
-  onOpenChat?: (q: string) => void;
+  area: Area; areas: Area[]; onSelect: (id: string) => void; onBack: () => void;
+  toast: (m: string) => void; onOpenChat?: (q: string) => void;
 }) {
   const status = statusFromPercent(area.percent);
+  const { total, filled } = countFilled(area);
   return (
     <div className="np-area-page">
-      <button className="np-area-back" onClick={onBack}>← Профиль компании</button>
+      <div className="np-kb-pageheader">
+        <button className="np-area-back" onClick={onBack}>← Профиль компании</button>
+        <h1>{area.title}</h1>
+        <div className="np-kb-pageheader-meta">
+          <span className={statusClass(status)}>{STATUS_LABEL[status]}</span>
+          <span className="np-muted">{area.why}</span>
+        </div>
+      </div>
 
       <div className="np-area-layout">
         <aside className="np-area-left">
-          <div className="np-area-left-title">Области знаний</div>
+          <div className="np-area-left-title">Области профиля</div>
           {areas.map((a) => {
             const s = statusFromPercent(a.percent);
             const isActive = a.id === area.id;
             return (
-              <button
-                key={a.id}
-                className={`np-area-left-item ${isActive ? "active" : ""}`}
-                onClick={() => onSelect(a.id)}
-              >
+              <button key={a.id} className={`np-area-left-item ${isActive ? "active" : ""}`} onClick={() => onSelect(a.id)}>
                 <div className="np-area-left-name">{a.title}</div>
                 <span className={statusClass(s)}>{STATUS_LABEL[s]}</span>
               </button>
@@ -353,68 +523,31 @@ function AreaPage({
         </aside>
 
         <div className="np-area-center">
-          <header className="np-area-header">
-            <div className="np-area-header-main">
-              <h2 className="np-area-title">{area.title}</h2>
-              <div className="np-area-meta">
-                <span className={statusClass(status)}>{STATUS_LABEL[status]}</span>
-                <span className="np-area-percent">{area.percent}%</span>
-              </div>
-              <p className="np-area-why">{area.why}</p>
-            </div>
-            <Ring percent={area.percent} size={88} stroke={8} />
-          </header>
-
           <section className="np-area-summary">
             <div className="np-kb-summary-eyebrow">Как Норм понимает эту область</div>
             <p>{area.aiSummary}</p>
           </section>
 
-          <section className="np-area-section">
-            <div className="np-area-section-head">
-              <h3>{area.sections ? "Разделы знания" : "Ключевые знания"}</h3>
-              <span className="np-muted">{area.sections ? area.sections.length : area.facts.length}</span>
-            </div>
-            {area.sections ? (
-              <div className="np-section-groups">
-                {area.sections.map((g, gi) => (
-                  <div key={gi} className="np-section-group">
-                    <div className="np-section-group-title">{g.title}</div>
-                    <ul className="np-fact-list">
-                      {g.items.map((it, ii) => (
-                        <li key={ii} className="np-fact">
-                          <div className="np-fact-row">
-                            <div className="np-fact-text">
-                              <span className="np-fact-label">{it.label}:</span> {it.value}
-                            </div>
-                            <button className="np-icon-btn" onClick={() => toast("Редактирование будет добавлено позже.")} aria-label="Меню">⋯</button>
-                          </div>
-                          <div className="np-fact-meta">
-                            <span className="np-source-badge">📄 1 источник</span>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            ) : (
-            <ul className="np-fact-list">
-              {area.facts.map((f, i) => (
-                <li key={i} className="np-fact">
-                  <div className="np-fact-row">
-                    <div className="np-fact-text">{f.text}</div>
-                    <button className="np-icon-btn" onClick={() => toast("Редактирование будет добавлено позже.")} aria-label="Меню">⋯</button>
-                  </div>
-                  <div className="np-fact-meta">
-                    <span className="np-source-badge" onClick={() => toast("Переход к источнику будет добавлен позже")}>📄 1 источник</span>
-                    {f.date !== "—" && <span>· обновлено {f.date}</span>}
-                  </div>
-                </li>
-              ))}
-            </ul>
-            )}
-          </section>
+          <div className="np-section-groups">
+            {area.groups.map((g, gi) => (
+              <section key={gi} className="np-area-section">
+                <h3>{g.title}</h3>
+                <ul className="np-fact-list">
+                  {g.fields.map((field, fi) => (
+                    <FactItem
+                      key={fi}
+                      field={field}
+                      onEdit={() => toast("Редактирование будет добавлено позже.")}
+                      onDelete={() => toast("Удаление будет добавлено позже.")}
+                      onAdd={() => onOpenChat
+                        ? onOpenChat(`Хочу дополнить знания в разделе ${area.title}: ${field.label}`)
+                        : toast("Добавление через чат Норма будет реализовано позже.")}
+                    />
+                  ))}
+                </ul>
+              </section>
+            ))}
+          </div>
 
           <section className="np-area-section">
             <h3>Источники <span className="np-muted">· {area.sourcesDetailed.length}</span></h3>
@@ -431,118 +564,61 @@ function AreaPage({
         </div>
 
         <aside className="np-area-right">
-          <section className="np-area-side-card">
-            <h4>Связь с рисками</h4>
-            <div className="np-area-side-row">
-              <span>Рисков</span>
-              <strong>{area.riskCount ?? area.risks.length}</strong>
+          <section className="np-area-side-card np-coverage-card">
+            <h4>Покрытие области</h4>
+            <div className="np-coverage-top">
+              <Ring percent={area.percent} size={64} stroke={6} />
+              <div>
+                <div className="np-coverage-status">{STATUS_LABEL[status]}</div>
+                <div className="np-muted np-coverage-base">Базовые поля: {filled} из {total}</div>
+              </div>
             </div>
-            <div className="np-area-side-meta">↑ {area.riskDelta ?? "+1 за месяц"}</div>
-          </section>
-
-          <section className="np-area-side-card">
-            <h4>Влияние на анализ</h4>
-            {(area.influence ?? [{ label: "Оценка рисков", value: 10 }, { label: "AI-рекомендации", value: 65 }]).map((it, i) => (
-              <div key={i} className="np-area-side-row"><span>{it.label}</span><strong>{it.value}</strong></div>
-            ))}
-          </section>
-
-          <section className="np-area-side-card np-area-improve">
-            <h4>Улучшить знания</h4>
-            <ul className="np-area-improve-list">
-              {area.gaps.slice(0, 4).map((g, i) => (
-                <li key={i} onClick={() => toast("Можно добавить через чат Норма.")}>{g}</li>
+            <div className="np-coverage-list">
+              {area.groupCoverage.map((g, i) => (
+                <div key={i} className="np-coverage-row">
+                  <span>{g.label}</span><strong>{g.percent}%</strong>
+                </div>
               ))}
-            </ul>
+            </div>
+            {area.missing.length > 0 && (
+              <div className="np-coverage-missing">
+                <div className="np-coverage-missing-title">Не хватает:</div>
+                <ul>
+                  {area.missing.map((m, i) => <li key={i}>{m}</li>)}
+                </ul>
+              </div>
+            )}
+            <button
+              className="np-btn np-btn-primary"
+              style={{ width: "100%", marginTop: 12 }}
+              onClick={() => onOpenChat
+                ? onOpenChat(`Хочу дополнить знания в разделе ${area.title}`)
+                : toast("Сценарий дополнения знаний будет реализован через чат Норма.")}
+            >
+              Дополнить знания
+            </button>
           </section>
         </aside>
       </div>
-
-      <button
-        className="np-area-fab"
-        onClick={() => {
-          if (onOpenChat) onOpenChat(`Хочу дополнить знания в разделе ${area.title}`);
-          else toast("Сценарий дополнения знаний будет реализован через чат Норма.");
-        }}
-      >
-        ✨ Дополнить знания
-      </button>
     </div>
   );
 }
 
-const IMPROVE_ITEMS: { title: string; why: string; gain: number; importance: "Высокая" | "Средняя" }[] = [
-  { title: "Оргструктура и владельцы процессов", why: "Поможет связывать риски, инциденты и меры с ответственными.", gain: 7, importance: "Высокая" },
-  { title: "Финансовая отчётность", why: "Нужна для оценки финансовой устойчивости и кредитных рисков.", gain: 6, importance: "Высокая" },
-  { title: "Карта ИТ-систем", why: "Поможет видеть технологические зависимости и критичные сервисы.", gain: 8, importance: "Высокая" },
-  { title: "Список ключевых контрагентов", why: "Помогает выявлять концентрацию поставщиков и внешние зависимости.", gain: 5, importance: "Средняя" },
-  { title: "Описание бизнес-модели", why: "Поможет понять критичные продукты, каналы продаж и зависимость от выручки.", gain: 4, importance: "Средняя" },
-];
-
-function ImproveDrawer({ onClose, onTransfer, toast }: { onClose: () => void; onTransfer: () => void; toast: (m: string) => void }) {
-  return (
-    <div className="np-drawer-backdrop" onClick={onClose}>
-      <aside className="np-drawer np-improve-drawer" onClick={(e) => e.stopPropagation()}>
-        <div className="np-drawer-head">
-          <div>
-            <div className="np-drawer-eyebrow">Индекс знания · 64%</div>
-            <h3 className="np-drawer-title">Как улучшить профиль</h3>
-          </div>
-          <button className="np-icon-btn" onClick={onClose} aria-label="Закрыть">✕</button>
-        </div>
-        <div className="np-drawer-body">
-          <ul className="np-improve-list">
-            {IMPROVE_ITEMS.map((it, i) => (
-              <li key={i} className="np-improve-item">
-                <div className="np-improve-rank">{i + 1}</div>
-                <div className="np-improve-main">
-                  <div className="np-improve-title">{it.title}</div>
-                  <div className="np-improve-why">{it.why}</div>
-                  <div className="np-improve-meta">
-                    <span className={`np-improve-badge ${it.importance === "Высокая" ? "high" : "mid"}`}>Важность: {it.importance}</span>
-                    <span className="np-improve-gain">+{it.gain}% к индексу</span>
-                  </div>
-                </div>
-                <button className="np-btn np-btn-primary np-improve-cta" onClick={() => toast("Добавление знаний будет реализовано через чат Норма.")}>Добавить знания</button>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="np-drawer-foot">
-          <button className="np-btn np-btn-primary" style={{ flex: 1 }} onClick={onTransfer}>Передать новые знания Норму</button>
-        </div>
-      </aside>
-    </div>
-  );
-}
-
-function ProfileTab({ onOpenChat }: { onOpenChat?: (q: string) => void }) {
-  const [areas, setAreas] = useState<Area[]>(AREAS_INITIAL);
+function ProfilePage({
+  onBack, onOpenChat,
+}: { onBack: () => void; onOpenChat?: (q: string) => void }) {
+  const [areas] = useState<Area[]>(AREAS_INITIAL);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  const [improveOpen, setImproveOpen] = useState(false);
   const active = activeId ? areas.find((a) => a.id === activeId) ?? null : null;
 
-  const handleAddFact = (id: string) => {
-    setAreas((prev) =>
-      prev.map((a) =>
-        a.id === id
-          ? {
-              ...a,
-              percent: Math.min(100, a.percent + 3),
-              facts: [
-                ...a.facts,
-                {
-                  text: "Карта ИТ-систем ожидается от ИТ-дирекции.",
-                  source: "Запрос знания от Норма",
-                  date: "сегодня",
-                },
-              ],
-            }
-          : a,
-      ),
-    );
-    setToast("Добавлено знание: карта ИТ-систем ожидается от ИТ-дирекции");
+  const addFromImprove = (title: string) => {
+    if (onOpenChat) onOpenChat(`Хочу дополнить профиль компании: ${title}`);
+    else setToast("Добавление знаний будет реализовано через чат Норма");
+  };
+  const transfer = () => {
+    if (onOpenChat) onOpenChat("Хочу передать новые знания в профиль компании");
+    else setToast("Сценарий добавления знаний будет реализован через чат Норма.");
   };
 
   if (active) {
@@ -553,7 +629,6 @@ function ProfileTab({ onOpenChat }: { onOpenChat?: (q: string) => void }) {
           areas={areas}
           onSelect={setActiveId}
           onBack={() => setActiveId(null)}
-          onAddFact={() => handleAddFact(active.id)}
           toast={setToast}
           onOpenChat={onOpenChat}
         />
@@ -564,43 +639,38 @@ function ProfileTab({ onOpenChat }: { onOpenChat?: (q: string) => void }) {
 
   return (
     <>
-      <div className="np-kb-top">
-        <section className="np-kb-summary np-kb-summary-solo">
-          <div className="np-kb-summary-head">
-            <div className="np-kb-summary-eyebrow">Как Норм понимает компанию</div>
-            <h3>Аналитический профиль компании для оценки рисков</h3>
-            <p>
-              Я собираю аналитический профиль компании из внутренних документов, открытых
-              источников и знаний, которые ты передаёшь в чате. Такой профиль помогает не просто
-              хранить факты, а понимать, где у компании могут возникать операционные,
-              технологические, финансовые и регуляторные риски.
-            </p>
-            <p className="np-kb-summary-extra">
-              Сейчас лучше всего покрыты общая информация, продукты и регуляторные сигналы.
-              Слабее всего — собственники, финансы и контрагенты.
-            </p>
+      <div className="np-kb-pageheader">
+        <button className="np-area-back" onClick={onBack}>← База знаний</button>
+        <div className="np-kb-pageheader-row">
+          <div>
+            <h1>Профиль компании</h1>
+            <p className="np-muted">Знания, которые Норм использует, чтобы понимать компанию и точнее анализировать риски.</p>
           </div>
-        </section>
-        <button className="np-index-widget" onClick={() => setImproveOpen(true)} aria-label="Открыть улучшение профиля">
-          <Ring percent={INDEX_PERCENT} size={88} stroke={8} />
-          <div className="np-index-widget-text">
-            <div className="np-index-widget-title">Индекс знания</div>
-            <div className="np-index-widget-sub">Показывает, насколько полно Норм понимает компанию для анализа рисков.</div>
-            <div className="np-index-widget-meta">3 области можно улучшить</div>
-          </div>
-        </button>
+          <IndexWidget onTransfer={transfer} onAdd={addFromImprove} toast={setToast} />
+        </div>
       </div>
+
+      <section className="np-kb-summary np-kb-summary-solo">
+        <div className="np-kb-summary-head">
+          <div className="np-kb-summary-eyebrow">Как Норм понимает компанию</div>
+          <p>
+            Я собираю профиль компании из внутренних документов, открытых источников и знаний,
+            которые ты передаёшь в чате. Сейчас лучше всего понимаю общую информацию, продукты
+            и регуляторные сигналы. Меньше всего знаю о собственниках, финансах и ключевых контрагентах.
+          </p>
+        </div>
+      </section>
 
       <section className="np-kb-grid">
         {areas.map((a) => {
           const s = statusFromPercent(a.percent);
+          const { total, filled } = countFilled(a);
           return (
             <article
               key={a.id}
               className="np-kb-card np-kb-card-clickable"
               onClick={() => setActiveId(a.id)}
-              role="button"
-              tabIndex={0}
+              role="button" tabIndex={0}
               onKeyDown={(e) => { if (e.key === "Enter") setActiveId(a.id); }}
             >
               <div className="np-kb-card-top">
@@ -612,54 +682,64 @@ function ProfileTab({ onOpenChat }: { onOpenChat?: (q: string) => void }) {
               </div>
               <p className="np-kb-card-insight">{a.insight}</p>
               <div className="np-kb-card-foot">
-                <span className="np-muted">{a.sourcesDetailed.length} источников · {a.facts.length} знаний</span>
+                <span className="np-muted">{filled} из {total} базовых полей · {a.sourcesDetailed.length} источников</span>
               </div>
             </article>
           );
         })}
       </section>
 
-      {improveOpen && (
-        <ImproveDrawer
-          onClose={() => setImproveOpen(false)}
-          onTransfer={() => {
-            setImproveOpen(false);
-            if (onOpenChat) onOpenChat("Хочу передать новые знания в профиль компании");
-            else setToast("Сценарий добавления знаний будет реализован через чат Норма.");
-          }}
-          toast={setToast}
-        />
-      )}
       {toast && <KbToast message={toast} onDone={() => setToast(null)} />}
     </>
   );
 }
 
-function PlaceholderTab({ title, text }: { title: string; text: string }) {
+function KbRoot({ onPick }: { onPick: (v: "profile" | "docs" | "method") => void }) {
+  const cards = [
+    { id: "profile", title: "Профиль компании", text: "Аналитический профиль компании: общая информация, структура, продукты, ИТ, финансы и риск-сигналы." },
+    { id: "docs", title: "Документы компании", text: "Документы, которые Норм использует как источники знаний." },
+    { id: "method", title: "Методология", text: "Политики, методики и регламенты, которыми пользуется Норм." },
+  ] as const;
   return (
-    <div className="np-kb-placeholder">
-      <h3>{title}</h3>
-      <p className="np-muted">{text}</p>
+    <>
+      <div className="np-kb-pageheader">
+        <h1>База знаний Норма AI</h1>
+        <p className="np-muted">Здесь живут знания, которыми Норм пользуется при анализе.</p>
+      </div>
+      <section className="np-kb-root-grid">
+        {cards.map((c) => (
+          <article key={c.id} className="np-kb-root-card" onClick={() => onPick(c.id as "profile" | "docs" | "method")}
+            role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter") onPick(c.id as "profile" | "docs" | "method"); }}>
+            <h3>{c.title}</h3>
+            <p className="np-muted">{c.text}</p>
+            <span className="np-kb-root-arrow">→</span>
+          </article>
+        ))}
+      </section>
+    </>
+  );
+}
+
+function PlaceholderPage({ title, text, onBack }: { title: string; text: string; onBack: () => void }) {
+  return (
+    <div>
+      <div className="np-kb-pageheader">
+        <button className="np-area-back" onClick={onBack}>← База знаний</button>
+        <h1>{title}</h1>
+      </div>
+      <div className="np-kb-placeholder"><p className="np-muted">{text}</p></div>
     </div>
   );
 }
 
 export default function KnowledgeBase({ onOpenChat }: { onOpenChat?: (q: string) => void }) {
-  const [tab, setTab] = useState<"profile" | "docs" | "method">("profile");
+  const [view, setView] = useState<"root" | "profile" | "docs" | "method">("root");
   return (
     <div className="np-kb">
-      <header className="np-kb-head">
-        <h1>База знаний Норма AI</h1>
-        <div className="np-kb-tabs">
-          <button className={`np-kb-tab ${tab === "profile" ? "active" : ""}`} onClick={() => setTab("profile")}>Профиль компании</button>
-          <button className={`np-kb-tab ${tab === "docs" ? "active" : ""}`} onClick={() => setTab("docs")}>Документы компании</button>
-          <button className={`np-kb-tab ${tab === "method" ? "active" : ""}`} onClick={() => setTab("method")}>Методология</button>
-        </div>
-      </header>
-
-      {tab === "profile" && <ProfileTab onOpenChat={onOpenChat} />}
-      {tab === "docs" && <PlaceholderTab title="Документы компании" text="Здесь будут категории документов: индикатор зрелости, стандарты, оргструктура, финансовое состояние, аудиты и проверки, прочее." />}
-      {tab === "method" && <PlaceholderTab title="Методология" text="Здесь будет описание методологии: политики, методики, регламенты и рекомендации, которыми пользуется Норм." />}
+      {view === "root" && <KbRoot onPick={setView} />}
+      {view === "profile" && <ProfilePage onBack={() => setView("root")} onOpenChat={onOpenChat} />}
+      {view === "docs" && <PlaceholderPage title="Документы компании" text="Здесь будут категории документов: индикатор зрелости, стандарты, оргструктура, финансовое состояние, аудиты и проверки, прочее." onBack={() => setView("root")} />}
+      {view === "method" && <PlaceholderPage title="Методология" text="Здесь будет описание методологии: политики, методики, регламенты и рекомендации, которыми пользуется Норм." onBack={() => setView("root")} />}
     </div>
   );
 }
