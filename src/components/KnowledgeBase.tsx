@@ -609,8 +609,8 @@ function AreaPage({
 }
 
 function ProfilePage({
-  onBack, onOpenChat,
-}: { onBack: () => void; onOpenChat?: (q: string) => void }) {
+  onOpenChat, header,
+}: { onOpenChat?: (q: string) => void; header: React.ReactNode }) {
   const [areas] = useState<Area[]>(AREAS_INITIAL);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -643,16 +643,7 @@ function ProfilePage({
 
   return (
     <>
-      <div className="np-kb-pageheader">
-        <button className="np-area-back" onClick={onBack}>← База знаний</button>
-        <div className="np-kb-pageheader-row">
-          <div>
-            <h1>Профиль компании</h1>
-            <p className="np-muted">Знания, которые Норм использует, чтобы понимать компанию и точнее анализировать риски.</p>
-          </div>
-          <IndexWidget onTransfer={transfer} onAdd={addFromImprove} toast={setToast} />
-        </div>
-      </div>
+      {header}
 
       <section className="np-kb-summary np-kb-summary-solo">
         <div className="np-kb-summary-head">
@@ -698,52 +689,47 @@ function ProfilePage({
   );
 }
 
-function KbRoot({ onPick }: { onPick: (v: "profile" | "docs" | "method") => void }) {
-  const cards = [
-    { id: "profile", title: "Профиль компании", text: "Аналитический профиль компании: общая информация, структура, продукты, ИТ, финансы и риск-сигналы." },
-    { id: "docs", title: "Документы компании", text: "Документы, которые Норм использует как источники знаний." },
-    { id: "method", title: "Методология", text: "Политики, методики и регламенты, которыми пользуется Норм." },
-  ] as const;
-  return (
-    <>
-      <div className="np-kb-pageheader">
-        <h1>База знаний Норма AI</h1>
-        <p className="np-muted">Здесь живут знания, которыми Норм пользуется при анализе.</p>
-      </div>
-      <section className="np-kb-root-grid">
-        {cards.map((c) => (
-          <article key={c.id} className="np-kb-root-card" onClick={() => onPick(c.id as "profile" | "docs" | "method")}
-            role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter") onPick(c.id as "profile" | "docs" | "method"); }}>
-            <h3>{c.title}</h3>
-            <p className="np-muted">{c.text}</p>
-            <span className="np-kb-root-arrow">→</span>
-          </article>
-        ))}
-      </section>
-    </>
-  );
-}
+export default function KnowledgeBase({ onOpenChat }: { onOpenChat?: (q: string) => void }) {
+  const [tab, setTab] = useState<"profile" | "docs">("profile");
+  const [toast, setToast] = useState<string | null>(null);
 
-function PlaceholderPage({ title, text, onBack }: { title: string; text: string; onBack: () => void }) {
-  return (
-    <div>
-      <div className="np-kb-pageheader">
-        <button className="np-area-back" onClick={onBack}>← База знаний</button>
-        <h1>{title}</h1>
+  const addFromImprove = (title: string) => {
+    if (onOpenChat) onOpenChat(`Хочу дополнить профиль компании: ${title}`);
+    else setToast("Добавление знаний будет реализовано через чат Норма");
+  };
+  const transfer = () => {
+    if (onOpenChat) onOpenChat("Хочу передать новые знания в профиль компании");
+    else setToast("Сценарий добавления знаний будет реализован через чат Норма.");
+  };
+
+  const header = (
+    <div className="np-kb-pageheader">
+      <div className="np-kb-pageheader-row">
+        <div>
+          <h1>Профиль компании</h1>
+          <p className="np-muted">Знания, которые Норм использует, чтобы понимать компанию и точнее анализировать риски.</p>
+        </div>
+        <IndexWidget onTransfer={transfer} onAdd={addFromImprove} toast={setToast} />
       </div>
-      <div className="np-kb-placeholder"><p className="np-muted">{text}</p></div>
+      <div className="np-kb-tabs" role="tablist">
+        <button className={`np-kb-tab ${tab === "profile" ? "active" : ""}`} onClick={() => setTab("profile")}>Знания о компании</button>
+        <button className={`np-kb-tab ${tab === "docs" ? "active" : ""}`} onClick={() => setTab("docs")}>Документы</button>
+      </div>
     </div>
   );
-}
 
-export default function KnowledgeBase({ onOpenChat }: { onOpenChat?: (q: string) => void }) {
-  const [view, setView] = useState<"root" | "profile" | "docs" | "method">("root");
   return (
     <div className="np-kb">
-      {view === "root" && <KbRoot onPick={setView} />}
-      {view === "profile" && <ProfilePage onBack={() => setView("root")} onOpenChat={onOpenChat} />}
-      {view === "docs" && <PlaceholderPage title="Документы компании" text="Здесь будут категории документов: индикатор зрелости, стандарты, оргструктура, финансовое состояние, аудиты и проверки, прочее." onBack={() => setView("root")} />}
-      {view === "method" && <PlaceholderPage title="Методология" text="Здесь будет описание методологии: политики, методики, регламенты и рекомендации, которыми пользуется Норм." onBack={() => setView("root")} />}
+      {tab === "profile" && <ProfilePage onOpenChat={onOpenChat} header={header} />}
+      {tab === "docs" && (
+        <>
+          {header}
+          <div className="np-kb-placeholder">
+            <p className="np-muted">Здесь будут документы компании: индикатор зрелости, стандарты, оргструктура, финансовое состояние, аудиты и проверки, прочее.</p>
+          </div>
+        </>
+      )}
+      {toast && <KbToast message={toast} onDone={() => setToast(null)} />}
     </div>
   );
 }
