@@ -587,6 +587,12 @@ function IndexWidget({ onAlert }: { onAlert: (msg: string) => void }) {
         <div className="np-index-widget-text">
           <div className="np-index-widget-title">Индекс знания</div>
           <div className="np-index-widget-sub">{AREAS.length} областей · {stats.total} карточек</div>
+          <div className="np-index-widget-bar">
+            <div className={`np-progress np-progress--sm np-progress--${stats.percent >= 80 ? "ok" : stats.percent >= 40 ? "warn" : "low"}`}>
+              <div className="np-progress-fill" style={{ width: `${stats.percent}%` }} />
+            </div>
+            <span className="np-index-widget-percent">{stats.percent}%</span>
+          </div>
           <div className="np-index-widget-meta">
             {stats.alerts > 0 ? `${stats.alerts} предупреждений` : `${stats.outdated.length} требуют обновления`}
           </div>
@@ -603,6 +609,12 @@ function IndexWidget({ onAlert }: { onAlert: (msg: string) => void }) {
                   {stats.current} из {stats.total} карточек актуальны.
                   {stats.alerts > 0 && ` ${stats.alerts} предупреждений требуют внимания.`}
                 </p>
+                <div className="np-progress-row np-progress-row--wide">
+                  <span className="np-progress-label">{stats.percent}%</span>
+                  <div className={`np-progress np-progress--${stats.percent >= 80 ? "ok" : stats.percent >= 40 ? "warn" : "low"}`}>
+                    <div className="np-progress-fill" style={{ width: `${stats.percent}%` }} />
+                  </div>
+                </div>
               </div>
               <button className="np-icon-btn" onClick={() => setOpen(false)} aria-label="Закрыть">✕</button>
             </div>
