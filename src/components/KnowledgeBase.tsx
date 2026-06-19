@@ -469,6 +469,10 @@ function AreaCard({ area, onOpen }: { area: Area; onOpen: () => void }) {
   const sources = uniqueSources(area);
   const alerts = countAlerts(area);
   const outdated = countOutdated(area);
+  const total = area.knowledge.length;
+  const current = area.knowledge.filter((k) => k.freshness.code === "current").length;
+  const percent = total === 0 ? 0 : Math.round((current / total) * 100);
+  const tone = percent >= 80 ? "ok" : percent >= 40 ? "warn" : "low";
   return (
     <article
       className="np-kb-card np-kb-card-clickable"
@@ -483,6 +487,13 @@ function AreaCard({ area, onOpen }: { area: Area; onOpen: () => void }) {
         </div>
       </div>
       {area.description && <p className="np-kb-card-insight">{area.description}</p>}
+      <div className="np-progress-row">
+        <span className="np-progress-label">{percent}%</span>
+        <div className={`np-progress np-progress--${tone}`}>
+          <div className="np-progress-fill" style={{ width: `${percent}%` }} />
+        </div>
+        <span className="np-progress-meta">{current} из {total}</span>
+      </div>
       <div className="np-kb-card-foot">
         <span className="np-muted">
           {area.knowledge.length} карточек знаний · {sources.length} источников
@@ -512,14 +523,23 @@ function AreaView({
           <div className="np-area-left-title">Области профиля</div>
           {areas.map((a) => {
             const isActive = a.id === area.id;
+            const t = a.knowledge.length;
+            const c = a.knowledge.filter((k) => k.freshness.code === "current").length;
+            const p = t === 0 ? 0 : Math.round((c / t) * 100);
+            const tn = p >= 80 ? "ok" : p >= 40 ? "warn" : "low";
             return (
               <button
                 key={a.id}
                 className={`np-area-left-item ${isActive ? "active" : ""}`}
                 onClick={() => onSelect(a.id)}
               >
-                <div className="np-area-left-name">{a.title}</div>
-                <span className="np-muted">{a.knowledge.length}</span>
+                <div className="np-area-left-row">
+                  <div className="np-area-left-name">{a.title}</div>
+                  <span className="np-muted">{p}%</span>
+                </div>
+                <div className={`np-progress np-progress--sm np-progress--${tn}`}>
+                  <div className="np-progress-fill" style={{ width: `${p}%` }} />
+                </div>
               </button>
             );
           })}
@@ -567,6 +587,12 @@ function IndexWidget({ onAlert }: { onAlert: (msg: string) => void }) {
         <div className="np-index-widget-text">
           <div className="np-index-widget-title">Индекс знания</div>
           <div className="np-index-widget-sub">{AREAS.length} областей · {stats.total} карточек</div>
+          <div className="np-index-widget-bar">
+            <div className={`np-progress np-progress--sm np-progress--${stats.percent >= 80 ? "ok" : stats.percent >= 40 ? "warn" : "low"}`}>
+              <div className="np-progress-fill" style={{ width: `${stats.percent}%` }} />
+            </div>
+            <span className="np-index-widget-percent">{stats.percent}%</span>
+          </div>
           <div className="np-index-widget-meta">
             {stats.alerts > 0 ? `${stats.alerts} предупреждений` : `${stats.outdated.length} требуют обновления`}
           </div>
@@ -583,6 +609,12 @@ function IndexWidget({ onAlert }: { onAlert: (msg: string) => void }) {
                   {stats.current} из {stats.total} карточек актуальны.
                   {stats.alerts > 0 && ` ${stats.alerts} предупреждений требуют внимания.`}
                 </p>
+                <div className="np-progress-row np-progress-row--wide">
+                  <span className="np-progress-label">{stats.percent}%</span>
+                  <div className={`np-progress np-progress--${stats.percent >= 80 ? "ok" : stats.percent >= 40 ? "warn" : "low"}`}>
+                    <div className="np-progress-fill" style={{ width: `${stats.percent}%` }} />
+                  </div>
+                </div>
               </div>
               <button className="np-icon-btn" onClick={() => setOpen(false)} aria-label="Закрыть">✕</button>
             </div>
