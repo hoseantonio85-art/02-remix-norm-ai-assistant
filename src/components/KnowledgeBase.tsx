@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import profileData from "../data/company_profile_full.json";
+import universalDemo from "../data/universal_knowledge_demo.json";
+import { UniversalKnowledgeCard } from "./UniversalKnowledgeCard";
+import type { UniversalKnowledgeDemo } from "../types/universalKnowledge";
 import type {
   Area,
   Attribute,
@@ -13,6 +16,7 @@ import type {
 
 const DATA = profileData as unknown as CompanyProfile;
 const AREAS: Area[] = DATA.profile.areas;
+const UNIVERSAL_DEMO = universalDemo as unknown as UniversalKnowledgeDemo;
 
 /* ---------- helpers ---------- */
 
@@ -547,9 +551,18 @@ function AreaView({
 
         <div className="np-area-center np-area-center-wide">
           <div className="np-k-stack">
-            {area.knowledge.map((k) => (
-              <KnowledgeCard key={k.id} k={k} onAlert={onAlert} />
-            ))}
+            {area.id === UNIVERSAL_DEMO.areaId ? (
+              <>
+                <div className="np-uv-testbadge">Тест универсального шаблона</div>
+                {UNIVERSAL_DEMO.knowledge.map((uk) => (
+                  <UniversalKnowledgeCard key={uk.id} k={uk} />
+                ))}
+              </>
+            ) : (
+              area.knowledge.map((k) => (
+                <KnowledgeCard key={k.id} k={k} onAlert={onAlert} />
+              ))
+            )}
           </div>
         </div>
       </div>

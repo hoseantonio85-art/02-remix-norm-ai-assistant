@@ -1,0 +1,297 @@
+{
+  "areaId": "general_information",
+  "knowledge": [
+    {
+      "id": "knowledge.company.inn",
+      "areaId": "general_information",
+      "key": "inn",
+      "title": "ИНН",
+      "description": null,
+      "state": { "code": "known", "label": "Известно" },
+      "required": true,
+      "order": 10,
+      "content": {
+        "id": "knowledge.company.inn.content",
+        "key": "inn",
+        "label": "ИНН",
+        "valueType": "string",
+        "value": "7811657720",
+        "displayValue": null,
+        "children": [],
+        "state": { "code": "known", "label": "Известно" },
+        "format": { "kind": "identifier" }
+      },
+      "metadata": {
+        "actualAt": "2026-06-18",
+        "freshness": { "code": "current", "label": "Актуально", "reason": null },
+        "origin": { "type": "registry", "name": "ФНС" }
+      },
+      "sources": [
+        { "id": "source-fns", "type": "registry", "name": "ФНС", "dataset": "ЕГРЮЛ", "official": true, "actualAt": "2026-06-18" }
+      ],
+      "tags": [],
+      "alerts": []
+    },
+    {
+      "id": "knowledge.company.description",
+      "areaId": "general_information",
+      "key": "description",
+      "title": "Описание компании",
+      "description": "Краткое описание деятельности, масштаба и особенностей бизнеса.",
+      "state": { "code": "known", "label": "Известно" },
+      "required": true,
+      "order": 20,
+      "content": {
+        "id": "knowledge.company.description.content",
+        "key": "description",
+        "label": "Описание компании",
+        "valueType": "text",
+        "value": "Компания развивает сервис экспресс-доставки продуктов и товаров повседневного спроса из распределённой сети дарксторов. Работа бизнеса зависит от стабильности логистики, доступности курьеров, качества товарных запасов и непрерывной работы цифровой платформы. Компания представлена более чем в ста городах России и продолжает расширять географию присутствия.",
+        "displayValue": null,
+        "children": [],
+        "state": { "code": "known", "label": "Известно" }
+      },
+      "metadata": {
+        "actualAt": "2026-06-10",
+        "freshness": { "code": "current", "label": "Актуально", "reason": null },
+        "origin": { "type": "aggregated", "name": "Собрано Нормом" }
+      },
+      "sources": [
+        { "id": "source-company-site", "type": "website", "name": "Сайт компании", "url": null, "official": true, "actualAt": "2026-06-10" }
+      ],
+      "tags": [],
+      "alerts": []
+    },
+    {
+      "id": "knowledge.company.ceo",
+      "areaId": "general_information",
+      "key": "chiefExecutiveOfficer",
+      "title": "Генеральный директор",
+      "description": "Действующий единоличный исполнительный орган компании.",
+      "state": { "code": "partial", "label": "Известно частично" },
+      "required": true,
+      "order": 30,
+      "content": {
+        "id": "knowledge.company.ceo.content",
+        "key": "chiefExecutiveOfficer",
+        "label": "Генеральный директор",
+        "valueType": "object",
+        "value": null,
+        "children": [
+          { "id": "knowledge.company.ceo.name", "key": "name", "label": "ФИО", "valueType": "string", "value": "Попов Сергей Викторович", "children": [], "state": { "code": "known", "label": "Известно" } },
+          { "id": "knowledge.company.ceo.position", "key": "position", "label": "Должность", "valueType": "string", "value": "Генеральный директор", "children": [], "state": { "code": "known", "label": "Известно" } },
+          { "id": "knowledge.company.ceo.effectiveDate", "key": "effectiveDate", "label": "В должности с", "valueType": "date", "value": "2025-05-19", "children": [], "state": { "code": "known", "label": "Известно" }, "format": { "kind": "date", "datePattern": "DD MMMM YYYY" } },
+          { "id": "knowledge.company.ceo.responsibilities", "key": "responsibilities", "label": "Зона ответственности", "valueType": "text", "value": null, "children": [], "state": { "code": "unknown", "label": "Пока неизвестно" } }
+        ],
+        "state": { "code": "partial", "label": "Известно частично" }
+      },
+      "metadata": {
+        "actualAt": "2026-06-18",
+        "freshness": { "code": "current", "label": "Актуально", "reason": null },
+        "origin": { "type": "registry", "name": "ФНС" }
+      },
+      "sources": [
+        { "id": "source-fns", "type": "registry", "name": "ФНС", "dataset": "ЕГРЮЛ", "official": true, "actualAt": "2026-06-18" }
+      ],
+      "tags": [{ "code": "key_person", "label": "Ключевое лицо", "tone": "neutral" }],
+      "alerts": []
+    },
+    {
+      "id": "knowledge.company.additionalOkved",
+      "areaId": "general_information",
+      "key": "additionalOkved",
+      "title": "Дополнительные ОКВЭД",
+      "description": "Дополнительные зарегистрированные виды деятельности.",
+      "state": { "code": "known", "label": "Известно" },
+      "required": false,
+      "order": 40,
+      "content": {
+        "id": "knowledge.company.additionalOkved.content",
+        "key": "additionalOkved",
+        "label": "Дополнительные ОКВЭД",
+        "valueType": "array",
+        "value": null,
+        "children": [
+          { "id": "okved-1", "key": "okved", "label": null, "valueType": "string", "value": "47.19 — Торговля розничная прочая в неспециализированных магазинах", "children": [], "state": { "code": "known", "label": "Известно" } },
+          { "id": "okved-2", "key": "okved", "label": null, "valueType": "string", "value": "47.91 — Торговля розничная по информационно-коммуникационной сети Интернет", "children": [], "state": { "code": "known", "label": "Известно" } },
+          { "id": "okved-3", "key": "okved", "label": null, "valueType": "string", "value": "52.10 — Деятельность по складированию и хранению", "children": [], "state": { "code": "known", "label": "Известно" } },
+          { "id": "okved-4", "key": "okved", "label": null, "valueType": "string", "value": "62.01 — Разработка компьютерного программного обеспечения", "children": [], "state": { "code": "known", "label": "Известно" } },
+          { "id": "okved-5", "key": "okved", "label": null, "valueType": "string", "value": "63.11 — Обработка данных и размещение информации", "children": [], "state": { "code": "known", "label": "Известно" } }
+        ],
+        "state": { "code": "known", "label": "Известно" }
+      },
+      "metadata": {
+        "actualAt": "2026-06-18",
+        "freshness": { "code": "current", "label": "Актуально", "reason": null }
+      },
+      "sources": [
+        { "id": "source-fns", "type": "registry", "name": "ФНС", "dataset": "ЕГРЮЛ", "official": true, "actualAt": "2026-06-18" }
+      ],
+      "tags": [],
+      "alerts": []
+    },
+    {
+      "id": "knowledge.company.keyManagers",
+      "areaId": "general_information",
+      "key": "keyManagers",
+      "title": "Ключевые руководители",
+      "description": "Руководители основных направлений компании.",
+      "state": { "code": "known", "label": "Известно" },
+      "required": false,
+      "order": 50,
+      "content": {
+        "id": "knowledge.company.keyManagers.content",
+        "key": "keyManagers",
+        "label": "Ключевые руководители",
+        "valueType": "array",
+        "value": null,
+        "children": [
+          {
+            "id": "manager-1", "key": "manager", "label": "Попов Сергей Викторович", "valueType": "object", "value": null,
+            "children": [
+              { "id": "manager-1-role", "key": "role", "label": "Должность", "valueType": "string", "value": "Генеральный директор", "children": [] },
+              { "id": "manager-1-responsibilities", "key": "responsibilities", "label": "Зона ответственности", "valueType": "text", "value": "Стратегия, P&L, инвестиции и взаимодействие с группой компаний.", "children": [] }
+            ]
+          },
+          {
+            "id": "manager-2", "key": "manager", "label": "Сидорова Анна Павловна", "valueType": "object", "value": null,
+            "children": [
+              { "id": "manager-2-role", "key": "role", "label": "Должность", "valueType": "string", "value": "Директор по операциям", "children": [] },
+              { "id": "manager-2-responsibilities", "key": "responsibilities", "label": "Зона ответственности", "valueType": "text", "value": "Дарксторы, логистика, курьерская инфраструктура и качество доставки.", "children": [] }
+            ]
+          },
+          {
+            "id": "manager-3", "key": "manager", "label": "Козлов Игорь Сергеевич", "valueType": "object", "value": null,
+            "children": [
+              { "id": "manager-3-role", "key": "role", "label": "Должность", "valueType": "string", "value": "Директор по технологиям", "children": [] },
+              { "id": "manager-3-responsibilities", "key": "responsibilities", "label": "Зона ответственности", "valueType": "text", "value": "ИТ-платформа, AI/ML, автоматизация и цифровая инфраструктура.", "children": [] }
+            ]
+          },
+          {
+            "id": "manager-4", "key": "manager", "label": "Морозова Елена Викторовна", "valueType": "object", "value": null,
+            "children": [
+              { "id": "manager-4-role", "key": "role", "label": "Должность", "valueType": "string", "value": "Финансовый директор", "children": [] },
+              { "id": "manager-4-responsibilities", "key": "responsibilities", "label": "Зона ответственности", "valueType": "text", "value": "Финансы, бюджетирование, инвестиционный контроль и отчётность.", "children": [] }
+            ]
+          }
+        ],
+        "state": { "code": "known", "label": "Известно" }
+      },
+      "metadata": {
+        "actualAt": "2026-05-31",
+        "freshness": { "code": "current", "label": "Актуально", "reason": null }
+      },
+      "sources": [
+        { "id": "source-orgstructure", "type": "document", "name": "Организационная структура", "documentName": "Организационная структура.pdf", "official": false, "actualAt": "2026-05-31" }
+      ],
+      "tags": [],
+      "alerts": []
+    },
+    {
+      "id": "knowledge.company.enforcement",
+      "areaId": "general_information",
+      "key": "enforcementProceedings",
+      "title": "Исполнительные производства",
+      "description": "Агрегированная информация об исполнительных производствах.",
+      "state": { "code": "known", "label": "Известно" },
+      "required": false,
+      "order": 60,
+      "content": {
+        "id": "knowledge.company.enforcement.content",
+        "key": "enforcementProceedings",
+        "label": "Исполнительные производства",
+        "valueType": "object",
+        "value": null,
+        "children": [
+          {
+            "id": "enforcement-summary", "key": "summary", "label": "Всего", "valueType": "object", "value": null,
+            "children": [
+              { "id": "enforcement-total-count", "key": "totalCount", "label": "Количество", "valueType": "number", "value": 22, "children": [], "format": { "kind": "number", "unit": "производства" } },
+              { "id": "enforcement-total-sum", "key": "totalSum", "label": "Общая сумма", "valueType": "number", "value": 3445211.7, "children": [], "format": { "kind": "money", "currency": "RUB", "decimals": 0 } }
+            ]
+          },
+          {
+            "id": "enforcement-breakdown", "key": "breakdown", "label": "Распределение", "valueType": "array", "value": null,
+            "children": [
+              {
+                "id": "enforcement-tax", "key": "category", "label": "Налоги и сборы", "valueType": "object", "value": null,
+                "children": [
+                  { "id": "enforcement-tax-count", "key": "count", "label": "Количество", "valueType": "number", "value": 10, "children": [] },
+                  { "id": "enforcement-tax-sum", "key": "sum", "label": "Сумма", "valueType": "number", "value": 1908400.5, "children": [], "format": { "kind": "money", "currency": "RUB", "decimals": 0 } }
+                ]
+              },
+              {
+                "id": "enforcement-customs", "key": "category", "label": "Таможенные платежи", "valueType": "object", "value": null,
+                "children": [
+                  { "id": "enforcement-customs-count", "key": "count", "label": "Количество", "valueType": "number", "value": 3, "children": [] },
+                  { "id": "enforcement-customs-sum", "key": "sum", "label": "Сумма", "valueType": "number", "value": 678500, "children": [], "format": { "kind": "money", "currency": "RUB", "decimals": 0 } }
+                ]
+              }
+            ]
+          }
+        ],
+        "state": { "code": "known", "label": "Известно" }
+      },
+      "metadata": {
+        "actualAt": "2026-06-18",
+        "freshness": { "code": "current", "label": "Актуально", "reason": null }
+      },
+      "sources": [
+        { "id": "source-fssp", "type": "registry", "name": "ФССП", "dataset": "Исполнительные производства", "official": true, "actualAt": "2026-06-18" }
+      ],
+      "tags": [],
+      "alerts": []
+    },
+    {
+      "id": "knowledge.company.taxDebt",
+      "areaId": "general_information",
+      "key": "taxDebt",
+      "title": "Налоговая задолженность",
+      "description": null,
+      "state": { "code": "known_empty", "label": "Не выявлено" },
+      "required": false,
+      "order": 70,
+      "content": {
+        "id": "knowledge.company.taxDebt.content",
+        "key": "taxDebt",
+        "label": "Налоговая задолженность",
+        "valueType": "array",
+        "value": null,
+        "children": [],
+        "state": { "code": "known_empty", "label": "Не выявлено" }
+      },
+      "metadata": {
+        "actualAt": "2026-06-18",
+        "freshness": { "code": "current", "label": "Актуально", "reason": null }
+      },
+      "sources": [
+        { "id": "source-fns", "type": "registry", "name": "ФНС", "dataset": "Задолженность по налогам", "official": true, "actualAt": "2026-06-18" }
+      ],
+      "tags": [],
+      "alerts": []
+    },
+    {
+      "id": "knowledge.company.employeeCount",
+      "areaId": "general_information",
+      "key": "employeeCount",
+      "title": "Численность сотрудников",
+      "description": null,
+      "state": { "code": "unknown", "label": "Пока неизвестно" },
+      "required": true,
+      "order": 80,
+      "content": {
+        "id": "knowledge.company.employeeCount.content",
+        "key": "employeeCount",
+        "label": "Численность сотрудников",
+        "valueType": "number",
+        "value": null,
+        "children": [],
+        "state": { "code": "unknown", "label": "Пока неизвестно" }
+      },
+      "metadata": null,
+      "sources": [],
+      "tags": [],
+      "alerts": []
+    }
+  ]
+}
