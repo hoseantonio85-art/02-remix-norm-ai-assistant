@@ -145,6 +145,7 @@ interface FocusPoint {
   primaryAction: string;
   secondaryActions: string[];
   chatQuestion: string;
+  signalDate: string;
 }
 
 const FOCUS_POINTS: FocusPoint[] = [
@@ -191,6 +192,7 @@ const FOCUS_POINTS: FocusPoint[] = [
     primaryAction: "Передать данные",
     secondaryActions: ["Обсудить с Нормом"],
     chatQuestion: "Помоги оценить, как бесплатная доставка конкурента может повлиять на отток клиентов",
+    signalDate: "12 июля 2026",
   },
   {
     id: "fp-supply",
@@ -237,6 +239,7 @@ const FOCUS_POINTS: FocusPoint[] = [
     primaryAction: "Проверить резервных поставщиков",
     secondaryActions: ["Обсудить с Нормом"],
     chatQuestion: "Помоги проверить зависимость от поставщиков с повторяющимися задержками",
+    signalDate: "18 июля 2026",
   },
   {
     id: "fp-it",
@@ -280,6 +283,7 @@ const FOCUS_POINTS: FocusPoint[] = [
     primaryAction: "Открыть меру",
     secondaryActions: ["Обсудить с Нормом"],
     chatQuestion: "Покажи, как новая мера повлияла на количество ИТ-сбоев",
+    signalDate: "21 июля 2026",
   },
 ];
 
@@ -1130,25 +1134,28 @@ function FocusPointModal({
 
         <div className="np-focus-modal-body">
           <div className="np-focus-col np-focus-col--main">
-            <p className="np-focus-intro-lead">{point.intro}</p>
-            <section className="np-focus-block">
-              <h4>Что я заметил</h4>
-              <p>{point.noticed}</p>
+            <section className="np-focus-island">
+              <h4 className="np-focus-island-title">Что я заметил</h4>
+              <p className="np-focus-intro-lead">{point.intro}</p>
+              <p className="np-focus-island-text">{point.noticed}</p>
             </section>
-            <section className="np-focus-block">
-              <h4>Почему это может повлиять на компанию</h4>
-              <p>{point.whyMatters}</p>
+            <section className="np-focus-island">
+              <h4 className="np-focus-island-title">Почему это может повлиять на компанию</h4>
+              <p className="np-focus-island-text">{point.whyMatters}</p>
             </section>
-            <section className="np-focus-block">
-              <h4>Чего пока не хватает</h4>
-              <p>{point.needMore}</p>
+            <section className="np-focus-island">
+              <h4 className="np-focus-island-title">Рекомендации</h4>
+              <div className="np-focus-reco">
+                <div className="np-focus-reco-label">Чего пока не хватает</div>
+                <p className="np-focus-island-text">{point.needMore}</p>
+              </div>
+              <div className="np-focus-reco np-focus-reco--divider">
+                <div className="np-focus-reco-label">Что я смогу сделать</div>
+                <p className="np-focus-island-text">{point.canDo}</p>
+              </div>
             </section>
-            <section className="np-focus-block">
-              <h4>Что я смогу сделать</h4>
-              <p>{point.canDo}</p>
-            </section>
-            <section className="np-focus-block">
-              <h4>Связанные объекты</h4>
+            <section className="np-focus-island">
+              <h4 className="np-focus-island-title">Связанные объекты</h4>
               <button
                 type="button"
                 className="np-focus-risk-link"
@@ -1195,7 +1202,7 @@ function FocusPointModal({
           </div>
 
           <aside className="np-focus-col np-focus-col--side">
-            <div className="np-focus-side-metrics">
+            <div className="np-focus-island np-focus-side-metrics">
               <div className="np-focus-side-row">
                 <span className="np-focus-side-row-label">Возможное влияние</span>
                 <span
@@ -1208,9 +1215,13 @@ function FocusPointModal({
                 <span className="np-focus-side-row-label">Уверенность Норма</span>
                 <span className="np-focus-side-row-value">{point.confidence}</span>
               </div>
+              <div className="np-focus-side-row">
+                <span className="np-focus-side-row-label">Дата сигнала</span>
+                <span className="np-focus-side-row-value np-focus-side-row-value--plain">{point.signalDate}</span>
+              </div>
             </div>
 
-            <div className="np-focus-side-block">
+            <div className="np-focus-island np-focus-side-block">
               <div className="np-focus-side-label">
                 Источники · {point.sources.length}
               </div>
@@ -1247,20 +1258,11 @@ function FocusPointModal({
 
             <div className="np-focus-actions">
               <button
-                className="np-btn np-btn-primary np-focus-primary"
-                onClick={() => handleAction(point.primaryAction)}
+                className="np-focus-discuss"
+                onClick={() => handleAction("Обсудить с Нормом")}
               >
-                {point.primaryAction}
+                Обсудить с Нормом
               </button>
-              {point.secondaryActions.map((a) => (
-                <button
-                  key={a}
-                  className="np-btn np-btn-ghost np-focus-secondary"
-                  onClick={() => handleAction(a)}
-                >
-                  {a}
-                </button>
-              ))}
             </div>
           </aside>
         </div>
@@ -1479,7 +1481,7 @@ export default function NormPrototype() {
 
         <section className="np-section">
           <div className="np-sec-head">
-            <h2>На что стоит обратить внимание</h2>
+            <h2>На что стоит обратить внимание ⚡️</h2>
             <button
               className="np-link"
               onClick={() => setToast("Полный список фокусных точек появится позже")}
