@@ -416,15 +416,16 @@ function KbToast({ message, onDone }: { message: string; onDone: () => void }) {
 /* ---------- main page ---------- */
 
 function ProfileTab({
-  areas, totalKnowledge, onOpenChat, onOpenSources,
+  areas, totalKnowledge, onOpenChat, onOpenSources, activeId, setActiveId,
 }: {
   areas: UniversalArea[];
   totalKnowledge: number;
   onOpenChat?: (q: string) => void;
   onOpenSources: (k: UniversalKnowledge) => void;
   setToast: (s: string | null) => void;
+  activeId: string | null;
+  setActiveId: (id: string | null) => void;
 }) {
-  const [activeId, setActiveId] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "lowKnowledge" | "needsUpdate">("all");
   const active = activeId ? areas.find((a) => a.id === activeId) ?? null : null;
 
@@ -488,6 +489,7 @@ export default function KnowledgeBase({ onOpenChat }: { onOpenChat?: (q: string)
   const [toast, setToast] = useState<string | null>(null);
   const [overrides, setOverrides] = useState<Overrides>({});
   const [sourcesFor, setSourcesFor] = useState<UniversalKnowledge | null>(null);
+  const [activeAreaId, setActiveAreaId] = useState<string | null>(null);
 
   // Normalize the full profile once; apply overrides on read.
   const baseAreas = useMemo(() => normalizeProfile(AREAS_RAW), []);
@@ -544,8 +546,11 @@ export default function KnowledgeBase({ onOpenChat }: { onOpenChat?: (q: string)
     });
   };
 
+  const hideChrome = tab === "profile" && activeAreaId !== null;
+
   return (
-    <div className="np-kb">
+    <div className={`np-kb ${hideChrome ? "np-kb--area-open" : ""}`}>
+      {!hideChrome && (
       <div className="np-kb-pageheader">
         <h1>База знаний Норма AI</h1>
         <div className="np-kb-tabs" role="tablist">
@@ -560,6 +565,7 @@ export default function KnowledgeBase({ onOpenChat }: { onOpenChat?: (q: string)
           </button>
         </div>
       </div>
+      )}
 
       {tab === "profile" && (
         <ProfileTab
@@ -568,6 +574,8 @@ export default function KnowledgeBase({ onOpenChat }: { onOpenChat?: (q: string)
           onOpenChat={onOpenChat}
           onOpenSources={openSources}
           setToast={setToast}
+          activeId={activeAreaId}
+          setActiveId={setActiveAreaId}
         />
       )}
       {tab === "docs" && (
