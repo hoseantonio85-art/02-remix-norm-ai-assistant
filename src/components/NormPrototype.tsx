@@ -893,6 +893,7 @@ export default function NormPrototype() {
   const [modalOpen, setModalOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [activeNav, setActiveNav] = useState<string>("home");
+  const [profileAreaOpen, setProfileAreaOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     return window.localStorage.getItem("norm-sidebar-collapsed") === "1";
