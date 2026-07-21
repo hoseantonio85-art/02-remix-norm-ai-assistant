@@ -235,6 +235,7 @@ function AreaCard({ area, onOpen }: { area: UniversalArea; onOpen: () => void })
   const status = cov?.status ?? "";
   const tone = toneForPercent(percent);
   const srcCount = uniqueSourceCount(area);
+  const signal = signalSummary(insightForArea(area.id));
   return (
     <article
       className="np-kb-card np-kb-card-clickable"
@@ -254,6 +255,12 @@ function AreaCard({ area, onOpen }: { area: UniversalArea; onOpen: () => void })
         <CoverageRing percent={percent} size={46} />
       </div>
       {area.description && <p className="np-kb-card-insight">{area.description}</p>}
+      {signal && (
+        <div className={`np-area-signal np-area-signal--${signal.tone}`}>
+          <span className="np-area-signal-dot" />
+          <span>{signal.label}</span>
+        </div>
+      )}
       <div className="np-kb-card-tags">
         <KnowledgeCountTag count={area.knowledge.length} />
         <SourceCountTag count={srcCount} />
