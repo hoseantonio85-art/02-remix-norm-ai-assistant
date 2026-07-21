@@ -1008,18 +1008,19 @@
 
 /* area card: status + signals in one row */
 .np-area-card-state-row {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 12px; min-height: 18px; margin-top: 2px;
+  display: flex; align-items: center; justify-content: flex-start;
+  gap: 5px; min-height: 16px; margin-top: 2px;
+  font-size: 12px; line-height: 16px; font-weight: 600;
 }
 .np-area-card-status,
 .np-area-card-signals {
   font-size: 12px; line-height: 16px; font-weight: 600;
 }
 .np-area-card-signals {
-  display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
+  white-space: nowrap;
 }
-.np-area-card-signal-dot {
-  width: 5px; height: 5px; border-radius: 50%; flex: none; background: currentColor;
+.np-area-card-state-divider {
+  color: var(--np-muted, #94a3b8); font-weight: 400;
 }
 
 /* area coverage widget: semantic heading */
@@ -1040,7 +1041,8 @@
 .np-kb-intro-title { font-size: 30px; font-weight: 700; margin: 0 0 12px; letter-spacing: -0.3px; color: #0f172a; }
 .np-kb-intro-desc { font-size: 14px; line-height: 1.55; color: #475569; margin: 0; }
 
-.np-kb-controls { margin-bottom: 40px; }
+.np-kb-index-group { margin-bottom: 40px; }
+.np-kb-controls { margin-bottom: 24px; }
 .np-kb-toolbar {
   display: flex; align-items: center; justify-content: space-between;
   gap: 16px; flex-wrap: wrap;
@@ -1071,8 +1073,7 @@
   font-size: 14px; color: #0f172a;
 }
 
-.np-kb-profile-content { display: flex; flex-direction: column; gap: 24px; }
-.np-kb-profile-content .np-index-horizontal { margin-bottom: 16px; }
+.np-kb-profile-content { display: flex; flex-direction: column; }
 
 @media (max-width: 760px) {
   .np-kb-toolbar-divider { display: none; }
