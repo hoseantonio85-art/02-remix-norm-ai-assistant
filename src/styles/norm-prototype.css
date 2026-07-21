@@ -980,7 +980,10 @@
 .np-kb-card { display: flex; flex-direction: column; gap: 8px; padding: 18px; border-radius: 14px; background: #fff; border: 1px solid var(--np-border); }
 .np-kb-card-top { display: grid; grid-template-columns: 1fr auto; align-items: flex-start; gap: 8px; }
 .np-kb-card-title h4 { font-size: 15px; font-weight: 700; margin: 0; }
-.np-kb-card-status { font-size: 12px; color: var(--np-muted); margin-top: 2px; }
+.np-kb-card-status { font-size: 12px; font-weight: 600; color: var(--np-muted); margin-top: 2px; }
+.np-kb-card-status--ok { color: #16a34a; }
+.np-kb-card-status--warn { color: #eab308; }
+.np-kb-card-status--low { color: #ef4444; }
 .np-kb-card-percent { font-size: 20px; font-weight: 700; color: #1f2937; }
 .np-kb-card-insight { font-size: 13px; color: #4b5563; line-height: 1.5; margin: 0; min-height: 38px; }
 .np-kb-card-foot { font-size: 12px; color: var(--np-muted); }
