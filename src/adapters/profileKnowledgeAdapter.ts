@@ -155,7 +155,7 @@ function itemToNode(item: KnowledgeItem): KnowledgeNode {
       label: item.title,
       valueType: "string",
       value: null,
-      state: { code: "known_empty", label: "Не выявлено" },
+      state: { code: "known_empty" as StateCode, label: "Не выявлено" },
       children: [],
     };
   }
