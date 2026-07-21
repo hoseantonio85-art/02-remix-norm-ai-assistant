@@ -42,6 +42,8 @@ export interface KnowledgeSourceReference {
     field?: string | null;
     dataset?: string | null;
     recordId?: string | null;
+    sheet?: string | null;
+    range?: string | null;
   };
 }
 
@@ -81,7 +83,11 @@ export interface KnowledgeSource {
   type: string;
   name: string;
   dataset?: string | null;
+  documentId?: string | null;
   documentName?: string | null;
+  fileName?: string | null;
+  mimeType?: string | null;
+  downloadUrl?: string | null;
   url?: string | null;
   official?: boolean;
   actualAt?: string | null;
