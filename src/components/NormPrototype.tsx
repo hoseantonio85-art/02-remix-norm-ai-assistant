@@ -959,9 +959,12 @@ export default function NormPrototype() {
         </div>
       </aside>
 
-      <main className="np-main">
+      <main className={`np-main ${profileAreaOpen ? "np-main--profile-area" : ""}`}>
         {activeNav === "kb" ? (
-          <KnowledgeBase onOpenChat={(q) => openWith(q)} />
+          <KnowledgeBase
+            onOpenChat={(q) => openWith(q)}
+            onAreaViewChange={setProfileAreaOpen}
+          />
         ) : (
         <>
         <h1 className="np-hello">
