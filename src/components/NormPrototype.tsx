@@ -1483,7 +1483,7 @@ export default function NormPrototype() {
 
         <section className="np-section">
           <div className="np-sec-head">
-            <h2>На что стоит обратить внимание</h2>
+            <h2>На что стоит обратить внимание ⚡️</h2>
             <button
               className="np-link"
               onClick={() => setToast("Полный список фокусных точек появится позже")}
