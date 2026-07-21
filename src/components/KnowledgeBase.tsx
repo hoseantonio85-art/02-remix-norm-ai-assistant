@@ -17,6 +17,7 @@ import { AreaCoverageCard } from "./AreaCoverageCard";
 import { KnowledgeCountTag, SourceCountTag } from "./MetaTag";
 import { KnowledgeInsightDrawer } from "./KnowledgeInsightDrawer";
 import { insightForArea, profileInsight } from "../data/profile_insights";
+import type { ImportantSignal, AreaInsight, ProfileInsight } from "../data/profile_insights";
 
 const DATA = profileData as unknown as CompanyProfile;
 const AREAS_RAW = DATA.profile.areas;
@@ -60,6 +61,29 @@ function coverageForArea(id: string): AreaCoverage | undefined {
 }
 function toneForPercent(p: number): "ok" | "warn" | "low" {
   return p >= 70 ? "ok" : p >= 40 ? "warn" : "low";
+}
+
+/* ---------- important-signals helper ---------- */
+
+type SignalTone = "conflict" | "warning" | "stale";
+
+function signalSummary(
+  insight: AreaInsight | ProfileInsight | undefined,
+): { tone: SignalTone; count: number; label: string } | null {
+  const list: ImportantSignal[] = insight?.importantSignals ?? [];
+  if (!list.length) return null;
+  const order: SignalTone[] = ["conflict", "warning", "stale"];
+  let tone: SignalTone = "stale";
+  for (const t of order) {
+    if (list.some((s) => s.type === t)) { tone = t; break; }
+  }
+  const n = list.length;
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  let word = "важных сигналов";
+  if (mod10 === 1 && mod100 !== 11) word = "важный сигнал";
+  else if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) word = "важных сигнала";
+  return { tone, count: n, label: `${n} ${word}` };
 }
 
 /* ---------- helpers ---------- */
