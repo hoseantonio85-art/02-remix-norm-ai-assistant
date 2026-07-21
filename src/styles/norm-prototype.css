@@ -572,6 +572,14 @@
 .np-area-actions .np-btn { width: auto; }
 .np-btn-primary { background: var(--np-mint); color: #fff; border-color: var(--np-mint); }
 .np-btn-primary:hover { background: #1ba98a; border-color: #1ba98a; }
+.np-focus-clarify-btn {
+  width: auto;
+  align-self: flex-start;
+  margin-top: 12px;
+  padding: 10px 16px;
+  font-weight: 600;
+  font-size: 13px;
+}
 
 @media (max-width: 720px) {
   .np-area-header { grid-template-columns: 1fr; }

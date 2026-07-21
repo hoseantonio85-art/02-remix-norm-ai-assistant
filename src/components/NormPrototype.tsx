@@ -134,6 +134,7 @@ interface FocusPoint {
   checkpoint: FocusCheckpoint;
   clarification: string;
   clarificationValue: string;
+  clarificationChatQuestion: string;
   related: string[];
   relatedRisk: {
     id: string;
@@ -201,6 +202,7 @@ const FOCUS_POINTS: FocusPoint[] = [
     },
     clarification: "Количество активных клиентов, выручка и средний чек в 12 затронутых городах.",
     clarificationValue: "Данные нужны для оценки возможных потерь и выбора городов для теста. Запустить мониторинг можно уже сейчас, не дожидаясь полного расчёта.",
+    clarificationChatQuestion: "Хочу уточнить данные об активных клиентах, выручке и среднем чеке в 12 городах, где конкурент запустил бесплатную доставку",
     related: [
       "риск «Снижение клиентской активности»",
       "продукт «Экспресс-доставка»",
@@ -272,6 +274,7 @@ const FOCUS_POINTS: FocusPoint[] = [
     },
     clarification: "Доля поставок каждого контрагента, перечень критичных товаров, текущие остатки и фактический срок перехода на резерв.",
     clarificationValue: "Данные позволят оценить масштаб возможной потери продаж и определить допустимый бюджет альтернативной закупки. Поиск резерва не должен откладываться до завершения расчёта.",
+    clarificationChatQuestion: "Хочу уточнить долю поставок контрагентов, критичные товары, текущие остатки и сроки перехода на резервных поставщиков",
     related: [
       "риск «Нарушение непрерывности поставок»",
       "три инцидента с задержкой",
@@ -340,6 +343,7 @@ const FOCUS_POINTS: FocusPoint[] = [
     },
     clarification: "Сопоставимость нагрузки, изменения в релизах и неизменность правил регистрации критичных ошибок.",
     clarificationValue: "Эти данные нужны, чтобы доказать причинную связь между новой мерой и снижением числа сбоев, а не принять временное совпадение за устойчивый результат.",
+    clarificationChatQuestion: "Хочу уточнить нагрузку, изменения в релизах и правила регистрации критичных ошибок, чтобы проверить эффективность новой меры",
     related: [
       "мера «Дополнительный мониторинг онлайн-расчётов»",
       "риск «Массовые сбои в системе онлайн-расчётов»",
@@ -1252,12 +1256,19 @@ function FocusPointModal({
               </div>
             </section>
             <section className="np-focus-island">
-              <h4 className="np-focus-island-title">Что ещё нужно уточнить</h4>
+              <h4 className="np-focus-island-title">Что ещё нужно уточнить для Норма</h4>
               <p className="np-focus-island-text">{point.clarification}</p>
               <div className="np-focus-clarification-value">
                 <div className="np-focus-checkpoint-label">Зачем это нужно</div>
                 <p className="np-focus-island-text">{point.clarificationValue}</p>
               </div>
+              <button
+                type="button"
+                className="np-btn np-btn-primary np-focus-clarify-btn"
+                onClick={() => onDiscuss(point.clarificationChatQuestion)}
+              >
+                Уточнить знания
+              </button>
             </section>
             <section className="np-focus-island">
               <h4 className="np-focus-island-title">Связанные объекты</h4>
