@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import profileData from "../data/company_profile_full.json";
 import coverageData from "../data/profile_coverage.json";
 import { UniversalValueRenderer } from "./UniversalValueRenderer";
@@ -80,9 +80,9 @@ function signalSummary(
   const n = list.length;
   const mod10 = n % 10;
   const mod100 = n % 100;
-  let word = "важных сигналов";
-  if (mod10 === 1 && mod100 !== 11) word = "важный сигнал";
-  else if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) word = "важных сигнала";
+  let word = "сигналов";
+  if (mod10 === 1 && mod100 !== 11) word = "сигнал";
+  else if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) word = "сигнала";
   return { tone, count: n, label: `${n} ${word}` };
 }
 
@@ -246,21 +246,23 @@ function AreaCard({ area, onOpen }: { area: UniversalArea; onOpen: () => void })
       <div className="np-kb-card-top">
         <div className="np-kb-card-title">
           <h4>{area.title}</h4>
-          {status && (
-            <div className={`np-kb-card-status np-kb-card-status--${tone}`}>
-              {status}
-            </div>
-          )}
+          <div className="np-area-card-state-row">
+            {status && (
+              <span className={`np-area-card-status np-kb-card-status--${tone}`}>
+                {status}
+              </span>
+            )}
+            {signal && (
+              <span className={`np-area-card-signals np-area-signal--${signal.tone}`}>
+                <span className="np-area-card-signal-dot" />
+                {signal.label}
+              </span>
+            )}
+          </div>
         </div>
         <CoverageRing percent={percent} size={46} />
       </div>
       {area.description && <p className="np-kb-card-insight">{area.description}</p>}
-      {signal && (
-        <div className={`np-area-signal np-area-signal--${signal.tone}`}>
-          <span className="np-area-signal-dot" />
-          <span>{signal.label}</span>
-        </div>
-      )}
       <div className="np-kb-card-tags">
         <KnowledgeCountTag count={area.knowledge.length} />
         <SourceCountTag count={srcCount} />
@@ -467,6 +469,7 @@ function KbToast({ message, onDone }: { message: string; onDone: () => void }) {
 
 function ProfileTab({
   areas, totalKnowledge, onOpenChat, onOpenSources, activeId, setActiveId,
+  filter, setFilter, searchQuery,
 }: {
   areas: UniversalArea[];
   totalKnowledge: number;
@@ -475,8 +478,10 @@ function ProfileTab({
   setToast: (s: string | null) => void;
   activeId: string | null;
   setActiveId: (id: string | null) => void;
+  filter: "all" | "lowKnowledge" | "needsUpdate";
+  setFilter: (f: "all" | "lowKnowledge" | "needsUpdate") => void;
+  searchQuery: string;
 }) {
-  const [filter, setFilter] = useState<"all" | "lowKnowledge" | "needsUpdate">("all");
   const active = activeId ? areas.find((a) => a.id === activeId) ?? null : null;
 
   if (active) {
@@ -492,45 +497,34 @@ function ProfileTab({
     );
   }
 
-  const lowCount = areas.filter((a) => coverageForArea(a.id)?.needsKnowledge).length;
-  const updCount = areas.filter((a) => coverageForArea(a.id)?.needsUpdate).length;
+  const q = searchQuery.trim().toLowerCase();
   const filtered = areas.filter((a) => {
     const c = coverageForArea(a.id);
-    if (filter === "lowKnowledge") return !!c?.needsKnowledge;
-    if (filter === "needsUpdate") return !!c?.needsUpdate;
-    return true;
+    if (filter === "lowKnowledge" && !c?.needsKnowledge) return false;
+    if (filter === "needsUpdate" && !c?.needsUpdate) return false;
+    if (!q) return true;
+    const hay: string[] = [a.title, a.description || "", c?.status || ""];
+    for (const k of a.knowledge) {
+      hay.push(k.title);
+      for (const s of k.sources || []) hay.push(s.name || s.documentName || s.id);
+    }
+    return hay.some((s) => s.toLowerCase().includes(q));
   });
 
   return (
-    <>
-      <IndexWidgetHorizontal
-        totalKnowledge={totalKnowledge}
-      />
-
-      <div className="np-kb-filters">
-        <div className="np-kb-filters-title">Области профиля</div>
-        <div className="np-kb-filters-row">
-          <button className={`np-kb-filter ${filter === "all" ? "active" : ""}`} onClick={() => setFilter("all")}>
-            Все · {areas.length}
-          </button>
-          <button className={`np-kb-filter ${filter === "lowKnowledge" ? "active" : ""}`} onClick={() => setFilter("lowKnowledge")}>
-            Мало знаний · {lowCount}
-          </button>
-          <button className={`np-kb-filter ${filter === "needsUpdate" ? "active" : ""}`} onClick={() => setFilter("needsUpdate")}>
-            Нужно обновить · {updCount}
-          </button>
-        </div>
-      </div>
-
-      <section className="np-kb-grid">
+    <section className="np-kb-profile-content">
+      <IndexWidgetHorizontal totalKnowledge={totalKnowledge} />
+      <div className="np-kb-area-grid np-kb-grid">
         {filtered.map((a) => (
           <AreaCard key={a.id} area={a} onOpen={() => setActiveId(a.id)} />
         ))}
         {filtered.length === 0 && (
-          <div className="np-kb-empty">В этой группе пока нет областей</div>
+          <div className="np-kb-empty">
+            {q ? "Ничего не найдено. Попробуйте изменить запрос." : "В этой группе пока нет областей"}
+          </div>
         )}
-      </section>
-    </>
+      </div>
+    </section>
   );
 }
 
@@ -548,6 +542,26 @@ export default function KnowledgeBase({
   const [overrides, setOverrides] = useState<Overrides>({});
   const [sourcesFor, setSourcesFor] = useState<UniversalKnowledge | null>(null);
   const [activeAreaId, setActiveAreaId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<"all" | "lowKnowledge" | "needsUpdate">("all");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (searchOpen) searchInputRef.current?.focus();
+  }, [searchOpen]);
+
+  useEffect(() => {
+    if (!searchOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSearchOpen(false);
+        setSearchQuery("");
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [searchOpen]);
 
   useEffect(() => {
     onAreaViewChange?.(activeAreaId !== null && tab === "profile");
@@ -627,24 +641,89 @@ export default function KnowledgeBase({
   };
 
   const hideChrome = tab === "profile" && activeAreaId !== null;
+  const lowCount = areas.filter((a) => coverageForArea(a.id)?.needsKnowledge).length;
+  const updCount = areas.filter((a) => coverageForArea(a.id)?.needsUpdate).length;
+
+  const toggleSearch = () => {
+    setSearchOpen((v) => {
+      const next = !v;
+      if (!next) setSearchQuery("");
+      return next;
+    });
+  };
 
   return (
     <div className={`np-kb ${hideChrome ? "np-kb--area-open" : "np-page-container"}`}>
       {!hideChrome && (
-      <div className="np-kb-pageheader">
-        <h1>База знаний Норма AI</h1>
-        <div className="np-kb-tabs" role="tablist">
-          <button className={`np-kb-tab ${tab === "profile" ? "active" : ""}`} onClick={() => setTab("profile")}>
-            Профиль компании
-          </button>
-          <button className={`np-kb-tab ${tab === "docs" ? "active" : ""}`} onClick={() => setTab("docs")}>
-            Документы компании
-          </button>
-          <button className={`np-kb-tab ${tab === "methodology" ? "active" : ""}`} onClick={() => setTab("methodology")}>
-            Методология
-          </button>
+      <>
+        <div className="np-kb-intro">
+          <h1 className="np-kb-intro-title">База знаний</h1>
+          <p className="np-kb-intro-desc">
+            Здесь Норм собирает цифровой профиль компании, чтобы точнее находить риски,
+            понимать их причины и моделировать возможные последствия.
+          </p>
         </div>
-      </div>
+        <div className="np-kb-controls">
+          <div className="np-kb-toolbar">
+            <div className="np-kb-toolbar-left">
+              <div className="np-kb-tabs" role="tablist">
+                <button className={`np-kb-tab ${tab === "profile" ? "active" : ""}`} onClick={() => setTab("profile")}>
+                  Профиль компании
+                </button>
+                <button className={`np-kb-tab ${tab === "docs" ? "active" : ""}`} onClick={() => setTab("docs")}>
+                  Документы компании
+                </button>
+                <button className={`np-kb-tab ${tab === "methodology" ? "active" : ""}`} onClick={() => setTab("methodology")}>
+                  Методология
+                </button>
+              </div>
+              {tab === "profile" && (
+                <>
+                  <span className="np-kb-toolbar-divider" aria-hidden>/</span>
+                  <div className="np-kb-filters-row">
+                    <button className={`np-kb-filter ${filter === "all" ? "active" : ""}`} onClick={() => setFilter("all")}>
+                      Все · {areas.length}
+                    </button>
+                    <button className={`np-kb-filter ${filter === "lowKnowledge" ? "active" : ""}`} onClick={() => setFilter("lowKnowledge")}>
+                      Мало знаний · {lowCount}
+                    </button>
+                    <button className={`np-kb-filter ${filter === "needsUpdate" ? "active" : ""}`} onClick={() => setFilter("needsUpdate")}>
+                      Нужно обновить · {updCount}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+            <button
+              type="button"
+              className={`np-kb-search-toggle ${searchOpen ? "active" : ""}`}
+              aria-label={searchOpen ? "Закрыть поиск" : "Открыть поиск"}
+              aria-pressed={searchOpen}
+              onClick={toggleSearch}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="11" cy="11" r="7" />
+                <path d="M20 20l-3.5-3.5" />
+              </svg>
+            </button>
+          </div>
+          {searchOpen && (
+            <div className="np-kb-search-field">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+                <circle cx="11" cy="11" r="7" />
+                <path d="M20 20l-3.5-3.5" />
+              </svg>
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Поиск по знаниям и областям"
+              />
+            </div>
+          )}
+        </div>
+      </>
       )}
 
       {tab === "profile" && (
@@ -656,6 +735,9 @@ export default function KnowledgeBase({
           setToast={setToast}
           activeId={activeAreaId}
           setActiveId={setActiveAreaId}
+          filter={filter}
+          setFilter={setFilter}
+          searchQuery={hideChrome ? "" : (searchOpen ? searchQuery : "")}
         />
       )}
       {tab === "docs" && (

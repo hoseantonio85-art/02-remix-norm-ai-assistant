@@ -1,5 +1,5 @@
 export function AreaCoverageCard({
-  percent, status, knowledgeCount, needsUpdateCount, signal, onOpen,
+  percent, status, knowledgeCount, signal, onOpen,
 }: {
   percent: number;
   status: string;
@@ -14,24 +14,22 @@ export function AreaCoverageCard({
     knowledgeCount >= 2 && knowledgeCount <= 4 ? "знания" : "знаний";
   return (
     <button type="button" className="np-area-cov" onClick={onOpen}>
-      <div className="np-area-cov-head">
-        <div className="np-area-cov-title">Знание области</div>
-        <div className="np-area-cov-percent">{percent}%</div>
+      <div className="np-area-coverage-heading">
+        <span className={`np-area-coverage-title np-area-cov-status--${tone}`}>
+          {status}
+        </span>
+        <strong className="np-area-coverage-percent">{percent}%</strong>
       </div>
-      <div className={`np-area-cov-status np-area-cov-status--${tone}`}>{status}</div>
-      <div className="np-area-cov-count">
-        {knowledgeCount} {kWord}
-        {needsUpdateCount && needsUpdateCount > 0
-          ? ` · ${needsUpdateCount} требуют обновления`
-          : ""}
-        {signal ? (
+      <div className="np-area-coverage-meta">
+        <span>{knowledgeCount} {kWord}</span>
+        {signal && (
           <>
-            {" · "}
-            <span className={`np-area-signal-inline np-area-signal--${signal.tone}`}>
+            <span className="np-meta-divider" aria-hidden>·</span>
+            <span className={`np-area-coverage-signals np-area-signal--${signal.tone}`}>
               {signal.label}
             </span>
           </>
-        ) : null}
+        )}
       </div>
       <div className="np-area-cov-bar">
         <div className={`np-progress np-progress--sm np-progress--${tone}`}>
