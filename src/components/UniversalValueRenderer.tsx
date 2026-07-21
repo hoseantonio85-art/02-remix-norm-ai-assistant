@@ -106,6 +106,39 @@ export function UniversalValueRenderer({
   return <span className="np-uv-value">{text || "—"}</span>;
 }
 
+function NodeStatusRow({ node }: { node: KnowledgeNode }) {
+  const hasStatus = !!node.status;
+  const hasTags = !!(node.tags && node.tags.length > 0);
+  if (!hasStatus && !hasTags) return null;
+  return (
+    <div className="np-uv-status-row">
+      {node.status && (
+        <span className={`np-uv-status np-uv-status--${node.status.tone || "neutral"}`}>
+          {node.status.label}
+        </span>
+      )}
+      {(node.tags || []).map((t) => (
+        <span key={t.code} className={`np-uv-chip np-uv-chip--${t.tone || "neutral"}`}>
+          {t.label}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function NodeLinks({ node }: { node: KnowledgeNode }) {
+  if (!node.links || node.links.length === 0) return null;
+  return (
+    <div className="np-uv-links">
+      {node.links.map((l, i) => (
+        <a key={i} className="np-uv-link" href={l.url} target="_blank" rel="noreferrer">
+          {l.label}
+        </a>
+      ))}
+    </div>
+  );
+}
+
 function TextRenderer({ node }: { node: KnowledgeNode }) {
   const [expanded, setExpanded] = useState(false);
   const v = node.displayValue || (node.value == null ? "" : String(node.value));
@@ -131,12 +164,14 @@ function ObjectRenderer({
   node, depth, parentTitle,
 }: { node: KnowledgeNode; depth: number; parentTitle: string | null }) {
   const kids = (node.children || []).filter((c) => !shouldHideNode(c));
-  if (kids.length === 0) return null;
+  const hasMeta = !!node.status || !!(node.tags && node.tags.length) || !!(node.links && node.links.length);
+  if (kids.length === 0 && !hasMeta) return null;
 
   const indentClass = depth >= 2 ? "np-uv-indent" : "";
 
   return (
     <div className={`np-uv-object ${indentClass}`}>
+      <NodeStatusRow node={node} />
       {kids.map((c) => {
         const isComposite = c.valueType === "object" || c.valueType === "array";
         const isLongText = c.valueType === "text";
@@ -168,6 +203,7 @@ function ObjectRenderer({
           </div>
         );
       })}
+      <NodeLinks node={node} />
     </div>
   );
 }
@@ -202,7 +238,14 @@ function ArrayRenderer({ node, depth }: { node: KnowledgeNode; depth: number }) 
             const itemTitle = c.label || `Элемент ${i + 1}`;
             return (
               <div key={c.id} className="np-uv-item">
-                <div className="np-uv-item-title">{itemTitle}</div>
+                <div className="np-uv-item-title-row">
+                  <div className="np-uv-item-title">{itemTitle}</div>
+                  {c.status && (
+                    <span className={`np-uv-status np-uv-status--${c.status.tone || "neutral"}`}>
+                      {c.status.label}
+                    </span>
+                  )}
+                </div>
                 <UniversalValueRenderer node={c} depth={depth + 1} parentTitle={itemTitle} />
               </div>
             );

@@ -12,6 +12,11 @@ import type {
   KnowledgeSourceReference,
 } from "../types/universalKnowledge";
 import type { CompanyProfile } from "../types/profile";
+import { CoverageRing } from "./CoverageRing";
+import { AreaCoverageCard } from "./AreaCoverageCard";
+import { KnowledgeCountTag, SourceCountTag } from "./MetaTag";
+import { KnowledgeInsightDrawer } from "./KnowledgeInsightDrawer";
+import { insightForArea, profileInsight } from "../data/profile_insights";
 
 const DATA = profileData as unknown as CompanyProfile;
 const AREAS_RAW = DATA.profile.areas;
@@ -79,6 +84,19 @@ function tagToneForFreshness(code: string | null | undefined): "ok" | "warn" | "
   return "neutral";
 }
 
+/** Decide whether to show a status badge on a closed accordion, and which one.
+ *  Priority: conflicting > update_required > partial. Others render no badge. */
+function pickBadge(k: UniversalKnowledge): { label: string; tone: "warn" | "low" | "neutral" } | null {
+  if (k.state.code === "conflicting") return { label: "Есть расхождения", tone: "warn" };
+  if (k.metadata?.freshness?.code === "update_required") return { label: "Нужно обновить", tone: "warn" };
+  if (k.state.code === "partial") return { label: "Известно частично", tone: "neutral" };
+  return null;
+}
+
+function countNeedsUpdate(area: UniversalArea): number {
+  return area.knowledge.filter((k) => k.metadata?.freshness?.code === "update_required").length;
+}
+
 /* ---------- source-override state ----------
  * Local edits/deletes performed via the sources drawer are held
  * per-knowledge and layered over the normalized data. */
@@ -109,16 +127,15 @@ function KnowledgeAccordion({
 }) {
   const [open, setOpen] = useState(!!defaultOpen);
   const freshness = k.metadata?.freshness;
-  const tag = freshness?.label || k.state.label;
-  const tone = tagToneForFreshness(freshness?.code);
-  const tagClass =
-    tone === "ok" ? "np-tag np-tag-ok"
-    : tone === "warn" ? "np-tag np-tag-warning"
-    : tone === "low" ? "np-tag np-tag-danger"
+  const badge = pickBadge(k);
+  const badgeClass =
+    badge?.tone === "warn" ? "np-tag np-tag-warning"
+    : badge?.tone === "low" ? "np-tag np-tag-danger"
     : "np-tag";
 
-  const actualAt = k.metadata?.actualAt
-    ? `Актуально на ${formatRuDate(k.metadata.actualAt)}`
+  const actualDate = k.metadata?.actualAt ? formatRuDate(k.metadata.actualAt) : "";
+  const actualAt = actualDate
+    ? (freshness?.code === "current" ? `Актуально на ${actualDate}` : `Данные на ${actualDate}`)
     : null;
 
   const openSources = () => onOpenSources(k);
@@ -134,7 +151,10 @@ function KnowledgeAccordion({
         <div className="np-k-acc-main">
           <div className="np-k-acc-titleline">
             <span className="np-k-acc-title">{k.title}</span>
-            {tag && <span className={tagClass}>{tag}</span>}
+            {badge && <span className={badgeClass}>{badge.label}</span>}
+            {k.state.code === "known_empty" && (
+              <span className="np-uv-empty-tag">Не выявлено</span>
+            )}
           </div>
           {k.description && <div className="np-k-acc-summary">{k.description}</div>}
           <div className="np-k-acc-meta">
@@ -157,7 +177,16 @@ function KnowledgeAccordion({
             <div className="np-uv-alerts">
               {k.alerts.map((a) => (
                 <div key={a.id} className={`np-uv-alert np-uv-alert--${a.severity}`}>
-                  {a.message}
+                  <span>{a.message}</span>
+                  {a.action && (
+                    <button
+                      type="button"
+                      className="np-uv-alert-action"
+                      onClick={() => onOpenSources(k)}
+                    >
+                      {a.action.label}
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
@@ -180,7 +209,6 @@ function AreaCard({ area, onOpen }: { area: UniversalArea; onOpen: () => void })
   const cov = coverageForArea(area.id);
   const percent = cov?.percent ?? 0;
   const status = cov?.status ?? "";
-  const tone = toneForPercent(percent);
   const srcCount = uniqueSourceCount(area);
   return (
     <article
@@ -194,43 +222,14 @@ function AreaCard({ area, onOpen }: { area: UniversalArea; onOpen: () => void })
           <h4>{area.title}</h4>
           {status && <div className="np-kb-card-status">{status}</div>}
         </div>
-        <div className="np-kb-card-percent">{percent}%</div>
+        <CoverageRing percent={percent} size={46} />
       </div>
       {area.description && <p className="np-kb-card-insight">{area.description}</p>}
-      <div className="np-kb-card-foot">
-        <span className="np-muted">
-          {area.knowledge.length} знаний · {srcCount} {srcCount === 1 ? "источник" : "источников"}
-        </span>
-      </div>
-      <div className={`np-progress np-progress--sm np-progress--${tone}`}>
-        <div className="np-progress-fill" style={{ width: `${percent}%` }} />
+      <div className="np-kb-card-tags">
+        <KnowledgeCountTag count={area.knowledge.length} />
+        <SourceCountTag count={srcCount} />
       </div>
     </article>
-  );
-}
-
-function LocalIndexBlock({
-  area, percent, tone, cov, onOpen,
-}: {
-  area: UniversalArea; percent: number; tone: string;
-  cov: AreaCoverage | undefined; onOpen: () => void;
-}) {
-  return (
-    <button type="button" className="np-index-horizontal np-index-horizontal--local" onClick={onOpen}>
-      <div className="np-idxh-value">{percent}%</div>
-      <div className="np-idxh-text">
-        <div className="np-idxh-title">Знание области</div>
-        <div className="np-idxh-sub">
-          {cov?.status ?? ""} · {area.knowledge.length} {area.knowledge.length === 1 ? "знание" : "знаний"}
-        </div>
-      </div>
-      <div className="np-idxh-bar-wrap">
-        <div className={`np-progress np-progress--sm np-progress--${tone}`}>
-          <div className="np-progress-fill" style={{ width: `${percent}%` }} />
-        </div>
-      </div>
-      <span className="np-idxh-chev" aria-hidden>›</span>
-    </button>
   );
 }
 
@@ -269,7 +268,6 @@ function AreaView({
 }) {
   const cov = coverageForArea(area.id);
   const percent = cov?.percent ?? 0;
-  const tone = toneForPercent(percent);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const handleRec = (r: CoverageRecommendation) => {
@@ -279,6 +277,7 @@ function AreaView({
   const visibleKnowledge = area.knowledge.filter(
     (k) => k.state.code !== "unknown" && k.state.code !== "not_applicable",
   );
+  const needsUpd = countNeedsUpdate(area);
 
   return (
     <div className="np-area-page">
@@ -330,19 +329,23 @@ function AreaView({
         </div>
 
         <aside className="np-area-right">
-          <LocalIndexBlock area={area} percent={percent} tone={tone} cov={cov} onOpen={() => setDrawerOpen(true)} />
+          <AreaCoverageCard
+            percent={percent}
+            status={cov?.status ?? ""}
+            knowledgeCount={area.knowledge.length}
+            needsUpdateCount={needsUpd}
+            onOpen={() => setDrawerOpen(true)}
+          />
           <ImproveBlock cov={cov} onRec={handleRec} />
         </aside>
       </div>
 
-      {drawerOpen && cov && (
+      {drawerOpen && (
         <KnowledgeInsightDrawer
           title={`Как Норм понимает «${area.title}»`}
           percent={percent}
-          status={cov.status}
-          understanding={cov.understanding}
-          canUse={[cov.canUse]}
-          limitations={[cov.limitations]}
+          status={cov?.status ?? ""}
+          insight={insightForArea(area.id)}
           onClose={() => setDrawerOpen(false)}
         />
       )}
@@ -350,75 +353,12 @@ function AreaView({
   );
 }
 
-/* ---------- shared insight drawer (unchanged shape) ---------- */
-
-function KnowledgeInsightDrawer({
-  title, percent, status, understanding, canUse, limitations, actionLabel, onAction, onClose,
-}: {
-  title: string;
-  percent: number;
-  status: string;
-  understanding: string;
-  canUse: string[];
-  limitations: string[];
-  actionLabel?: string;
-  onAction?: () => void;
-  onClose: () => void;
-}) {
-  const tone = toneForPercent(percent);
-  return (
-    <div className="np-drawer-backdrop" onClick={onClose}>
-      <div className="np-drawer" onClick={(e) => e.stopPropagation()} role="dialog">
-        <div className="np-drawer-head">
-          <div>
-            <div className="np-drawer-eyebrow">Индекс знания</div>
-            <h3 className="np-drawer-title">{title}</h3>
-            <div className="np-progress-row np-progress-row--wide">
-              <span className="np-progress-label">{percent}%</span>
-              <div className={`np-progress np-progress--${tone}`}>
-                <div className="np-progress-fill" style={{ width: `${percent}%` }} />
-              </div>
-              <span className="np-progress-meta">{status}</span>
-            </div>
-            <p className="np-drawer-summary">{understanding}</p>
-          </div>
-          <button className="np-icon-btn" onClick={onClose} aria-label="Закрыть">✕</button>
-        </div>
-        <div className="np-drawer-body">
-          <section className="np-drawer-section">
-            <h4>Что Норм уже может учитывать</h4>
-            <ul className="np-drawer-list">
-              {canUse.filter(Boolean).map((s, i) => <li key={i}>{s}</li>)}
-            </ul>
-          </section>
-          <section className="np-drawer-section">
-            <h4>Где понимание ограничено</h4>
-            <ul className="np-drawer-list">
-              {limitations.filter(Boolean).map((s, i) => <li key={i}>{s}</li>)}
-            </ul>
-          </section>
-        </div>
-        {(actionLabel && onAction) && (
-          <div className="np-drawer-foot">
-            <button className="np-btn" onClick={onClose}>Закрыть</button>
-            <button className="np-btn np-btn-primary" onClick={() => { onAction(); onClose(); }}>
-              {actionLabel}
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
 /* ---------- horizontal index widget ---------- */
 
 function IndexWidgetHorizontal({
-  totalKnowledge, onOpenChat, setToast,
+  totalKnowledge,
 }: {
   totalKnowledge: number;
-  onOpenChat?: (q: string) => void;
-  setToast: (s: string | null) => void;
 }) {
   const [open, setOpen] = useState(false);
   const p = COVERAGE.profile;
@@ -443,15 +383,7 @@ function IndexWidgetHorizontal({
           title="Как Норм понимает компанию"
           percent={p.percent}
           status={p.status}
-          understanding={p.understanding}
-          canUse={p.canUse}
-          limitations={p.limitations}
-          actionLabel="Дополнить профиль"
-          onAction={() => {
-            const prompt = "Хочу дополнить профиль компании. Покажи, каких знаний сейчас не хватает больше всего и почему они важны.";
-            if (onOpenChat) onOpenChat(prompt);
-            else setToast("Открой чат с Нормом, чтобы дополнить профиль.");
-          }}
+          insight={profileInsight()}
           onClose={() => setOpen(false)}
         />
       )}
@@ -469,7 +401,7 @@ function KbToast({ message, onDone }: { message: string; onDone: () => void }) {
 /* ---------- main page ---------- */
 
 function ProfileTab({
-  areas, totalKnowledge, onOpenChat, onOpenSources, setToast,
+  areas, totalKnowledge, onOpenChat, onOpenSources,
 }: {
   areas: UniversalArea[];
   totalKnowledge: number;
@@ -507,8 +439,6 @@ function ProfileTab({
     <>
       <IndexWidgetHorizontal
         totalKnowledge={totalKnowledge}
-        onOpenChat={onOpenChat}
-        setToast={setToast}
       />
 
       <div className="np-kb-filters">

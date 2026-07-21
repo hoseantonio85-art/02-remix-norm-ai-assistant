@@ -76,6 +76,9 @@ export interface KnowledgeNode {
   state?: KnowledgeState;
   format?: KnowledgeFormat | null;
   metadata?: KnowledgeMetadata | null;
+  status?: { code: string; label: string; tone?: string | null } | null;
+  tags?: { code: string; label: string; tone?: string | null }[];
+  links?: { label: string; url: string }[];
 }
 
 export interface KnowledgeSource {
@@ -104,6 +107,12 @@ export interface UniversalKnowledgeAlert {
   code: string;
   severity: string;
   message: string;
+  targetItemId?: string | null;
+  action?: {
+    type: string;
+    label: string;
+    targetItemId?: string | null;
+  } | null;
 }
 
 export interface UniversalKnowledge {

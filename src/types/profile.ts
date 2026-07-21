@@ -5,6 +5,14 @@ export interface Attribute {
   label: string;
   value?: string | number | string[] | null;
   value_type?: ValueType;
+  format?: {
+    kind?: "text" | "identifier" | "number" | "money" | "percentage" | "date";
+    currency?: string | null;
+    unit?: string | null;
+    decimals?: number | null;
+    prefix?: string | null;
+    suffix?: string | null;
+  };
 }
 
 export interface Tag {
