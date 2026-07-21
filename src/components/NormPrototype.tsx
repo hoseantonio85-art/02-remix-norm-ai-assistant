@@ -1016,6 +1016,217 @@ function AssistantModal({ initialQuery, onClose, onToast }: { initialQuery: stri
   );
 }
 
+function FocusPointModal({
+  point,
+  activeSourceIdx,
+  onOpenSource,
+  onCloseSource,
+  onClose,
+  onToast,
+  onDiscuss,
+}: {
+  point: FocusPoint;
+  activeSourceIdx: number | null;
+  onOpenSource: (i: number) => void;
+  onCloseSource: () => void;
+  onClose: () => void;
+  onToast: (m: string) => void;
+  onDiscuss: (q: string) => void;
+}) {
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (activeSourceIdx !== null) {
+        e.stopPropagation();
+        onCloseSource();
+      } else {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [activeSourceIdx, onClose, onCloseSource]);
+
+  const handleAction = (label: string) => {
+    if (label === "Обсудить с Нормом") {
+      onDiscuss(point.chatQuestion);
+      return;
+    }
+    onToast(`«${label}» — этот раздел прототипа пока не реализован`);
+  };
+
+  const source = activeSourceIdx !== null ? point.sources[activeSourceIdx] : null;
+
+  return (
+    <div
+      className="np-focus-backdrop"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label={point.title}
+    >
+      <div className="np-focus-modal" onClick={(e) => e.stopPropagation()}>
+        <header className="np-focus-modal-head">
+          <div className="np-focus-modal-meta">
+            <span className={`np-focus-type np-focus-type--${point.tone}`}>{point.type}</span>
+            <span className="np-focus-area">{point.area}</span>
+            <span className={`np-focus-state np-focus-state--${point.tone}`}>
+              <span className="np-focus-dot" aria-hidden />
+              {point.state}
+            </span>
+          </div>
+          <h2 className="np-focus-modal-title">{point.title}</h2>
+          <p className="np-focus-modal-intro">{point.intro}</p>
+          <div className="np-focus-modal-badges">
+            <div className={`np-focus-badge np-focus-badge--${point.impactTone}`}>
+              <span className="np-focus-badge-label">Возможное влияние</span>
+              <span className="np-focus-badge-value">{point.impact}</span>
+            </div>
+            <div className="np-focus-badge">
+              <span className="np-focus-badge-label">Уверенность Норма</span>
+              <span className="np-focus-badge-value">{point.confidence}</span>
+            </div>
+          </div>
+          <button className="np-icon-btn np-focus-close" onClick={onClose} aria-label="Закрыть">
+            <Icon name="close" size={18} />
+          </button>
+        </header>
+
+        <div className="np-focus-modal-body">
+          <div className="np-focus-col np-focus-col--main">
+            <section className="np-focus-block">
+              <h4>Что я заметил</h4>
+              <p>{point.noticed}</p>
+            </section>
+            <section className="np-focus-block">
+              <h4>Почему это может повлиять на компанию</h4>
+              <p>{point.whyMatters}</p>
+            </section>
+            <section className="np-focus-block">
+              <h4>Чего пока не хватает</h4>
+              <p>{point.needMore}</p>
+            </section>
+            <section className="np-focus-block">
+              <h4>Что я смогу сделать</h4>
+              <p>{point.canDo}</p>
+            </section>
+            <section className="np-focus-block">
+              <h4>Связанные объекты</h4>
+              <ul className="np-focus-related">
+                {point.related.map((r, i) => (
+                  <li key={i}>{r}</li>
+                ))}
+              </ul>
+            </section>
+          </div>
+
+          <aside className="np-focus-col np-focus-col--side">
+            <div className="np-focus-side-block">
+              <div className="np-focus-side-label">Возможное влияние</div>
+              <div className={`np-focus-side-value np-focus-side-value--${point.impactTone}`}>
+                {point.impact}
+              </div>
+            </div>
+            <div className="np-focus-side-block">
+              <div className="np-focus-side-label">Уверенность в выводе</div>
+              <div className="np-focus-side-value">{point.confidence}</div>
+            </div>
+
+            <div className="np-focus-side-block">
+              <div className="np-focus-side-label">Источники</div>
+              <ul className="np-focus-sources">
+                {point.sources.map((s, i) => (
+                  <li key={i}>
+                    <button
+                      type="button"
+                      className="np-focus-source-btn"
+                      onClick={() => onOpenSource(i)}
+                    >
+                      <span className="np-focus-source-type">{s.type}</span>
+                      <span className="np-focus-source-title">{s.title}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="np-focus-actions">
+              <button
+                className="np-btn np-btn-primary np-focus-primary"
+                onClick={() => handleAction(point.primaryAction)}
+              >
+                {point.primaryAction}
+              </button>
+              {point.secondaryActions.map((a) => (
+                <button
+                  key={a}
+                  className="np-btn np-btn-ghost np-focus-secondary"
+                  onClick={() => handleAction(a)}
+                >
+                  {a}
+                </button>
+              ))}
+            </div>
+          </aside>
+        </div>
+
+        {source && (
+          <div
+            className="np-focus-src-backdrop"
+            onClick={onCloseSource}
+          >
+            <aside
+              className="np-focus-src-drawer"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-label={source.title}
+            >
+              <div className="np-focus-src-head">
+                <div>
+                  <div className="np-focus-src-type">{source.type}</div>
+                  <h3 className="np-focus-src-title">{source.title}</h3>
+                  {source.date && <div className="np-focus-src-date">Актуально: {source.date}</div>}
+                </div>
+                <button
+                  className="np-icon-btn"
+                  onClick={onCloseSource}
+                  aria-label="Закрыть источник"
+                >
+                  <Icon name="close" size={18} />
+                </button>
+              </div>
+              <div className="np-focus-src-body">
+                <section className="np-focus-block">
+                  <h4>Содержание</h4>
+                  <p>{source.excerpt}</p>
+                </section>
+                <section className="np-focus-block">
+                  <h4>Как источник связан с выводом</h4>
+                  <p>{source.relation}</p>
+                </section>
+                <button
+                  className="np-btn np-btn-primary"
+                  onClick={() =>
+                    onToast("Открытие источника в этом прототипе пока не реализовано")
+                  }
+                >
+                  Открыть источник
+                </button>
+              </div>
+            </aside>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function NormPrototype() {
   const [modalQuery, setModalQuery] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
