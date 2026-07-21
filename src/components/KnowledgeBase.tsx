@@ -253,10 +253,12 @@ function AreaCard({ area, onOpen }: { area: UniversalArea; onOpen: () => void })
               </span>
             )}
             {signal && (
-              <span className={`np-area-card-signals np-area-signal--${signal.tone}`}>
-                <span className="np-area-card-signal-dot" />
-                {signal.label}
-              </span>
+              <>
+                <span className="np-area-card-state-divider" aria-hidden>·</span>
+                <span className={`np-area-card-signals np-area-signal--${signal.tone}`}>
+                  {signal.label}
+                </span>
+              </>
             )}
           </div>
         </div>
@@ -513,7 +515,6 @@ function ProfileTab({
 
   return (
     <section className="np-kb-profile-content">
-      <IndexWidgetHorizontal totalKnowledge={totalKnowledge} />
       <div className="np-kb-area-grid np-kb-grid">
         {filtered.map((a) => (
           <AreaCard key={a.id} area={a} onOpen={() => setActiveId(a.id)} />
@@ -663,6 +664,11 @@ export default function KnowledgeBase({
             понимать их причины и моделировать возможные последствия.
           </p>
         </div>
+        {tab === "profile" && (
+          <section className="np-kb-index-group">
+            <IndexWidgetHorizontal totalKnowledge={totalKnowledge} />
+          </section>
+        )}
         <div className="np-kb-controls">
           <div className="np-kb-toolbar">
             <div className="np-kb-toolbar-left">
