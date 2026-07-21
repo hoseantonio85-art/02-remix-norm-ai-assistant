@@ -80,9 +80,9 @@ function signalSummary(
   const n = list.length;
   const mod10 = n % 10;
   const mod100 = n % 100;
-  let word = "важных сигналов";
-  if (mod10 === 1 && mod100 !== 11) word = "важный сигнал";
-  else if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) word = "важных сигнала";
+  let word = "сигналов";
+  if (mod10 === 1 && mod100 !== 11) word = "сигнал";
+  else if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) word = "сигнала";
   return { tone, count: n, label: `${n} ${word}` };
 }
 
@@ -246,21 +246,23 @@ function AreaCard({ area, onOpen }: { area: UniversalArea; onOpen: () => void })
       <div className="np-kb-card-top">
         <div className="np-kb-card-title">
           <h4>{area.title}</h4>
-          {status && (
-            <div className={`np-kb-card-status np-kb-card-status--${tone}`}>
-              {status}
-            </div>
-          )}
+          <div className="np-area-card-state-row">
+            {status && (
+              <span className={`np-area-card-status np-kb-card-status--${tone}`}>
+                {status}
+              </span>
+            )}
+            {signal && (
+              <span className={`np-area-card-signals np-area-signal--${signal.tone}`}>
+                <span className="np-area-card-signal-dot" />
+                {signal.label}
+              </span>
+            )}
+          </div>
         </div>
         <CoverageRing percent={percent} size={46} />
       </div>
       {area.description && <p className="np-kb-card-insight">{area.description}</p>}
-      {signal && (
-        <div className={`np-area-signal np-area-signal--${signal.tone}`}>
-          <span className="np-area-signal-dot" />
-          <span>{signal.label}</span>
-        </div>
-      )}
       <div className="np-kb-card-tags">
         <KnowledgeCountTag count={area.knowledge.length} />
         <SourceCountTag count={srcCount} />
