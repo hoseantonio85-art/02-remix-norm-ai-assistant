@@ -484,12 +484,22 @@ function ProfileTab({
   );
 }
 
-export default function KnowledgeBase({ onOpenChat }: { onOpenChat?: (q: string) => void }) {
+export default function KnowledgeBase({
+  onOpenChat,
+  onAreaViewChange,
+}: {
+  onOpenChat?: (q: string) => void;
+  onAreaViewChange?: (isOpen: boolean) => void;
+}) {
   const [tab, setTab] = useState<"profile" | "docs" | "methodology">("profile");
   const [toast, setToast] = useState<string | null>(null);
   const [overrides, setOverrides] = useState<Overrides>({});
   const [sourcesFor, setSourcesFor] = useState<UniversalKnowledge | null>(null);
   const [activeAreaId, setActiveAreaId] = useState<string | null>(null);
+
+  useEffect(() => {
+    onAreaViewChange?.(activeAreaId !== null && tab === "profile");
+  }, [activeAreaId, tab, onAreaViewChange]);
 
   // Normalize the full profile once; apply overrides on read.
   const baseAreas = useMemo(() => normalizeProfile(AREAS_RAW), []);
