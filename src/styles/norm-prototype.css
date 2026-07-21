@@ -1098,3 +1098,88 @@
 .np-src-form input:focus, .np-src-form textarea:focus { outline: 2px solid var(--np-mint-soft, #d4f3ea); border-color: var(--np-mint, #22c4a3); }
 .np-src-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .np-src-form-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+
+/* ---------- coverage ring ---------- */
+.np-ring { position: relative; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.np-ring-inner {
+  background: #fff; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 600; color: #0f172a;
+}
+
+/* ---------- meta tag ---------- */
+.np-metatag {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px; border-radius: 999px;
+  background: #f1f5f4; color: #334155;
+  font-size: 12px; font-weight: 500;
+}
+
+/* ---------- area coverage card (right column) ---------- */
+.np-area-cov {
+  display: flex; flex-direction: column; gap: 8px;
+  width: 100%; padding: 14px; border-radius: 14px;
+  background: #fff; border: 1px solid #e5e9e7;
+  text-align: left; cursor: pointer;
+  transition: border-color .15s;
+}
+.np-area-cov:hover { border-color: var(--np-mint, #22c4a3); }
+.np-area-cov-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.np-area-cov-title { font-size: 13px; color: #64748b; text-transform: uppercase; letter-spacing: .04em; }
+.np-area-cov-percent { font-size: 22px; font-weight: 700; color: #0f172a; }
+.np-area-cov-status { font-size: 13px; color: #0f172a; font-weight: 500; }
+.np-area-cov-count { font-size: 12px; color: #64748b; }
+.np-area-cov-bar { margin-top: 2px; }
+.np-area-cov-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: 8px; margin-top: 4px; border-top: 1px solid #eef2f0;
+  font-size: 13px; color: var(--np-mint-strong, #109680); font-weight: 500;
+}
+.np-area-cov-chev { font-size: 18px; line-height: 1; }
+
+/* ---------- area card tags row ---------- */
+.np-kb-card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+
+/* ---------- inline status + tags on knowledge nodes ---------- */
+.np-uv-status-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 6px; }
+.np-uv-status {
+  display: inline-flex; padding: 2px 8px; border-radius: 999px;
+  font-size: 11px; font-weight: 600; letter-spacing: .02em;
+  background: #eef2f0; color: #334155;
+}
+.np-uv-status--positive, .np-uv-status--ok { background: #dcfce7; color: #166534; }
+.np-uv-status--warning, .np-uv-status--warn { background: #fef3c7; color: #92400e; }
+.np-uv-status--negative, .np-uv-status--danger { background: #fee2e2; color: #991b1b; }
+.np-uv-status--historical, .np-uv-status--muted { background: #f1f5f9; color: #64748b; }
+
+.np-uv-chip {
+  display: inline-flex; padding: 2px 8px; border-radius: 6px;
+  font-size: 11px; background: #f1f5f4; color: #334155;
+}
+.np-uv-chip--positive { background: #dcfce7; color: #166534; }
+.np-uv-chip--warning { background: #fef3c7; color: #92400e; }
+.np-uv-chip--negative { background: #fee2e2; color: #991b1b; }
+
+.np-uv-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.np-uv-links .np-uv-link { font-size: 12px; }
+
+.np-uv-item-title-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.np-uv-empty-tag {
+  display: inline-flex; padding: 2px 8px; border-radius: 999px;
+  font-size: 11px; background: #f1f5f9; color: #64748b;
+}
+
+.np-uv-alert { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.np-uv-alert-action {
+  border: none; background: transparent; padding: 4px 8px;
+  color: var(--np-mint-strong, #109680); font-weight: 600; cursor: pointer;
+  font-size: 13px;
+}
+
+/* ---------- drawer additions ---------- */
+.np-drawer-metrics { display: flex; align-items: center; gap: 12px; margin: 12px 0 8px; }
+.np-drawer-metrics-status { font-size: 13px; color: #0f172a; font-weight: 500; }
+.np-drawer-risks { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.np-drawer-risks li { padding: 10px 12px; border-radius: 10px; background: #f8faf9; }
+.np-drawer-risk-area { font-weight: 600; color: #0f172a; font-size: 13px; margin-bottom: 2px; }
+.np-drawer-risk-why { font-size: 13px; color: #475569; line-height: 1.45; }
