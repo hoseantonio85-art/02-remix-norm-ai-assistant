@@ -984,6 +984,32 @@
 .np-kb-card-status--ok { color: #16a34a; }
 .np-kb-card-status--warn { color: #eab308; }
 .np-kb-card-status--low { color: #ef4444; }
+
+/* important-signals indicator */
+.np-area-signal {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.np-area-signal-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex: none;
+  background: currentColor;
+}
+.np-area-signal--conflict { color: #d64545; }
+.np-area-signal--warning  { color: #e08a3c; }
+.np-area-signal--stale    { color: #c99a2e; }
+.np-area-signal-inline { font-weight: 600; }
+
+/* colored status text inside area coverage widget */
+.np-area-cov-status--ok   { color: #16a34a; }
+.np-area-cov-status--warn { color: #eab308; }
+.np-area-cov-status--low  { color: #ef4444; }
 .np-kb-card-percent { font-size: 20px; font-weight: 700; color: #1f2937; }
 .np-kb-card-insight { font-size: 13px; color: #4b5563; line-height: 1.5; margin: 0; min-height: 38px; }
 .np-kb-card-foot { font-size: 12px; color: var(--np-muted); }
