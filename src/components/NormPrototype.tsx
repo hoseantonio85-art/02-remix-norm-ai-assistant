@@ -894,6 +894,7 @@ export default function NormPrototype() {
   const [toast, setToast] = useState<string | null>(null);
   const [activeNav, setActiveNav] = useState<string>("home");
   const [profileAreaOpen, setProfileAreaOpen] = useState(false);
+  const [knowledgeBaseRootRequest, setKnowledgeBaseRootRequest] = useState(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     return window.localStorage.getItem("norm-sidebar-collapsed") === "1";
@@ -902,6 +903,21 @@ export default function NormPrototype() {
     if (typeof window === "undefined") return;
     window.localStorage.setItem("norm-sidebar-collapsed", sidebarCollapsed ? "1" : "0");
   }, [sidebarCollapsed]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [activeNav, profileAreaOpen]);
+
+  const handleNavigation = (navId: string) => {
+    setActiveNav(navId);
+    if (navId !== "kb") {
+      setProfileAreaOpen(false);
+    } else {
+      setProfileAreaOpen(false);
+      setKnowledgeBaseRootRequest((v) => v + 1);
+    }
+  };
 
   const openWith = (q: string | null) => { setModalQuery(q); setModalOpen(true); };
   const close = () => { setModalOpen(false); setModalQuery(null); };
@@ -928,7 +944,7 @@ export default function NormPrototype() {
             <button
               key={n.id}
               className={`np-nav-item ${activeNav === n.id ? "active" : ""}`}
-              onClick={() => setActiveNav(n.id)}
+              onClick={() => handleNavigation(n.id)}
               title={n.label}
               aria-label={n.label}
             >
@@ -965,9 +981,10 @@ export default function NormPrototype() {
           <KnowledgeBase
             onOpenChat={(q) => openWith(q)}
             onAreaViewChange={setProfileAreaOpen}
+            rootRequest={knowledgeBaseRootRequest}
           />
         ) : (
-        <>
+        <div className="np-page-container">
         <h1 className="np-hello">
           — Привет, Кирилл! Меня зовут <span className="np-grad">Норм.</span><br/>
           Я твой <span className="np-grad">виртуальный помощник.</span>
@@ -1031,7 +1048,7 @@ export default function NormPrototype() {
             ))}
           </div>
         </section>
-        </>
+        </div>
         )}
       </main>
 
