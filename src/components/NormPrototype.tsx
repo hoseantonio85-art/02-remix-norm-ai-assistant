@@ -1358,7 +1358,7 @@ export default function NormPrototype() {
   const [modalOpen, setModalOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [focusIdx, setFocusIdx] = useState<number | null>(null);
-  const [focusSourceIdx, setFocusSourceIdx] = useState<number | null>(null);
+  const [focusSourceIdx, setFocusSourceIdx] = useState<number | "list" | null>(null);
   const [activeNav, setActiveNav] = useState<string>("home");
   const [profileAreaOpen, setProfileAreaOpen] = useState(false);
   const [knowledgeBaseRootRequest, setKnowledgeBaseRootRequest] = useState(0);
@@ -1487,33 +1487,27 @@ export default function NormPrototype() {
               Смотреть все →
             </button>
           </div>
+          <div className="np-focus-outer">
           <div className="np-focus-wrap">
             {FOCUS_POINTS.map((fp) => (
               <button
                 key={fp.id}
                 type="button"
-                className={`np-focus-card np-focus-card--${fp.tone}`}
+                className="np-focus-card"
                 onClick={() => setFocusIdx(FOCUS_POINTS.indexOf(fp))}
               >
                 <div className="np-focus-card-top">
                   <span className={`np-focus-type np-focus-type--${fp.tone}`}>{fp.type}</span>
                   <span className="np-focus-area">{fp.area}</span>
                 </div>
-                <div className={`np-focus-state np-focus-state--${fp.tone}`}>
-                  <span className="np-focus-dot" aria-hidden />
-                  {fp.state}
-                </div>
                 <h3 className="np-focus-title">{fp.title}</h3>
                 <p className="np-focus-short">{fp.short}</p>
-                <div className="np-focus-missing">
-                  <span className="np-focus-missing-label">Чего не хватает</span>
-                  {fp.missing}
-                </div>
                 <div className="np-focus-cta">
                   {fp.cta} <Icon name="arrow" size={14} />
                 </div>
               </button>
             ))}
+          </div>
           </div>
         </section>
 
