@@ -127,11 +127,13 @@ interface FocusPoint {
   impact: string;
   impactTone: "strong" | "positive";
   confidence: "низкая" | "средняя" | "высокая";
-  intro: string;
-  noticed: string;
-  whyMatters: string;
-  needMore: string;
-  canDo: string;
+  situation: string;
+  cause: string;
+  businessImpact: string;
+  recommendations: FocusRecommendation[];
+  checkpoint: FocusCheckpoint;
+  clarification: string;
+  clarificationValue: string;
   related: string[];
   relatedRisk: {
     id: string;
@@ -146,6 +148,17 @@ interface FocusPoint {
   secondaryActions: string[];
   chatQuestion: string;
   signalDate: string;
+}
+
+interface FocusRecommendation {
+  stage: string;
+  action: string;
+  expectedEffect: string;
+}
+
+interface FocusCheckpoint {
+  condition: string;
+  response: string;
 }
 
 const FOCUS_POINTS: FocusPoint[] = [
