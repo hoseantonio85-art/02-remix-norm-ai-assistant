@@ -280,16 +280,10 @@ function AreaView({
   const needsUpd = countNeedsUpdate(area);
 
   return (
-    <div className="np-area-page">
-      <div className="np-kb-pageheader">
-        <button className="np-area-back" onClick={onBack}>← Профиль компании</button>
-        <h1>{area.title}</h1>
-        {area.description && <p className="np-muted">{area.description}</p>}
-      </div>
-
-      <div className="np-area-layout">
-        <aside className="np-area-left">
-          <div className="np-area-left-title">Области профиля</div>
+    <div className="np-profile-workspace">
+      <aside className="np-profile-rail">
+        <div className="np-profile-rail-title">Области профиля</div>
+        <div className="np-profile-rail-list">
           {areas.map((a) => {
             const isActive = a.id === area.id;
             const p = coverageForArea(a.id)?.percent ?? 0;
@@ -297,11 +291,11 @@ function AreaView({
             return (
               <button
                 key={a.id}
-                className={`np-area-left-item ${isActive ? "active" : ""}`}
+                className={`np-profile-rail-item ${isActive ? "active" : ""}`}
                 onClick={() => onSelect(a.id)}
               >
-                <div className="np-area-left-row">
-                  <div className="np-area-left-name">{a.title}</div>
+                <div className="np-profile-rail-row">
+                  <div className="np-profile-rail-name">{a.title}</div>
                   <span className="np-muted">{p}%</span>
                 </div>
                 <div className={`np-progress np-progress--sm np-progress--${tn}`}>
@@ -310,35 +304,56 @@ function AreaView({
               </button>
             );
           })}
-        </aside>
-
-        <div className="np-area-center">
-          <div className="np-k-stack">
-            {visibleKnowledge.map((k, i) => (
-              <KnowledgeAccordion
-                key={k.id}
-                k={k}
-                defaultOpen={i === 0}
-                onOpenSources={onOpenSources}
-              />
-            ))}
-            {visibleKnowledge.length === 0 && (
-              <div className="np-kb-empty">В этой области пока нет знаний.</div>
-            )}
-          </div>
         </div>
+      </aside>
 
-        <aside className="np-area-right">
-          <AreaCoverageCard
-            percent={percent}
-            status={cov?.status ?? ""}
-            knowledgeCount={area.knowledge.length}
-            needsUpdateCount={needsUpd}
-            onOpen={() => setDrawerOpen(true)}
-          />
-          <ImproveBlock cov={cov} onRec={handleRec} />
-        </aside>
-      </div>
+      <section className="np-area-workspace">
+        <header className="np-area-workhead">
+          <button
+            type="button"
+            className="np-area-back-btn"
+            onClick={onBack}
+            aria-label="Вернуться в профиль компании"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+          <div className="np-area-workhead-text">
+            <h1 className="np-area-workhead-title">{area.title}</h1>
+            {area.description && <p className="np-area-workhead-sub">{area.description}</p>}
+          </div>
+        </header>
+
+        <div className="np-area-content">
+          <div className="np-area-center">
+            <div className="np-k-stack">
+              {visibleKnowledge.map((k, i) => (
+                <KnowledgeAccordion
+                  key={k.id}
+                  k={k}
+                  defaultOpen={i === 0}
+                  onOpenSources={onOpenSources}
+                />
+              ))}
+              {visibleKnowledge.length === 0 && (
+                <div className="np-kb-empty">В этой области пока нет знаний.</div>
+              )}
+            </div>
+          </div>
+
+          <aside className="np-area-right">
+            <AreaCoverageCard
+              percent={percent}
+              status={cov?.status ?? ""}
+              knowledgeCount={area.knowledge.length}
+              needsUpdateCount={needsUpd}
+              onOpen={() => setDrawerOpen(true)}
+            />
+            <ImproveBlock cov={cov} onRec={handleRec} />
+          </aside>
+        </div>
+      </section>
 
       {drawerOpen && (
         <KnowledgeInsightDrawer

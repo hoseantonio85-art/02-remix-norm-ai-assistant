@@ -893,12 +893,20 @@ export default function NormPrototype() {
   const [modalOpen, setModalOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [activeNav, setActiveNav] = useState<string>("home");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem("norm-sidebar-collapsed") === "1";
+  });
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem("norm-sidebar-collapsed", sidebarCollapsed ? "1" : "0");
+  }, [sidebarCollapsed]);
 
   const openWith = (q: string | null) => { setModalQuery(q); setModalOpen(true); };
   const close = () => { setModalOpen(false); setModalQuery(null); };
 
   return (
-    <div className="np-app">
+    <div className={`np-app ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
       <aside className="np-sidebar">
         <div className="np-brand">
           <LogoMark size={26} />
@@ -920,6 +928,8 @@ export default function NormPrototype() {
               key={n.id}
               className={`np-nav-item ${activeNav === n.id ? "active" : ""}`}
               onClick={() => setActiveNav(n.id)}
+              title={n.label}
+              aria-label={n.label}
             >
               <Icon name={n.icon} size={18} />
               <span>{n.label}</span>
@@ -935,8 +945,17 @@ export default function NormPrototype() {
               <div className="np-user-role">Риск-менеджер (ЦА)</div>
             </div>
           </div>
-          <button className="np-side-link"><Icon name="headset" size={16} /><span>Служба поддержки</span></button>
-          <button className="np-side-link"><Icon name="menu" size={16} /><span>Свернуть</span></button>
+          <button className="np-side-link" title="Служба поддержки" aria-label="Служба поддержки">
+            <Icon name="headset" size={16} /><span>Служба поддержки</span>
+          </button>
+          <button
+            className="np-side-link np-side-collapse"
+            onClick={() => setSidebarCollapsed((v) => !v)}
+            aria-label={sidebarCollapsed ? "Развернуть меню" : "Свернуть меню"}
+            title={sidebarCollapsed ? "Развернуть меню" : "Свернуть меню"}
+          >
+            <Icon name="menu" size={16} /><span>Свернуть</span>
+          </button>
         </div>
       </aside>
 

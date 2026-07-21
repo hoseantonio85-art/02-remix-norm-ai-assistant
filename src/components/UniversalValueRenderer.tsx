@@ -73,6 +73,33 @@ export function shouldHideNode(node: KnowledgeNode): boolean {
   return isNodeEmpty(node);
 }
 
+/* ---------- badge selection ----------
+ * Rule: at most ONE visual badge per node.
+ * Priority: status (any) > meaningful tag. Classification tags are hidden.
+ * When status is present, tags are hidden to avoid duplication.
+ */
+const CLASSIFICATION_LABEL_RE =
+  /^(юридическое лицо|физическое лицо|дочерняя компания|учредитель|руководитель|поставщик|клиент|компания|действующая?|действующий( учредитель| руководитель)?)$/i;
+
+const CLASSIFICATION_CODE_RE =
+  /^(legal_entity|individual|subsidiary|founder|director|manager|supplier|client|company|active(_founder|_director|_manager|_company)?|entity_type|role_.*|kind_.*|type_.*)$/i;
+
+function isClassificationTag(t: { code: string; label: string }): boolean {
+  return CLASSIFICATION_CODE_RE.test(t.code || "") ||
+    CLASSIFICATION_LABEL_RE.test((t.label || "").trim());
+}
+
+export function getPrimaryNodeBadge(
+  node: KnowledgeNode,
+): { label: string; tone: string } | null {
+  if (node.status) {
+    return { label: node.status.label, tone: node.status.tone || "neutral" };
+  }
+  const tags = (node.tags || []).filter((t) => !isClassificationTag(t));
+  if (tags.length > 0) return { label: tags[0].label, tone: tags[0].tone || "neutral" };
+  return null;
+}
+
 /** Public type alias for parent contexts */
 export type RendererCtx = {
   /** title of the enclosing card; if a node's label matches, skip dup label */
@@ -83,17 +110,19 @@ export function UniversalValueRenderer({
   node,
   depth = 0,
   parentTitle = null,
+  suppressOwnMeta = false,
 }: {
   node: KnowledgeNode;
   depth?: number;
   parentTitle?: string | null;
+  suppressOwnMeta?: boolean;
 }) {
   if (shouldHideNode(node)) return null;
   if (node.state?.code === "known_empty" && (node.valueType === "object" || node.valueType === "array")) {
     return <div className="np-uv-empty">Не выявлено</div>;
   }
   if (node.valueType === "object") {
-    return <ObjectRenderer node={node} depth={depth} parentTitle={parentTitle} />;
+    return <ObjectRenderer node={node} depth={depth} parentTitle={parentTitle} suppressOwnMeta={suppressOwnMeta} />;
   }
   if (node.valueType === "array") {
     return <ArrayRenderer node={node} depth={depth} />;
@@ -106,22 +135,12 @@ export function UniversalValueRenderer({
   return <span className="np-uv-value">{text || "—"}</span>;
 }
 
-function NodeStatusRow({ node }: { node: KnowledgeNode }) {
-  const hasStatus = !!node.status;
-  const hasTags = !!(node.tags && node.tags.length > 0);
-  if (!hasStatus && !hasTags) return null;
+function NodeBadge({ node }: { node: KnowledgeNode }) {
+  const b = getPrimaryNodeBadge(node);
+  if (!b) return null;
   return (
     <div className="np-uv-status-row">
-      {node.status && (
-        <span className={`np-uv-status np-uv-status--${node.status.tone || "neutral"}`}>
-          {node.status.label}
-        </span>
-      )}
-      {(node.tags || []).map((t) => (
-        <span key={t.code} className={`np-uv-chip np-uv-chip--${t.tone || "neutral"}`}>
-          {t.label}
-        </span>
-      ))}
+      <span className={`np-uv-status np-uv-status--${b.tone}`}>{b.label}</span>
     </div>
   );
 }
@@ -161,17 +180,18 @@ function TextRenderer({ node }: { node: KnowledgeNode }) {
 }
 
 function ObjectRenderer({
-  node, depth, parentTitle,
-}: { node: KnowledgeNode; depth: number; parentTitle: string | null }) {
+  node, depth, parentTitle, suppressOwnMeta,
+}: { node: KnowledgeNode; depth: number; parentTitle: string | null; suppressOwnMeta?: boolean }) {
   const kids = (node.children || []).filter((c) => !shouldHideNode(c));
-  const hasMeta = !!node.status || !!(node.tags && node.tags.length) || !!(node.links && node.links.length);
+  const badge = suppressOwnMeta ? null : getPrimaryNodeBadge(node);
+  const hasMeta = !!badge || !!(node.links && node.links.length);
   if (kids.length === 0 && !hasMeta) return null;
 
   const indentClass = depth >= 2 ? "np-uv-indent" : "";
 
   return (
     <div className={`np-uv-object ${indentClass}`}>
-      <NodeStatusRow node={node} />
+      {!suppressOwnMeta && <NodeBadge node={node} />}
       {kids.map((c) => {
         const isComposite = c.valueType === "object" || c.valueType === "array";
         const isLongText = c.valueType === "text";
@@ -236,17 +256,18 @@ function ArrayRenderer({ node, depth }: { node: KnowledgeNode; depth: number }) 
         <div className="np-uv-items">
           {visible.map((c, i) => {
             const itemTitle = c.label || `Элемент ${i + 1}`;
+            const badge = getPrimaryNodeBadge(c);
             return (
               <div key={c.id} className="np-uv-item">
                 <div className="np-uv-item-title-row">
                   <div className="np-uv-item-title">{itemTitle}</div>
-                  {c.status && (
-                    <span className={`np-uv-status np-uv-status--${c.status.tone || "neutral"}`}>
-                      {c.status.label}
+                  {badge && (
+                    <span className={`np-uv-status np-uv-status--${badge.tone}`}>
+                      {badge.label}
                     </span>
                   )}
                 </div>
-                <UniversalValueRenderer node={c} depth={depth + 1} parentTitle={itemTitle} />
+                <UniversalValueRenderer node={c} depth={depth + 1} parentTitle={itemTitle} suppressOwnMeta />
               </div>
             );
           })}
