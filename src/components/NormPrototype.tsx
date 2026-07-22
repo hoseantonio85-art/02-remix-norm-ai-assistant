@@ -1609,6 +1609,191 @@ function FocusPointModal({
   );
 }
 
+function CompanySummaryModal({
+  summary,
+  activeSourceId,
+  onOpenSource,
+  onCloseSource,
+  onOpenFocus,
+  onClose,
+  onDiscuss,
+  onClarify,
+  onToast,
+  focusOnTop,
+}: {
+  summary: CompanySummary;
+  activeSourceId: string | null;
+  onOpenSource: (id: string) => void;
+  onCloseSource: () => void;
+  onOpenFocus: (fpId: string) => void;
+  onClose: () => void;
+  onDiscuss: () => void;
+  onClarify: () => void;
+  onToast: (m: string) => void;
+  focusOnTop: boolean;
+}) {
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (focusOnTop) return; // focus modal handles its own escape
+      if (activeSourceId) {
+        e.stopPropagation();
+        onCloseSource();
+      } else {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [activeSourceId, onClose, onCloseSource, focusOnTop]);
+
+  const source = activeSourceId ? SOURCES_INDEX[activeSourceId] : null;
+
+  return (
+    <div
+      className="np-company-summary-backdrop"
+      onClick={() => {
+        if (activeSourceId) onCloseSource();
+        else onClose();
+      }}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Ситуация в компании"
+    >
+      <div className="np-company-summary" onClick={(e) => e.stopPropagation()}>
+        <header className="np-company-summary-head">
+          <div className="np-company-summary-head-main">
+            <LogoMark size={32} />
+            <div>
+              <h2 className="np-company-summary-title">Ситуация в компании</h2>
+              <div className="np-company-summary-updated">{summary.updatedAt}</div>
+            </div>
+          </div>
+          <button
+            className="np-icon-btn np-company-summary-close"
+            onClick={onClose}
+            aria-label="Закрыть"
+          >
+            <Icon name="close" size={18} />
+          </button>
+        </header>
+
+        <div className="np-company-summary-body">
+          {summary.sections.map((sec) => (
+            <section key={sec.id} className="np-company-summary-section">
+              <h3 className="np-company-summary-section-title">{sec.title}</h3>
+              {sec.paragraphs.map((p) => (
+                <div key={p.id} className="np-company-summary-paragraph">
+                  {p.subtitle && (
+                    <div className="np-company-summary-subtitle">{p.subtitle}</div>
+                  )}
+                  <p className="np-company-summary-text">{p.text}</p>
+                  {p.sources.length > 0 && (
+                    <div className="np-summary-source-tags">
+                      {p.sources.map((s, i) => (
+                        <button
+                          key={`${p.id}-src-${i}`}
+                          type="button"
+                          className="np-summary-source-tag"
+                          onClick={() => onOpenSource(s.sourceId)}
+                        >
+                          {s.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {p.focusPointId && p.focusPointLabel && (
+                    <button
+                      type="button"
+                      className="np-summary-focus-link"
+                      onClick={() => onOpenFocus(p.focusPointId!)}
+                    >
+                      Подробнее: {p.focusPointLabel} →
+                    </button>
+                  )}
+                  {sec.id === "gaps" && (
+                    <div className="np-company-summary-clarify">
+                      <button
+                        type="button"
+                        className="np-btn np-btn-primary np-company-summary-clarify-btn"
+                        onClick={onClarify}
+                      >
+                        Уточнить знания
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </section>
+          ))}
+        </div>
+
+        <footer className="np-company-summary-footer">
+          <button
+            type="button"
+            className="np-focus-discuss np-company-summary-discuss"
+            onClick={onDiscuss}
+          >
+            Обсудить ситуацию с Нормом
+          </button>
+        </footer>
+
+        {source && (
+          <div className="np-summary-source-backdrop" onClick={onCloseSource}>
+            <aside
+              className="np-summary-source-drawer"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-label={source.title}
+            >
+              <div className="np-summary-source-head">
+                <div className="np-summary-source-head-main">
+                  <div className="np-summary-source-type">{source.type}</div>
+                  <h3 className="np-summary-source-title">{source.title}</h3>
+                  {source.date && (
+                    <div className="np-summary-source-date">Актуально: {source.date}</div>
+                  )}
+                </div>
+                <button
+                  className="np-icon-btn"
+                  onClick={onCloseSource}
+                  aria-label="Закрыть"
+                >
+                  <Icon name="close" size={18} />
+                </button>
+              </div>
+              <div className="np-summary-source-body">
+                <section className="np-summary-source-block">
+                  <h4>Содержание</h4>
+                  <p>{source.excerpt}</p>
+                </section>
+                <section className="np-summary-source-block">
+                  <h4>Как источник связан с выводом</h4>
+                  <p>{source.relation}</p>
+                </section>
+                <button
+                  className="np-btn np-btn-primary"
+                  onClick={() =>
+                    onToast("Открытие источника в этом прототипе пока не реализовано")
+                  }
+                >
+                  Открыть источник
+                </button>
+              </div>
+            </aside>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function NormPrototype() {
   const [modalQuery, setModalQuery] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
