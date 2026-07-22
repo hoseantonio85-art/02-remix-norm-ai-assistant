@@ -373,6 +373,143 @@ const FOCUS_POINTS: FocusPoint[] = [
   },
 ];
 
+// assign stable ids to focus sources and build a lookup index
+FOCUS_POINTS.forEach((fp) => {
+  fp.sources.forEach((s, i) => {
+    if (!s.id) s.id = `${fp.id}-s${i}`;
+  });
+});
+const SOURCES_INDEX: Record<string, FocusSource> = {};
+FOCUS_POINTS.forEach((fp) => fp.sources.forEach((s) => { SOURCES_INDEX[s.id!] = s; }));
+
+interface SummarySourceRef {
+  sourceId: string;
+  label: string;
+}
+interface SummaryParagraph {
+  id: string;
+  subtitle?: string;
+  text: string;
+  sources: SummarySourceRef[];
+  focusPointId?: string;
+  focusPointLabel?: string;
+}
+interface SummarySection {
+  id: string;
+  title: string;
+  paragraphs: SummaryParagraph[];
+}
+interface CompanySummary {
+  updatedAt: string;
+  status: string;
+  statusTone: "attention";
+  sections: SummarySection[];
+  discussQuestion: string;
+  clarificationQuestion: string;
+}
+
+const COMPANY_SUMMARY: CompanySummary = {
+  updatedAt: "Актуально на 22 июля 2026, 09:30",
+  status: "требует внимания",
+  statusTone: "attention",
+  discussQuestion: "Хочу обсудить текущую ситуацию в компании и понять, на что обратить внимание в первую очередь",
+  clarificationQuestion: "Помоги уточнить данные о продажах критичных товаров, готовности резервных поставщиков и клиентской активности в 12 затронутых городах",
+  sections: [
+    {
+      id: "main",
+      title: "Главное",
+      paragraphs: [
+        {
+          id: "main-1",
+          text: "Основное влияние на компанию сейчас оказывают устойчивые задержки поставок: они уже отражаются на наличии товаров и могут приводить к потере продаж. Одновременно появился ранний сигнал возможного оттока клиентов в 12 городах, но его фактическое влияние пока не подтверждено. Дополнительный контроль ИТ-систем показывает положительный результат, однако данных ещё недостаточно, чтобы признать меру эффективной и снизить оценку риска.",
+          sources: [
+            { sourceId: "fp-supply-s0", label: "Инциденты поставок" },
+            { sourceId: "fp-supply-s1", label: "Аналитика ассортимента" },
+            { sourceId: "fp-it-s0", label: "Отчёт ИТ-мониторинга" },
+          ],
+        },
+      ],
+    },
+    {
+      id: "risks",
+      title: "Риски и потери",
+      paragraphs: [
+        {
+          id: "risks-1",
+          subtitle: "Что уже происходит",
+          text: "Повторные задержки трёх поставщиков привели к росту доли отсутствующих товаров с 6% до 24%. Компания уже может терять продажи, однако масштаб фактических потерь пока не рассчитан.",
+          sources: [
+            { sourceId: "fp-supply-s0", label: "Инциденты поставок" },
+            { sourceId: "fp-supply-s2", label: "Профиль · Поставщики" },
+            { sourceId: "fp-supply-s3", label: "Риск QNR-0214" },
+          ],
+          focusPointId: "fp-supply",
+          focusPointLabel: "Задержки поставок начинают влиять на наличие товаров",
+        },
+        {
+          id: "risks-2",
+          subtitle: "Что может произойти",
+          text: "Бесплатная доставка конкурента может усилить отток клиентов в 12 городах присутствия. Пока это ранний сигнал: снижение конверсии и повторных заказов ещё не подтверждено.",
+          sources: [
+            { sourceId: "fp-delivery-s0", label: "Внешняя новость" },
+            { sourceId: "fp-delivery-s2", label: "Аналитика отказов" },
+            { sourceId: "fp-delivery-s1", label: "Профиль · География" },
+          ],
+          focusPointId: "fp-delivery",
+          focusPointLabel: "Бесплатная доставка конкурента может увеличить отток",
+        },
+      ],
+    },
+    {
+      id: "measures",
+      title: "Меры и контроль",
+      paragraphs: [
+        {
+          id: "measures-1",
+          text: "Дополнительный мониторинг ИТ-систем снизил число критичных ошибок на 37%, а массовые сбои не повторялись 21 день. Мера показывает хороший ранний результат, но её эффективность нужно подтвердить при сопоставимой и пиковой нагрузке. По проблемным поставщикам готовность резервного сценария пока не подтверждена.",
+          sources: [
+            { sourceId: "fp-it-s1", label: "Мера · Дополнительный мониторинг" },
+            { sourceId: "fp-it-s2", label: "Журнал ИТ-инцидентов" },
+            { sourceId: "fp-supply-s2", label: "Профиль · Поставщики" },
+          ],
+          focusPointId: "fp-it",
+          focusPointLabel: "После новой меры число критичных сбоев снизилось",
+        },
+      ],
+    },
+    {
+      id: "changes",
+      title: "Изменения и сигналы",
+      paragraphs: [
+        {
+          id: "changes-1",
+          text: "За последний месяц ситуация с поставками перешла от отдельных задержек к устойчивой проблеме. Во внешней среде конкурент изменил условия доставки в городах присутствия компании. В ИТ-контуре, напротив, наблюдается положительная динамика после подключения дополнительного контроля.",
+          sources: [
+            { sourceId: "fp-supply-s0", label: "Инциденты · июнь–июль" },
+            { sourceId: "fp-delivery-s0", label: "Новости рынка" },
+            { sourceId: "fp-it-s0", label: "Мониторинг мер" },
+          ],
+        },
+      ],
+    },
+    {
+      id: "gaps",
+      title: "Что пока известно не полностью",
+      paragraphs: [
+        {
+          id: "gaps-1",
+          text: "Норм достаточно хорошо видит динамику поставок и ИТ-сбоев, но пока не может точно оценить финансовые последствия. Не хватает данных о продажах критичных товаров, готовности резервных поставщиков и клиентской активности в 12 затронутых городах.",
+          sources: [
+            { sourceId: "fp-supply-s1", label: "Профиль · Продажи" },
+            { sourceId: "fp-supply-s2", label: "Профиль · Поставщики" },
+            { sourceId: "fp-delivery-s1", label: "Профиль · Клиенты" },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
 function Donut({ percent, color }: { percent: number; color: string }) {
   const r = 26;
   const c = 2 * Math.PI * r;
