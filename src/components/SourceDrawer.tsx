@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // ----- Universal source model -----
 
@@ -40,14 +40,52 @@ export interface UniSource {
   url?: string | null;
 }
 
-function primaryActionLabel(type: SourceType): string {
-  switch (type) {
-    case "document": return "Открыть документ";
-    case "news": return "Открыть новость ↗";
-    case "law": return "Открыть текст закона ↗";
-    case "website": return "Открыть страницу ↗";
-    case "internal_system": return "Открыть в системе";
+function isExternalType(s: UniSource): boolean {
+  return s.type === "news" || s.type === "law" || s.type === "website";
+}
+
+function externalHref(s: UniSource): string | null {
+  if (s.url) return s.url;
+  if (s.file?.downloadUrl) return s.file.downloadUrl;
+  return null;
+}
+
+function TitleLink({
+  s,
+  onExternal,
+  children,
+}: {
+  s: UniSource;
+  onExternal: (s: UniSource) => void;
+  children: React.ReactNode;
+}) {
+  const href = externalHref(s);
+  if (href && isExternalType(s)) {
+    return (
+      <a
+        className="np-sd-titlelink"
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {children}
+        <span className="np-sd-ext" aria-hidden> ↗</span>
+      </a>
+    );
   }
+  return (
+    <button
+      type="button"
+      className="np-sd-titlelink"
+      onClick={(e) => {
+        e.stopPropagation();
+        onExternal(s);
+      }}
+    >
+      {children}
+    </button>
+  );
 }
 
 function locationLine(loc: UniSource["location"]): string | null {
