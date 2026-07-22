@@ -549,6 +549,7 @@ interface SummarySection {
   id: "decision" | "check" | "watch" | "gaps";
   title: string;
   tone: "orange" | "blue" | "green" | "neutral";
+  headline: string;
   text: string;
   actionLabel?: string;
   actionText?: string;
