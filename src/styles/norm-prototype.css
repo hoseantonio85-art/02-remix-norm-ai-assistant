@@ -3006,14 +3006,15 @@
   align-items: stretch;
 }
 .np-risk-chart-island {
-  background: #fff;
-  border: 1px solid #eef0f4;
+  background: #f6f7f9;
+  border: 1px solid #e5e7eb;
   border-radius: 16px;
-  padding: 24px;
+  box-shadow: none;
+  padding: 28px 32px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
 }
 .np-risk-chart-wrap {
   position: relative;
