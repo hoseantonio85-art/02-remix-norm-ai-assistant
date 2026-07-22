@@ -7,7 +7,8 @@ export type SourceType =
   | "news"
   | "law"
   | "website"
-  | "internal_system";
+  | "internal_system"
+  | "state_of_knowledge";
 
 export interface UniSource {
   id: string;
@@ -50,40 +51,49 @@ function externalHref(s: UniSource): string | null {
   return null;
 }
 
-function TitleLink({
-  s,
-  onExternal,
-  children,
-}: {
-  s: UniSource;
-  onExternal: (s: UniSource) => void;
-  children: React.ReactNode;
-}) {
+function ctaLabelFor(type: SourceType): string {
+  switch (type) {
+    case "document": return "Открыть документ";
+    case "news": return "Открыть новость";
+    case "law": return "Открыть текст закона";
+    case "website": return "Открыть страницу";
+    case "internal_system": return "Открыть в системе";
+    default: return "";
+  }
+}
+
+function hasRealAction(s: UniSource): boolean {
+  if (s.type === "state_of_knowledge") return false;
+  return !!(s.url || s.file?.downloadUrl);
+}
+
+function OpenSourceButton({ s, onExternal }: { s: UniSource; onExternal: (s: UniSource) => void }) {
+  if (!hasRealAction(s)) return null;
+  const label = ctaLabelFor(s.type);
+  if (!label) return null;
+  const external = isExternalType(s) || s.type === "document";
   const href = externalHref(s);
-  if (href && isExternalType(s)) {
+  if (href && external) {
     return (
       <a
-        className="np-sd-titlelink"
+        className="np-sd-open-btn"
         href={href}
         target="_blank"
         rel="noopener noreferrer"
         onClick={(e) => e.stopPropagation()}
       >
-        {children}
-        <span className="np-sd-ext" aria-hidden> ↗</span>
+        {label}
+        <span className="np-sd-open-btn-ico" aria-hidden> ↗</span>
       </a>
     );
   }
   return (
     <button
       type="button"
-      className="np-sd-titlelink"
-      onClick={(e) => {
-        e.stopPropagation();
-        onExternal(s);
-      }}
+      className="np-sd-open-btn"
+      onClick={(e) => { e.stopPropagation(); onExternal(s); }}
     >
-      {children}
+      {label}
     </button>
   );
 }
@@ -123,46 +133,48 @@ function SourceDetail({
   onExternal: (s: UniSource) => void;
 }) {
   const loc = locationLine(s.location);
+  const isGap = s.type === "state_of_knowledge";
+  const showFileCard = !!s.file && !isGap;
+  // If file name equals title, don't repeat it in the file card
+  const fileNameDuplicatesTitle = !!s.file && s.file.name.trim() === s.title.trim();
   return (
     <div className="np-sd-detail">
-      {s.file && (
+      {showFileCard && (
         <div className="np-sd-file">
-          <button
-            type="button"
-            className="np-sd-file-main-btn"
-            onClick={(e) => {
-              e.stopPropagation();
-              onExternal(s);
-            }}
-          >
-            <span className="np-sd-file-icon" aria-hidden>📄</span>
-            <span className="np-sd-file-body">
-              <span className="np-sd-file-name">
-                {s.file.name}
-                <span className="np-sd-ext" aria-hidden> ↗</span>
-              </span>
-              <span className="np-sd-file-meta">
-                {[s.file.format, s.file.size, s.validAt].filter(Boolean).join(" · ")}
-              </span>
-            </span>
-          </button>
-          {s.file.downloadUrl && (
-            <a
-              className="np-sd-linkbtn"
-              href={s.file.downloadUrl}
-              download
-              onClick={(e) => e.stopPropagation()}
-            >
-              Скачать
-            </a>
-          )}
+          <span className="np-sd-file-icon" aria-hidden>📄</span>
+          <div className="np-sd-file-body">
+            {!fileNameDuplicatesTitle && (
+              <div className="np-sd-file-name">{s.file!.name}</div>
+            )}
+            <div className="np-sd-file-meta">
+              {[s.file!.format, s.file!.size, s.validAt].filter(Boolean).join(" · ")}
+            </div>
+          </div>
         </div>
       )}
 
+      <div className="np-sd-actions">
+        <OpenSourceButton s={s} onExternal={onExternal} />
+        {s.file?.downloadUrl && !isGap && (
+          <a
+            className="np-sd-linkbtn"
+            href={s.file.downloadUrl}
+            download
+            onClick={(e) => e.stopPropagation()}
+          >
+            Скачать
+          </a>
+        )}
+      </div>
+
       <div className="np-sd-block">
-        <div className="np-sd-label">Использованный фрагмент</div>
+        <div className="np-sd-label">
+          {isGap ? "Каких данных не хватает" : "Использованный фрагмент"}
+        </div>
         {s.quote ? (
-          <div className="np-sd-quote">«{s.quote}»</div>
+          <div className={`np-sd-quote${isGap ? " np-sd-quote--gap" : ""}`}>
+            {isGap ? s.quote : `«${s.quote}»`}
+          </div>
         ) : (
           <div className="np-sd-quote np-sd-quote--muted">
             Точный фрагмент источника пока не добавлен
@@ -269,6 +281,7 @@ export interface SourceDrawerProps {
   editable?: boolean;
   onEdit?: (s: UniSource) => void;
   onDelete?: (s: UniSource) => void;
+  placement?: "viewport" | "modal";
 }
 
 export function SourceDrawer({
@@ -282,6 +295,7 @@ export function SourceDrawer({
   editable,
   onEdit,
   onDelete,
+  placement = "viewport",
 }: SourceDrawerProps) {
   useEffect(() => {
     if (activeId === null) return;
@@ -317,7 +331,10 @@ export function SourceDrawer({
     mode === "knowledge" ? "Источники знания" : listTitle ?? "На чём основан вывод";
 
   return (
-    <div className="np-sd-backdrop" onClick={onClose}>
+    <div
+      className={`np-sd-backdrop np-sd-backdrop--${placement}`}
+      onClick={onClose}
+    >
       <aside
         className="np-sd-drawer"
         onClick={(e) => e.stopPropagation()}
@@ -340,13 +357,7 @@ export function SourceDrawer({
               {selected ? selected.typeLabel : heading}
             </div>
             <h3 className="np-sd-title">
-              {selected ? (
-                <TitleLink s={selected} onExternal={handleExternal}>
-                  {selected.title}
-                </TitleLink>
-              ) : (
-                `${heading} · ${sources.length}`
-              )}
+              {selected ? selected.title : `${heading} · ${sources.length}`}
             </h3>
             {selected && (
               <div className="np-sd-submeta">{headerMeta(selected)}</div>
@@ -419,14 +430,20 @@ export interface FocusSourceLike {
     sheet?: string;
     range?: string;
   };
+  provider?: string;
+  domain?: string;
+  url?: string;
 }
 
 function classifyFocusType(s: FocusSourceLike): { type: SourceType; typeLabel: string } {
-  if (s.document) return { type: "document", typeLabel: "Документ" };
   const t = (s.type || "").toLowerCase();
+  if (t.includes("состояние знан") || t.includes("пробел")) {
+    return { type: "state_of_knowledge", typeLabel: "Пробел в знаниях" };
+  }
   if (t.includes("новост")) return { type: "news", typeLabel: "Новость" };
-  if (t.includes("сайт") || t.includes("страниц")) return { type: "website", typeLabel: "Страница сайта" };
   if (t.includes("закон") || t.includes("норматив")) return { type: "law", typeLabel: "Нормативный акт" };
+  if (t.includes("сайт") || t.includes("страниц")) return { type: "website", typeLabel: "Страница сайта" };
+  if (s.document) return { type: "document", typeLabel: "Документ" };
   return { type: "internal_system", typeLabel: s.type || "Внутренняя запись" };
 }
 
@@ -435,12 +452,18 @@ export function focusSourceToUni(
   opts?: { supportedClaim?: string | null },
 ): UniSource {
   const { type, typeLabel } = classifyFocusType(s);
+  const url = s.url || null;
+  let domain = s.domain || null;
+  if (!domain && url) {
+    try { domain = new URL(url).hostname; } catch { /* noop */ }
+  }
   return {
     id: s.id || s.title,
     type,
     typeLabel,
     title: s.title,
-    provider: s.document ? "Внутренняя система" : null,
+    provider: s.provider || (s.document ? "Внутренняя система" : null),
+    domain,
     validAt: s.date || s.document?.updatedAt || null,
     publishedAt: type === "news" ? s.date || null : null,
     quote: s.quote || s.excerpt || null,
@@ -462,6 +485,7 @@ export function focusSourceToUni(
           downloadUrl: s.document.downloadUrl || null,
         }
       : null,
+    url,
   };
 }
 
@@ -492,10 +516,23 @@ export function knowledgeSourceToUni(
     };
   },
 ): UniSource {
-  const isDoc = !!(s.fileName || s.documentName);
-  const isUrl = !!s.url && !isDoc;
-  const type: SourceType = isDoc ? "document" : isUrl ? "website" : "internal_system";
-  const typeLabel = isDoc ? "Документ" : isUrl ? "Страница сайта" : s.type || "Внутренняя запись";
+  const raw = (s.type || "").toLowerCase();
+  let type: SourceType;
+  let typeLabel: string;
+  if (raw === "news" || raw.includes("новост")) {
+    type = "news"; typeLabel = "Новость";
+  } else if (raw === "law" || raw.includes("закон") || raw.includes("норматив")) {
+    type = "law"; typeLabel = "Нормативный акт";
+  } else if (raw === "website" || raw.includes("сайт") || raw.includes("страниц")) {
+    type = "website"; typeLabel = "Страница сайта";
+  } else if (raw === "document" || s.fileName || s.documentName) {
+    type = "document"; typeLabel = "Документ";
+  } else if (s.url) {
+    type = "website"; typeLabel = "Страница сайта";
+  } else {
+    type = "internal_system"; typeLabel = s.type || "Внутренняя запись";
+  }
+  const isDoc = type === "document";
   return {
     id: s.id,
     type,
