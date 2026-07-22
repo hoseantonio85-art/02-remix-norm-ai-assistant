@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "../styles/norm-prototype.css";
 import KnowledgeBase from "./KnowledgeBase";
 
@@ -1827,7 +1827,7 @@ function CompanySummaryModal({
   }, [activeSourceId, onClose, onCloseSource, focusOnTop]);
 
   const source = activeSourceId ? SOURCES_INDEX[activeSourceId] : null;
-  const supportedClaim = React.useMemo(() => {
+  const supportedClaim = useMemo(() => {
     if (!activeSourceId) return null;
     for (const sec of summary.sections) {
       const found = sec.sources.find((s) => s.sourceId === activeSourceId);
