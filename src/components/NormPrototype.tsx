@@ -2519,44 +2519,24 @@ function CompanySummaryModal({
           </div>
         </div>
 
-        {source && (
-          <div className="np-summary-source-backdrop" onClick={onCloseSource}>
-            <aside
-              className="np-summary-source-drawer"
-              onClick={(e) => e.stopPropagation()}
-              role="dialog"
-              aria-modal="true"
-              aria-label={source.title}
-            >
-              <div className="np-summary-source-head">
-                <div className="np-summary-source-head-main">
-                  <div className="np-summary-source-type">{source.type}</div>
-                  <h3 className="np-summary-source-title">{source.title}</h3>
-                  {source.date && (
-                    <div className="np-summary-source-date">Актуально: {source.date}</div>
-                  )}
-                </div>
-                <button
-                  className="np-icon-btn"
-                  onClick={onCloseSource}
-                  aria-label="Закрыть"
-                >
-                  <Icon name="close" size={18} />
-                </button>
-              </div>
-              <div className="np-summary-source-body">
-                <SourceCardContent
-                  source={source}
-                  supportedClaim={supportedClaim}
-                  relation={sourceRelation}
-                  onOpen={() =>
-                    onToast("Открытие источника в этом прототипе пока не реализовано")
-                  }
-                />
-              </div>
-            </aside>
-          </div>
-        )}
+        {source && (() => {
+          const uni = focusSourceToUni(source, { supportedClaim });
+          if (sourceRelation) uni.relationToConclusion = sourceRelation;
+          return (
+            <SourceDrawer
+              sources={[uni]}
+              activeId={uni.id}
+              mode="conclusion"
+              onOpen={() => {}}
+              onClose={onCloseSource}
+              onExternal={(s) => {
+                if (s.url) window.open(s.url, "_blank", "noopener,noreferrer");
+                else if (s.file?.downloadUrl) window.open(s.file.downloadUrl, "_blank", "noopener,noreferrer");
+                else onToast("Открытие источника в этом прототипе пока не реализовано");
+              }}
+            />
+          );
+        })()}
         {shareOpen && (
           <ShareDrawer
             kind="summary"
