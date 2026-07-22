@@ -374,6 +374,8 @@ const FOCUS_POINTS: FocusPoint[] = [
 ];
 
 function Donut({ percent, color }: { percent: number; color: string }) {
+  // placeholder anchor
+  void 0;
   const r = 26;
   const c = 2 * Math.PI * r;
   const off = c * (1 - percent / 100);
