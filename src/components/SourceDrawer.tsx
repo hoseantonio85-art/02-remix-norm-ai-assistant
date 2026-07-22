@@ -430,14 +430,20 @@ export interface FocusSourceLike {
     sheet?: string;
     range?: string;
   };
+  provider?: string;
+  domain?: string;
+  url?: string;
 }
 
 function classifyFocusType(s: FocusSourceLike): { type: SourceType; typeLabel: string } {
-  if (s.document) return { type: "document", typeLabel: "Документ" };
   const t = (s.type || "").toLowerCase();
+  if (t.includes("состояние знан") || t.includes("пробел")) {
+    return { type: "state_of_knowledge", typeLabel: "Пробел в знаниях" };
+  }
   if (t.includes("новост")) return { type: "news", typeLabel: "Новость" };
-  if (t.includes("сайт") || t.includes("страниц")) return { type: "website", typeLabel: "Страница сайта" };
   if (t.includes("закон") || t.includes("норматив")) return { type: "law", typeLabel: "Нормативный акт" };
+  if (t.includes("сайт") || t.includes("страниц")) return { type: "website", typeLabel: "Страница сайта" };
+  if (s.document) return { type: "document", typeLabel: "Документ" };
   return { type: "internal_system", typeLabel: s.type || "Внутренняя запись" };
 }
 
@@ -446,12 +452,18 @@ export function focusSourceToUni(
   opts?: { supportedClaim?: string | null },
 ): UniSource {
   const { type, typeLabel } = classifyFocusType(s);
+  const url = s.url || null;
+  let domain = s.domain || null;
+  if (!domain && url) {
+    try { domain = new URL(url).hostname; } catch { /* noop */ }
+  }
   return {
     id: s.id || s.title,
     type,
     typeLabel,
     title: s.title,
-    provider: s.document ? "Внутренняя система" : null,
+    provider: s.provider || (s.document ? "Внутренняя система" : null),
+    domain,
     validAt: s.date || s.document?.updatedAt || null,
     publishedAt: type === "news" ? s.date || null : null,
     quote: s.quote || s.excerpt || null,
@@ -473,6 +485,7 @@ export function focusSourceToUni(
           downloadUrl: s.document.downloadUrl || null,
         }
       : null,
+    url,
   };
 }
 
@@ -503,10 +516,23 @@ export function knowledgeSourceToUni(
     };
   },
 ): UniSource {
-  const isDoc = !!(s.fileName || s.documentName);
-  const isUrl = !!s.url && !isDoc;
-  const type: SourceType = isDoc ? "document" : isUrl ? "website" : "internal_system";
-  const typeLabel = isDoc ? "Документ" : isUrl ? "Страница сайта" : s.type || "Внутренняя запись";
+  const raw = (s.type || "").toLowerCase();
+  let type: SourceType;
+  let typeLabel: string;
+  if (raw === "news" || raw.includes("новост")) {
+    type = "news"; typeLabel = "Новость";
+  } else if (raw === "law" || raw.includes("закон") || raw.includes("норматив")) {
+    type = "law"; typeLabel = "Нормативный акт";
+  } else if (raw === "website" || raw.includes("сайт") || raw.includes("страниц")) {
+    type = "website"; typeLabel = "Страница сайта";
+  } else if (raw === "document" || s.fileName || s.documentName) {
+    type = "document"; typeLabel = "Документ";
+  } else if (s.url) {
+    type = "website"; typeLabel = "Страница сайта";
+  } else {
+    type = "internal_system"; typeLabel = s.type || "Внутренняя запись";
+  }
+  const isDoc = type === "document";
   return {
     id: s.id,
     type,
