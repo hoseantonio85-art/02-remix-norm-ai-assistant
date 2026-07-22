@@ -114,6 +114,20 @@ interface FocusSource {
   date?: string;
   excerpt: string;
   relation: string;
+  document?: {
+    fileName: string;
+    mimeType?: string;
+    fileSize?: string;
+    updatedAt?: string;
+    downloadUrl?: string;
+  };
+  quote?: string;
+  locator?: {
+    page?: number;
+    section?: string;
+    sheet?: string;
+    range?: string;
+  };
 }
 interface FocusPoint {
   id: string;
@@ -414,6 +428,118 @@ const GAP_SOURCES: Record<string, FocusSource> = {
 };
 Object.assign(SOURCES_INDEX, GAP_SOURCES);
 
+// Decorate a subset of sources with document / quote / locator so the unified
+// source card can show honest document cards or system-object cards.
+const SOURCE_DECORATIONS: Record<string, Partial<FocusSource>> = {
+  "fp-supply-s0": {
+    document: {
+      fileName: "Инциденты поставок за июнь 2026.xlsx",
+      mimeType: "XLSX",
+      fileSize: "84 КБ",
+      updatedAt: "1 июля 2026",
+    },
+    quote: "Пять из семи зарегистрированных задержек связаны с поставщиками «Альфа Фуд», «Север Трейд» и «Фреш Лайн».",
+    locator: { sheet: "Инциденты", range: "18–24" },
+  },
+  "fp-supply-s1": {
+    document: {
+      fileName: "Доступность ассортимента, неделя 22–29.xlsx",
+      mimeType: "XLSX",
+      fileSize: "62 КБ",
+      updatedAt: "20 июля 2026",
+    },
+    quote: "Доля отсутствующих товаров выросла с 6% до 24% за четыре недели.",
+    locator: { sheet: "Weekly", range: "3–7" },
+  },
+  "fp-it-s0": {
+    document: {
+      fileName: "Отчёт ИТ-мониторинга, июль 2026.pdf",
+      mimeType: "PDF",
+      fileSize: "1,2 МБ",
+      updatedAt: "21 июля 2026",
+    },
+    quote: "Количество критичных ошибок за три недели снизилось на 37% относительно предыдущего периода.",
+    locator: { section: "Раздел 2. Динамика инцидентов" },
+  },
+  "fp-it-s2": {
+    document: {
+      fileName: "Журнал инцидентов, июнь–июль 2026.csv",
+      mimeType: "CSV",
+      fileSize: "210 КБ",
+      updatedAt: "21 июля 2026",
+    },
+    quote: "После 30 июня 2026 массовых сбоев не зарегистрировано.",
+    locator: { section: "Фильтр: severity=critical" },
+  },
+  "fp-delivery-s0": {
+    quote: "«С 12 июля 2026 бесплатная доставка распространяется на все города-миллионники без ограничения по сумме заказа».",
+    locator: { section: "Пресс-релиз конкурента, 12 июля 2026" },
+  },
+  "fp-delivery-s2": {
+    document: {
+      fileName: "Причины отказа от заказа, июнь 2026.xlsx",
+      mimeType: "XLSX",
+      fileSize: "48 КБ",
+      updatedAt: "1 июля 2026",
+    },
+    quote: "Стоимость доставки — вторая по частоте причина отмены заказа (17,4%).",
+    locator: { sheet: "Причины", range: "5–9" },
+  },
+};
+Object.entries(SOURCE_DECORATIONS).forEach(([id, dec]) => {
+  const s = SOURCES_INDEX[id];
+  if (s) Object.assign(s, dec);
+});
+
+// Recipients directory used by the ShareDrawer. Static demo data.
+interface Recipient {
+  id: string;
+  name: string;
+  role: string;
+  dept: string;
+  initials: string;
+}
+const RECIPIENTS: Recipient[] = [
+  { id: "r1", name: "Алексей Смирнов", role: "Владелец процесса поставок", dept: "Закупки", initials: "АС" },
+  { id: "r2", name: "Ирина Ковалёва", role: "Ответственный за риск QNR-0214", dept: "Управление рисками", initials: "ИК" },
+  { id: "r3", name: "Дмитрий Орлов", role: "Категорийный менеджер по поставщикам", dept: "Закупки", initials: "ДО" },
+  { id: "r4", name: "Ольга Никитина", role: "Руководитель клиентской аналитики", dept: "Маркетинг и клиенты", initials: "ОН" },
+  { id: "r5", name: "Павел Крылов", role: "Владелец продукта «Экспресс-доставка»", dept: "Продукт", initials: "ПК" },
+  { id: "r6", name: "Мария Титова", role: "Владелец ИТ-сервиса онлайн-расчётов", dept: "ИТ", initials: "МТ" },
+  { id: "r7", name: "Сергей Львов", role: "Ответственный за меру дополнительного мониторинга", dept: "ИТ", initials: "СЛ" },
+  { id: "r8", name: "Наталья Гусева", role: "Владелец риска QNR-0331", dept: "Управление рисками", initials: "НГ" },
+];
+
+function pickSuggested(kind: "summary" | "fp-delivery" | "fp-supply" | "fp-it"): { id: string; reason: string }[] {
+  switch (kind) {
+    case "fp-supply":
+      return [
+        { id: "r1", reason: "Владелец процесса поставок" },
+        { id: "r2", reason: "Ответственный за риск QNR-0214" },
+        { id: "r3", reason: "Отвечает за работу с поставщиками" },
+      ];
+    case "fp-delivery":
+      return [
+        { id: "r5", reason: "Владелец продукта «Экспресс-доставка»" },
+        { id: "r4", reason: "Отвечает за клиентскую аналитику" },
+      ];
+    case "fp-it":
+      return [
+        { id: "r6", reason: "Владелец ИТ-сервиса" },
+        { id: "r7", reason: "Ответственный за меру мониторинга" },
+        { id: "r8", reason: "Владелец риска QNR-0331" },
+      ];
+    case "summary":
+    default:
+      return [
+        { id: "r1", reason: "Владелец процесса поставок" },
+        { id: "r2", reason: "Ответственный за риск QNR-0214" },
+        { id: "r4", reason: "Отвечает за клиентскую аналитику" },
+        { id: "r6", reason: "Владелец ИТ-сервиса онлайн-расчётов" },
+      ];
+  }
+}
+
 interface SummarySourceRef {
   sourceId: string;
   label: string;
@@ -423,6 +549,7 @@ interface SummarySection {
   id: "decision" | "check" | "watch" | "gaps";
   title: string;
   tone: "orange" | "blue" | "green" | "neutral";
+  headline: string;
   text: string;
   actionLabel?: string;
   actionText?: string;
@@ -434,9 +561,14 @@ interface SummarySection {
 interface CompanySummary {
   updatedAt: string;
   leadTitle: string;
+  leadHeadline: string;
   leadText: string;
   requiredDecision: string;
-  sinceLastVisit: string;
+  secondaryStatuses: {
+    tone: "blue" | "green";
+    label: string;
+    text: string;
+  }[];
   sections: SummarySection[];
   discussQuestion: string;
   clarificationQuestion: string;
@@ -448,19 +580,22 @@ const COMPANY_SUMMARY: CompanySummary = {
     "Хочу обсудить текущую ситуацию в компании и понять, на что обратить внимание в первую очередь",
   clarificationQuestion:
     "Помоги уточнить данные о продажах критичных товаров, готовности резервных поставщиков и клиентской активности в 12 затронутых городах",
-  leadTitle: "Сейчас главное",
+  leadTitle: "Главное за 30 сек",
+  leadHeadline: "Поставки — главная проблема сейчас",
   leadText:
-    "Повторные задержки трёх поставщиков уже отражаются на доступности товаров: доля отсутствующих SKU выросла с 6% до 24%. Возможные потери продаж пока не рассчитаны. Сигнал возможного оттока требует проверки, а эффект новой ИТ-меры — дальнейшего наблюдения.",
-  requiredDecision:
-    "Требуется решение: подтвердить резервный сценарий поставок.",
-  sinceLastVisit:
-    "С прошлого визита: ситуация с поставками ухудшилась; по ИТ-сбоям появилась положительная динамика.",
+    "Пять из семи задержек за последний месяц пришлись на трёх поставщиков. За тот же период доля отсутствующих товаров выросла с 6% до 24%. Возможные потери пока не рассчитаны.",
+  requiredDecision: "подтвердить резервный сценарий поставок.",
+  secondaryStatuses: [
+    { tone: "blue", label: "Проверить", text: "есть сигнал возможного оттока клиентов" },
+    { tone: "green", label: "Наблюдать", text: "по ИТ-сбоям появилась положительная динамика" },
+  ],
   sections: [
     {
       id: "decision",
       title: "Требует решения",
       tone: "orange",
-      text: "За последний месяц пять из семи задержек пришлись на трёх поставщиков. За тот же период доля отсутствующих товаров выросла с 6% до 24%. Возможный объём потерь продаж пока не рассчитан.",
+      headline: "Нужен резервный сценарий поставок",
+      text: "Пять из семи задержек за последний месяц пришлись на трёх поставщиков. За тот же период доля отсутствующих товаров выросла с 6% до 24%. Возможный объём потерь продаж пока не рассчитан.",
       actionLabel: "Что нужно сделать",
       actionText:
         "подтвердить резервных поставщиков и сроки переключения по трём проблемным контрагентам.",
@@ -491,16 +626,17 @@ const COMPANY_SUMMARY: CompanySummary = {
         },
       ],
       focusPointId: "fp-supply",
-      focusPointLabel: "Задержки поставок начинают влиять на наличие товаров",
+      focusPointLabel: "Нужен резервный сценарий поставок",
     },
     {
       id: "check",
       title: "Нужно проверить",
       tone: "blue",
-      text: "Конкурент запустил бесплатную доставку в 12 городах присутствия компании. Стоимость доставки уже входит в число частых причин отказа от заказа, поэтому Норм видит риск возможного оттока. Снижение конверсии и повторных заказов пока не подтверждено.",
-      actionLabel: "Что нужно проверить",
+      headline: "Возможный отток клиентов в 12 городах",
+      text: "Конкурент запустил бесплатную доставку в 12 городах присутствия компании. Стоимость доставки уже входит в число частых причин отказа от заказа. Поэтому есть сигнал возможного оттока, но снижение конверсии и повторных заказов пока не подтверждено.",
+      actionLabel: "Что проверить",
       actionText:
-        "клиентскую активность и конверсию в 12 затронутых городах.",
+        "клиентскую активность и конверсию в затронутых городах.",
       sources: [
         {
           sourceId: "fp-delivery-s0",
@@ -522,13 +658,14 @@ const COMPANY_SUMMARY: CompanySummary = {
         },
       ],
       focusPointId: "fp-delivery",
-      focusPointLabel: "Бесплатная доставка конкурента может увеличить отток",
+      focusPointLabel: "Возможный отток клиентов в 12 городах",
     },
     {
       id: "watch",
       title: "Под наблюдением",
       tone: "green",
-      text: "После подключения дополнительного мониторинга число критичных ошибок снизилось на 37%, а массовые сбои не повторялись 21 день. Это хороший ранний результат, но период наблюдения пока недостаточен, чтобы подтвердить эффективность меры и снизить оценку риска.",
+      headline: "Результат ИТ-меры выглядит положительно",
+      text: "После подключения дополнительного мониторинга число критичных ошибок снизилось на 37%, а массовые сбои не повторялись 21 день. Это хороший ранний результат, но период наблюдения пока слишком короткий, чтобы подтвердить эффективность меры и снизить оценку риска.",
       actionLabel: "Решение сейчас не требуется",
       actionText:
         "продолжить наблюдение и проверить результат при сопоставимой и пиковой нагрузке.",
@@ -553,13 +690,14 @@ const COMPANY_SUMMARY: CompanySummary = {
         },
       ],
       focusPointId: "fp-it",
-      focusPointLabel: "После новой меры число критичных сбоев снизилось",
+      focusPointLabel: "Результат ИТ-меры выглядит положительно",
     },
     {
       id: "gaps",
-      title: "Что Норм пока видит не полностью",
+      title: "Не хватает данных",
       tone: "neutral",
-      text: "Норм пока не может точно оценить финансовые последствия. Не хватает данных о продажах критичных товаров, резервных поставщиках и клиентской активности в 12 затронутых городах.",
+      headline: "Финансовые последствия пока нельзя оценить точно",
+      text: "Норму не хватает данных о продажах критичных товаров, готовности резервных поставщиков и клиентской активности в 12 затронутых городах.",
       sources: [
         {
           sourceId: "gap-sales",
@@ -1457,6 +1595,282 @@ function AssistantModal({ initialQuery, onClose, onToast }: { initialQuery: stri
   );
 }
 
+function SourceCardContent({
+  source,
+  supportedClaim,
+  relation,
+  onOpen,
+}: {
+  source: FocusSource;
+  supportedClaim?: string | null;
+  relation?: string | null;
+  onOpen: () => void;
+}) {
+  const doc = source.document;
+  const quote = source.quote ?? source.excerpt;
+  const rel = relation ?? source.relation;
+  const locParts: string[] = [];
+  if (source.locator) {
+    if (source.locator.sheet) locParts.push(`Лист «${source.locator.sheet}»`);
+    if (source.locator.range) locParts.push(`строки ${source.locator.range}`);
+    if (source.locator.section) locParts.push(source.locator.section);
+    if (source.locator.page) locParts.push(`страница ${source.locator.page}`);
+  }
+  const hasLocator = locParts.length > 0;
+  return (
+    <div className="np-src-card">
+      {doc ? (
+        <div className="np-src-doc">
+          <span className="np-src-doc-icon" aria-hidden>📄</span>
+          <div className="np-src-doc-main">
+            <div className="np-src-doc-name">{doc.fileName}</div>
+            <div className="np-src-doc-meta">
+              {[doc.mimeType, doc.fileSize, doc.updatedAt].filter(Boolean).join(" · ")}
+            </div>
+          </div>
+          {doc.downloadUrl && (
+            <a className="np-src-linkbtn" href={doc.downloadUrl} download>Скачать</a>
+          )}
+        </div>
+      ) : (
+        <div className="np-src-obj">
+          <div className="np-src-obj-type">{source.type}</div>
+          <div className="np-src-obj-name">{source.title}</div>
+          {source.date && <div className="np-src-obj-meta">Актуально: {source.date}</div>}
+        </div>
+      )}
+      <div className="np-src-block">
+        <div className="np-src-block-label">Цитата</div>
+        {quote ? (
+          <div className="np-src-quote">«{quote}»</div>
+        ) : (
+          <div className="np-src-quote np-src-quote--muted">Точный фрагмент источника пока не добавлен</div>
+        )}
+      </div>
+      {hasLocator && (
+        <div className="np-src-block">
+          <div className="np-src-block-label">Место в источнике</div>
+          <div className="np-src-locator">{locParts.join(", ")}</div>
+        </div>
+      )}
+      {supportedClaim && (
+        <div className="np-src-block">
+          <div className="np-src-block-label">Подтверждает в сводке</div>
+          <div className="np-src-quote np-src-quote--claim">«{supportedClaim}»</div>
+        </div>
+      )}
+      {rel && (
+        <div className="np-src-block">
+          <div className="np-src-block-label">Как источник связан с выводом</div>
+          <div>{rel}</div>
+        </div>
+      )}
+      <button className="np-btn np-btn-primary np-src-open" onClick={onOpen}>
+        Открыть источник
+      </button>
+    </div>
+  );
+}
+
+type ShareKind = "summary" | "fp-delivery" | "fp-supply" | "fp-it";
+interface SharePreview {
+  status: string;
+  statusTone: "orange" | "blue" | "green" | "neutral";
+  headline: string;
+  action?: string;
+  actualAt: string;
+  detailLabel?: string;
+  onOpenDetail?: () => void;
+}
+function ShareDrawer({
+  kind,
+  title,
+  preview,
+  onClose,
+  onSent,
+}: {
+  kind: ShareKind;
+  title: string;
+  preview: SharePreview;
+  onClose: () => void;
+  onSent: (n: number) => void;
+}) {
+  const suggested = pickSuggested(kind);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [query, setQuery] = useState("");
+  const [comment, setComment] = useState("");
+  const toggle = (id: string) =>
+    setSelected((s) => {
+      const n = new Set(s);
+      if (n.has(id)) n.delete(id); else n.add(id);
+      return n;
+    });
+  const q = query.trim().toLowerCase();
+  const filtered = q
+    ? RECIPIENTS.filter(
+        (r) =>
+          r.name.toLowerCase().includes(q) ||
+          r.role.toLowerCase().includes(q) ||
+          r.dept.toLowerCase().includes(q),
+      )
+    : [];
+  const selectedList = RECIPIENTS.filter((r) => selected.has(r.id));
+  return (
+    <div className="np-share-backdrop" onClick={onClose}>
+      <aside
+        className="np-share-drawer"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+      >
+        <div className="np-share-head">
+          <div>
+            <div className="np-share-eyebrow">Пересылка</div>
+            <h3 className="np-share-title">{title}</h3>
+          </div>
+          <button className="np-icon-btn" onClick={onClose} aria-label="Закрыть">
+            <Icon name="close" size={18} />
+          </button>
+        </div>
+        <div className="np-share-body">
+          <section className="np-share-preview">
+            <div className={`np-share-preview-status np-share-preview-status--${preview.statusTone}`}>
+              {preview.status}
+            </div>
+            <div className="np-share-preview-headline">{preview.headline}</div>
+            {preview.action && (
+              <div className="np-share-preview-action">{preview.action}</div>
+            )}
+            <div className="np-share-preview-meta">Актуально: {preview.actualAt}</div>
+            {preview.detailLabel && preview.onOpenDetail && (
+              <button
+                type="button"
+                className="np-share-preview-link"
+                onClick={preview.onOpenDetail}
+              >
+                {preview.detailLabel} →
+              </button>
+            )}
+          </section>
+
+          <section className="np-share-section">
+            <div className="np-share-section-title">Норм предлагает</div>
+            <ul className="np-share-list">
+              {suggested.map((s) => {
+                const r = RECIPIENTS.find((x) => x.id === s.id)!;
+                const on = selected.has(r.id);
+                return (
+                  <li key={r.id} className="np-share-item">
+                    <div className="np-share-item-avatar">{r.initials}</div>
+                    <div className="np-share-item-main">
+                      <div className="np-share-item-name">{r.name}</div>
+                      <div className="np-share-item-role">{s.reason}</div>
+                    </div>
+                    <button
+                      type="button"
+                      className={`np-share-add ${on ? "is-on" : ""}`}
+                      onClick={() => toggle(r.id)}
+                    >
+                      {on ? "Добавлен" : "Добавить"}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+
+          <section className="np-share-section">
+            <div className="np-share-section-title">Найти участника</div>
+            <input
+              className="np-share-input"
+              placeholder="Имя, роль или подразделение"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            {q && (
+              <ul className="np-share-list">
+                {filtered.length === 0 && (
+                  <li className="np-share-empty">Никого не нашлось</li>
+                )}
+                {filtered.map((r) => {
+                  const on = selected.has(r.id);
+                  return (
+                    <li key={r.id} className="np-share-item">
+                      <div className="np-share-item-avatar">{r.initials}</div>
+                      <div className="np-share-item-main">
+                        <div className="np-share-item-name">{r.name}</div>
+                        <div className="np-share-item-role">{r.role} · {r.dept}</div>
+                      </div>
+                      <button
+                        type="button"
+                        className={`np-share-add ${on ? "is-on" : ""}`}
+                        onClick={() => toggle(r.id)}
+                      >
+                        {on ? "Добавлен" : "Добавить"}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </section>
+
+          {selectedList.length > 0 && (
+            <section className="np-share-section">
+              <div className="np-share-section-title">Кому отправить · {selectedList.length}</div>
+              <div className="np-share-chips">
+                {selectedList.map((r) => (
+                  <span key={r.id} className="np-share-chip">
+                    {r.name}
+                    <button
+                      type="button"
+                      className="np-share-chip-x"
+                      onClick={() => toggle(r.id)}
+                      aria-label="Убрать"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </section>
+          )}
+
+          <section className="np-share-section">
+            <div className="np-share-section-title">Комментарий (необязательно)</div>
+            <textarea
+              className="np-share-textarea"
+              rows={3}
+              placeholder="Например: обратите внимание на пункт про резерв"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+            />
+          </section>
+        </div>
+
+        <div className="np-share-footer">
+          <button
+            type="button"
+            className="np-share-secondary"
+            onClick={() => onSent(-1)}
+          >
+            Скопировать ссылку
+          </button>
+          <button
+            type="button"
+            className="np-btn np-btn-primary np-share-send"
+            disabled={selectedList.length === 0}
+            onClick={() => onSent(selectedList.length)}
+          >
+            Отправить {selectedList.length > 0 ? `· ${selectedList.length}` : ""}
+          </button>
+        </div>
+      </aside>
+    </div>
+  );
+}
+
 function FocusPointModal({
   point,
   activeSourceIdx,
@@ -1476,11 +1890,17 @@ function FocusPointModal({
   onDiscuss: (q: string) => void;
   overSummary?: boolean;
 }) {
+  const [shareOpen, setShareOpen] = useState(false);
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
+      if (shareOpen) {
+        e.stopPropagation();
+        setShareOpen(false);
+        return;
+      }
       if (activeSourceIdx !== null) {
         e.stopPropagation();
         onCloseSource();
@@ -1493,7 +1913,7 @@ function FocusPointModal({
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
-  }, [activeSourceIdx, onClose, onCloseSource]);
+  }, [activeSourceIdx, onClose, onCloseSource, shareOpen]);
 
   const handleAction = (label: string) => {
     if (label === "Обсудить с Нормом") {
@@ -1524,9 +1944,18 @@ function FocusPointModal({
             <span className="np-focus-area">{point.area}</span>
           </div>
           <h2 className="np-focus-modal-title">{point.title}</h2>
-          <button className="np-icon-btn np-focus-close" onClick={onClose} aria-label="Закрыть">
-            <Icon name="close" size={18} />
-          </button>
+          <div className="np-focus-head-actions">
+            <button
+              type="button"
+              className="np-share-trigger"
+              onClick={() => setShareOpen(true)}
+            >
+              Поделиться
+            </button>
+            <button className="np-icon-btn np-focus-close" onClick={onClose} aria-label="Закрыть">
+              <Icon name="close" size={18} />
+            </button>
+          </div>
         </header>
 
         <div className="np-focus-modal-body">
@@ -1734,24 +2163,12 @@ function FocusPointModal({
               </div>
               <div className="np-focus-src-body">
                 {source ? (
-                  <>
-                    <section className="np-focus-block">
-                      <h4>Содержание</h4>
-                      <p>{source.excerpt}</p>
-                    </section>
-                    <section className="np-focus-block">
-                      <h4>Как источник связан с выводом</h4>
-                      <p>{source.relation}</p>
-                    </section>
-                    <button
-                      className="np-btn np-btn-primary"
-                      onClick={() =>
-                        onToast("Открытие источника в этом прототипе пока не реализовано")
-                      }
-                    >
-                      Открыть источник
-                    </button>
-                  </>
+                  <SourceCardContent
+                    source={source}
+                    onOpen={() =>
+                      onToast("Открытие источника в этом прототипе пока не реализовано")
+                    }
+                  />
                 ) : (
                   <ul className="np-focus-src-links np-focus-src-links--full">
                     {point.sources.map((s, i) => (
@@ -1777,6 +2194,25 @@ function FocusPointModal({
               </div>
             </aside>
           </div>
+        )}
+        {shareOpen && (
+          <ShareDrawer
+            kind={point.id === "fp-delivery" ? "fp-delivery" : point.id === "fp-supply" ? "fp-supply" : "fp-it"}
+            title="Отправить фокусную точку"
+            preview={{
+              status: point.type,
+              statusTone: point.tone as "orange" | "blue" | "green" | "neutral",
+              headline: point.title,
+              action: point.recommendations[0]?.action,
+              actualAt: point.signalDate,
+            }}
+            onClose={() => setShareOpen(false)}
+            onSent={(n) => {
+              setShareOpen(false);
+              if (n < 0) onToast("Ссылка скопирована");
+              else onToast(`Фокусная точка отправлена · ${n}`);
+            }}
+          />
         )}
       </div>
     </div>
@@ -1806,12 +2242,18 @@ function CompanySummaryModal({
   onToast: (m: string) => void;
   focusOnTop: boolean;
 }) {
+  const [shareOpen, setShareOpen] = useState(false);
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       if (focusOnTop) return; // focus modal handles its own escape
+      if (shareOpen) {
+        e.stopPropagation();
+        setShareOpen(false);
+        return;
+      }
       if (activeSourceId) {
         e.stopPropagation();
         onCloseSource();
@@ -1824,7 +2266,7 @@ function CompanySummaryModal({
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
-  }, [activeSourceId, onClose, onCloseSource, focusOnTop]);
+  }, [activeSourceId, onClose, onCloseSource, focusOnTop, shareOpen]);
 
   const source = activeSourceId ? SOURCES_INDEX[activeSourceId] : null;
   const supportedClaim = useMemo(() => {
@@ -1835,6 +2277,81 @@ function CompanySummaryModal({
     }
     return null;
   }, [activeSourceId, summary.sections]);
+  const sourceRelation = source?.relation || null;
+
+  const sectionCompact = (sec: SummarySection) => {
+    const preview = sec.sources.slice(0, 3);
+    const more = Math.max(0, sec.sources.length - 3);
+    return (
+      <>
+        <div className="np-summary-island-head">
+          <span className={`np-summary-island-kicker np-summary-island-kicker--${sec.tone}`}>
+            {sec.title}
+          </span>
+          {sec.headline && (
+            <h4 className="np-summary-island-headline">{sec.headline}</h4>
+          )}
+        </div>
+        <p className="np-summary-island-text">{sec.text}</p>
+        {sec.actionLabel && sec.actionText && (
+          <div className="np-summary-action-line">
+            <span className={`np-summary-action-label np-summary-action-label--${sec.tone}`}>
+              {sec.actionLabel}:
+            </span>{" "}
+            <span>{sec.actionText}</span>
+          </div>
+        )}
+        {sec.sources.length > 0 && (
+          <div className="np-summary-source-tags">
+            {preview.map((s, i) => (
+              <button
+                key={`${sec.id}-src-${i}`}
+                type="button"
+                className="np-summary-source-tag"
+                onClick={() => onOpenSource(s.sourceId)}
+              >
+                {s.label}
+              </button>
+            ))}
+            {more > 0 && (
+              <button
+                type="button"
+                className="np-summary-source-tag np-summary-source-tag--more"
+                onClick={() => onOpenSource(sec.sources[3].sourceId)}
+              >
+                ещё {more}
+              </button>
+            )}
+          </div>
+        )}
+        {sec.focusPointId && sec.focusPointLabel && (
+          <button
+            type="button"
+            className="np-summary-focus-link"
+            onClick={() => onOpenFocus(sec.focusPointId!)}
+          >
+            Подробнее: {sec.focusPointLabel} →
+          </button>
+        )}
+        {sec.showClarifyButton && (
+          <div className="np-company-summary-clarify">
+            <button
+              type="button"
+              className="np-btn np-btn-primary np-company-summary-clarify-btn"
+              onClick={onClarify}
+            >
+              Уточнить знания
+            </button>
+          </div>
+        )}
+      </>
+    );
+  };
+
+  const decision = summary.sections.find((s) => s.id === "decision");
+  const check = summary.sections.find((s) => s.id === "check");
+  const watch = summary.sections.find((s) => s.id === "watch");
+  const gaps = summary.sections.find((s) => s.id === "gaps");
 
   return (
     <div
@@ -1856,6 +2373,14 @@ function CompanySummaryModal({
               <div className="np-company-summary-updated">{summary.updatedAt}</div>
             </div>
           </div>
+          <div className="np-company-summary-head-actions">
+            <button
+              type="button"
+              className="np-share-trigger"
+              onClick={() => setShareOpen(true)}
+            >
+              Поделиться
+            </button>
           <button
             className="np-icon-btn np-company-summary-close"
             onClick={onClose}
@@ -1863,79 +2388,56 @@ function CompanySummaryModal({
           >
             <Icon name="close" size={18} />
           </button>
+          </div>
         </header>
 
         <div className="np-company-summary-body">
-          <section className="np-summary-lead">
-            <h3 className="np-summary-lead-title">{summary.leadTitle}</h3>
+          <section className="np-summary-lead-island">
+            <div className="np-summary-lead-kicker">{summary.leadTitle}</div>
+            <h3 className="np-summary-lead-headline">{summary.leadHeadline}</h3>
             <p className="np-summary-lead-text">{summary.leadText}</p>
             <div className="np-summary-required-decision">
               <span className="np-summary-required-label">Требуется решение:</span>{" "}
-              <span>
-                {summary.requiredDecision.replace(/^Требуется решение:\s*/, "")}
-              </span>
+              <span>{summary.requiredDecision.replace(/^Требуется решение:\s*/, "")}</span>
             </div>
+            {summary.secondaryStatuses.length > 0 && (
+              <div className="np-summary-secondary-row">
+                {summary.secondaryStatuses.map((s, i) => (
+                  <span key={i} className={`np-summary-secondary np-summary-secondary--${s.tone}`}>
+                    <span className="np-summary-secondary-dot" aria-hidden>●</span>
+                    <span className="np-summary-secondary-label">{s.label}</span>
+                    <span className="np-summary-secondary-sep" aria-hidden>·</span>
+                    <span className="np-summary-secondary-text">{s.text}</span>
+                  </span>
+                ))}
+              </div>
+            )}
           </section>
 
-          <div className="np-summary-since">
-            <span className="np-summary-since-dot" aria-hidden>●</span>
-            <span>{summary.sinceLastVisit}</span>
-          </div>
-
-          <div className="np-summary-stream">
-            {summary.sections.map((sec) => (
-              <section
-                key={sec.id}
-                className={`np-summary-block np-summary-block--${sec.tone}`}
-              >
-                <h3 className={`np-summary-block-title np-summary-block-title--${sec.tone}`}>
-                  {sec.title}
-                </h3>
-                <p className="np-company-summary-text">{sec.text}</p>
-                {sec.actionLabel && sec.actionText && (
-                  <div className="np-summary-action-line">
-                    <span className={`np-summary-action-label np-summary-action-label--${sec.tone}`}>
-                      {sec.actionLabel}:
-                    </span>{" "}
-                    <span>{sec.actionText}</span>
-                  </div>
-                )}
-                {sec.sources.length > 0 && (
-                  <div className="np-summary-source-tags">
-                    {sec.sources.map((s, i) => (
-                      <button
-                        key={`${sec.id}-src-${i}`}
-                        type="button"
-                        className="np-summary-source-tag"
-                        onClick={() => onOpenSource(s.sourceId)}
-                      >
-                        {s.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-                {sec.focusPointId && sec.focusPointLabel && (
-                  <button
-                    type="button"
-                    className="np-summary-focus-link"
-                    onClick={() => onOpenFocus(sec.focusPointId!)}
-                  >
-                    Подробнее: {sec.focusPointLabel} →
-                  </button>
-                )}
-                {sec.showClarifyButton && (
-                  <div className="np-company-summary-clarify">
-                    <button
-                      type="button"
-                      className="np-btn np-btn-primary np-company-summary-clarify-btn"
-                      onClick={onClarify}
-                    >
-                      Уточнить знания
-                    </button>
-                  </div>
-                )}
-              </section>
-            ))}
+          <div className="np-summary-details">
+            <h3 className="np-summary-details-title">Ситуация в деталях</h3>
+            <div className="np-summary-details-grid">
+              {decision && (
+                <section className={`np-summary-island np-summary-island--wide np-summary-island--${decision.tone}`}>
+                  {sectionCompact(decision)}
+                </section>
+              )}
+              {check && (
+                <section className={`np-summary-island np-summary-island--${check.tone}`}>
+                  {sectionCompact(check)}
+                </section>
+              )}
+              {watch && (
+                <section className={`np-summary-island np-summary-island--${watch.tone}`}>
+                  {sectionCompact(watch)}
+                </section>
+              )}
+              {gaps && (
+                <section className={`np-summary-island np-summary-island--wide np-summary-island--${gaps.tone}`}>
+                  {sectionCompact(gaps)}
+                </section>
+              )}
+            </div>
           </div>
         </div>
 
@@ -1975,31 +2477,36 @@ function CompanySummaryModal({
                 </button>
               </div>
               <div className="np-summary-source-body">
-                {supportedClaim && (
-                  <section className="np-summary-source-block np-summary-source-block--claim">
-                    <h4>Подтверждает в сводке</h4>
-                    <p>«{supportedClaim}»</p>
-                  </section>
-                )}
-                <section className="np-summary-source-block">
-                  <h4>Содержание</h4>
-                  <p>{source.excerpt}</p>
-                </section>
-                <section className="np-summary-source-block">
-                  <h4>Как источник связан с выводом</h4>
-                  <p>{source.relation}</p>
-                </section>
-                <button
-                  className="np-btn np-btn-primary"
-                  onClick={() =>
+                <SourceCardContent
+                  source={source}
+                  supportedClaim={supportedClaim}
+                  relation={sourceRelation}
+                  onOpen={() =>
                     onToast("Открытие источника в этом прототипе пока не реализовано")
                   }
-                >
-                  Открыть источник
-                </button>
+                />
               </div>
             </aside>
           </div>
+        )}
+        {shareOpen && (
+          <ShareDrawer
+            kind="summary"
+            title="Отправить сводку"
+            preview={{
+              status: "Требуется решение",
+              statusTone: "orange",
+              headline: summary.leadHeadline,
+              action: summary.requiredDecision,
+              actualAt: summary.updatedAt.replace(/^Актуально на\s*/, ""),
+            }}
+            onClose={() => setShareOpen(false)}
+            onSent={(n) => {
+              setShareOpen(false);
+              if (n < 0) onToast("Ссылка скопирована");
+              else onToast(`Сводка отправлена · ${n}`);
+            }}
+          />
         )}
       </div>
     </div>
@@ -2108,7 +2615,7 @@ export default function NormPrototype() {
         ) : (
         <div className="np-page-container">
         <h1 className="np-hello">
-          <span className="np-hello-line">Привет, Кирилл!</span>
+          <span className="np-hello-line">Привет, Сергей!</span>
           <button
             type="button"
             className="np-hello-summary"
