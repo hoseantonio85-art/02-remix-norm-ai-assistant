@@ -2474,6 +2474,28 @@
   gap: 8px;
 }
 
+/* Secondary Share button inside FocusPointModal right column */
+.np-focus-share-secondary {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  color: #1f2937;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.np-focus-share-secondary:hover { background: #f5f6f8; border-color: #b8bfca; }
+.np-focus-share-icon { font-size: 13px; line-height: 1; }
+.np-focus-actions .np-focus-discuss { width: 100%; }
+
 /* Share drawer nested inside modal */
 .np-share-backdrop {
   position: absolute;
