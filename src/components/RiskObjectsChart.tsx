@@ -195,15 +195,32 @@ export default function RiskObjectsChart({ rightSlot }: Props) {
 
         <div className="np-risk-legend">
           <span className="np-risk-legend-item">
-            <span className="np-risk-legend-swatch np-risk-legend-swatch--fact" />
+            <svg width={18} height={8} aria-hidden style={{ display: "inline-block" }}>
+              <line
+                x1={1}
+                y1={4}
+                x2={17}
+                y2={4}
+                stroke="#6b8f80"
+                strokeWidth={1.5}
+                strokeLinecap="round"
+                strokeDasharray="3 3"
+              />
+            </svg>
             Факт
           </span>
           <span className="np-risk-legend-item">
-            <span className="np-risk-legend-swatch np-risk-legend-swatch--limit" />
+            <span
+              className="np-risk-legend-swatch"
+              style={{ background: "#cfe4dc" }}
+            />
             Лимит
           </span>
           <span className="np-risk-legend-item">
-            <span className="np-risk-legend-swatch np-risk-legend-swatch--forecast" />
+            <span
+              className="np-risk-legend-swatch"
+              style={{ background: "#e8f1ec", border: "1px solid #d1e0d8" }}
+            />
             Прогноз
           </span>
         </div>
