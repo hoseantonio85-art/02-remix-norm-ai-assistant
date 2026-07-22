@@ -3318,3 +3318,53 @@
 @media (max-width: 520px) {
   .np-sd-drawer { width: 100%; }
 }
+
+/* ============================================================
+   Unified sizing for large modals and floating drawers
+   ============================================================ */
+
+/* Large modals: single width across the prototype */
+.np-modal,
+.np-focus-modal,
+.np-company-summary {
+  width: 1340px;
+  max-width: calc(100vw - 48px);
+}
+
+/* Floating drawers — rounded on all sides, detached from viewport edges */
+.np-drawer-backdrop,
+.np-sd-backdrop {
+  padding: 24px;
+  box-sizing: border-box;
+}
+.np-drawer,
+.np-sd-drawer {
+  height: auto;
+  max-height: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+/* Nested drawers inside modals — same rounding + spacing from modal edges */
+.np-share-backdrop,
+.np-focus-src-backdrop,
+.np-summary-source-backdrop {
+  padding: 16px;
+  box-sizing: border-box;
+}
+.np-share-drawer,
+.np-focus-src-drawer,
+.np-summary-source-drawer {
+  height: auto;
+  max-height: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+@media (max-width: 640px) {
+  .np-drawer-backdrop,
+  .np-sd-backdrop { padding: 12px; }
+  .np-share-backdrop,
+  .np-focus-src-backdrop,
+  .np-summary-source-backdrop { padding: 10px; }
+}
