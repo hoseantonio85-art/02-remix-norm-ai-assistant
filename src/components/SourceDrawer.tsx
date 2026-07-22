@@ -340,25 +340,33 @@ export function SourceDrawer({
               {selected ? selected.typeLabel : heading}
             </div>
             <h3 className="np-sd-title">
-              {selected ? selected.title : `${heading} · ${sources.length}`}
+              {selected ? (
+                <TitleLink s={selected} onExternal={handleExternal}>
+                  {selected.title}
+                </TitleLink>
+              ) : (
+                `${heading} · ${sources.length}`
+              )}
             </h3>
             {selected && (
               <div className="np-sd-submeta">{headerMeta(selected)}</div>
             )}
           </div>
-          <button className="np-icon-btn np-sd-close" onClick={onClose} aria-label="Закрыть">
-            ✕
-          </button>
+          <div className="np-sd-head-actions">
+            {selected && editable && (
+              <OverflowMenu s={selected} onEdit={onEdit} onDelete={onDelete} />
+            )}
+            <button className="np-icon-btn np-sd-close" onClick={onClose} aria-label="Закрыть">
+              ✕
+            </button>
+          </div>
         </div>
         <div className="np-sd-body">
           {selected ? (
             <SourceDetail
               s={selected}
               mode={mode}
-              editable={editable}
               onExternal={handleExternal}
-              onEdit={onEdit}
-              onDelete={onDelete}
             />
           ) : showList ? (
             <ul className="np-sd-list">
