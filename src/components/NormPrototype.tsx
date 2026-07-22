@@ -1890,11 +1890,17 @@ function FocusPointModal({
   onDiscuss: (q: string) => void;
   overSummary?: boolean;
 }) {
+  const [shareOpen, setShareOpen] = useState(false);
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
+      if (shareOpen) {
+        e.stopPropagation();
+        setShareOpen(false);
+        return;
+      }
       if (activeSourceIdx !== null) {
         e.stopPropagation();
         onCloseSource();
@@ -1907,7 +1913,7 @@ function FocusPointModal({
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
-  }, [activeSourceIdx, onClose, onCloseSource]);
+  }, [activeSourceIdx, onClose, onCloseSource, shareOpen]);
 
   const handleAction = (label: string) => {
     if (label === "Обсудить с Нормом") {
@@ -1938,9 +1944,18 @@ function FocusPointModal({
             <span className="np-focus-area">{point.area}</span>
           </div>
           <h2 className="np-focus-modal-title">{point.title}</h2>
-          <button className="np-icon-btn np-focus-close" onClick={onClose} aria-label="Закрыть">
-            <Icon name="close" size={18} />
-          </button>
+          <div className="np-focus-head-actions">
+            <button
+              type="button"
+              className="np-share-trigger"
+              onClick={() => setShareOpen(true)}
+            >
+              Поделиться
+            </button>
+            <button className="np-icon-btn np-focus-close" onClick={onClose} aria-label="Закрыть">
+              <Icon name="close" size={18} />
+            </button>
+          </div>
         </header>
 
         <div className="np-focus-modal-body">
@@ -2148,24 +2163,12 @@ function FocusPointModal({
               </div>
               <div className="np-focus-src-body">
                 {source ? (
-                  <>
-                    <section className="np-focus-block">
-                      <h4>Содержание</h4>
-                      <p>{source.excerpt}</p>
-                    </section>
-                    <section className="np-focus-block">
-                      <h4>Как источник связан с выводом</h4>
-                      <p>{source.relation}</p>
-                    </section>
-                    <button
-                      className="np-btn np-btn-primary"
-                      onClick={() =>
-                        onToast("Открытие источника в этом прототипе пока не реализовано")
-                      }
-                    >
-                      Открыть источник
-                    </button>
-                  </>
+                  <SourceCardContent
+                    source={source}
+                    onOpen={() =>
+                      onToast("Открытие источника в этом прототипе пока не реализовано")
+                    }
+                  />
                 ) : (
                   <ul className="np-focus-src-links np-focus-src-links--full">
                     {point.sources.map((s, i) => (
@@ -2191,6 +2194,25 @@ function FocusPointModal({
               </div>
             </aside>
           </div>
+        )}
+        {shareOpen && (
+          <ShareDrawer
+            kind={point.id === "fp-delivery" ? "fp-delivery" : point.id === "fp-supply" ? "fp-supply" : "fp-it"}
+            title="Отправить фокусную точку"
+            preview={{
+              status: point.type,
+              statusTone: point.tone as "orange" | "blue" | "green" | "neutral",
+              headline: point.title,
+              action: point.recommendations[0]?.action,
+              actualAt: point.signalDate,
+            }}
+            onClose={() => setShareOpen(false)}
+            onSent={(n) => {
+              setShareOpen(false);
+              if (n < 0) onToast("Ссылка скопирована");
+              else onToast(`Фокусная точка отправлена · ${n}`);
+            }}
+          />
         )}
       </div>
     </div>
