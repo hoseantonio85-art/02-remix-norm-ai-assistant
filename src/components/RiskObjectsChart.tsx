@@ -11,9 +11,34 @@ interface RiskObject {
   potentialPath: string;
   assessmentPath: string;
   factDashes: string[];
+  tone: "critical" | "attention" | "stable";
 }
 
 const RISK_OBJECTS = chartDataRaw as RiskObject[];
+
+const CHART_TONES = {
+  critical: {
+    potential: "#FDF0F1",
+    assessment: "#F8DCDD",
+    fact: "#E05A5F",
+    hoverPotential: "#FAE4E6",
+    hoverAssessment: "#F3CDCF",
+  },
+  attention: {
+    potential: "#FFF8E7",
+    assessment: "#F8EDC8",
+    fact: "#E5A62B",
+    hoverPotential: "#FFF2D2",
+    hoverAssessment: "#F3E2A9",
+  },
+  stable: {
+    potential: "#EAF9F4",
+    assessment: "#D4F2E8",
+    fact: "#2BBF8A",
+    hoverPotential: "#DFF6EE",
+    hoverAssessment: "#C4EBDD",
+  },
+} as const;
 
 // Local mini-icons for labels — small, muted, secondary
 function MiniIcon({ name }: { name: string }) {
@@ -104,6 +129,7 @@ export default function RiskObjectsChart({ rightSlot }: Props) {
             <g transform="translate(339, 250)">
               {RISK_OBJECTS.map((s) => {
                 const active = hovered === s.id;
+                const tone = CHART_TONES[s.tone];
                 return (
                   <g
                     key={s.id}
@@ -113,12 +139,12 @@ export default function RiskObjectsChart({ rightSlot }: Props) {
                   >
                     <path
                       d={s.potentialPath}
-                      fill={active ? "#D1FAEF" : "#ECFDF8"}
+                      fill={active ? tone.hoverPotential : tone.potential}
                       style={{ transition: "fill 180ms" }}
                     />
                     <path
                       d={s.assessmentPath}
-                      fill={active ? "#A8F0D8" : "#D1FAEF"}
+                      fill={active ? tone.hoverAssessment : tone.assessment}
                       style={{ transition: "fill 180ms" }}
                     />
                     {s.factDashes.map((d, i) => (
@@ -126,7 +152,7 @@ export default function RiskObjectsChart({ rightSlot }: Props) {
                         key={i}
                         d={d}
                         fill="none"
-                        stroke="#23D773"
+                        stroke={tone.fact}
                         strokeWidth={1.5}
                         strokeLinecap="round"
                       />
@@ -169,15 +195,32 @@ export default function RiskObjectsChart({ rightSlot }: Props) {
 
         <div className="np-risk-legend">
           <span className="np-risk-legend-item">
-            <span className="np-risk-legend-swatch np-risk-legend-swatch--fact" />
+            <svg width={18} height={8} aria-hidden style={{ display: "inline-block" }}>
+              <line
+                x1={1}
+                y1={4}
+                x2={17}
+                y2={4}
+                stroke="#6b8f80"
+                strokeWidth={1.5}
+                strokeLinecap="round"
+                strokeDasharray="3 3"
+              />
+            </svg>
             Факт
           </span>
           <span className="np-risk-legend-item">
-            <span className="np-risk-legend-swatch np-risk-legend-swatch--limit" />
+            <span
+              className="np-risk-legend-swatch"
+              style={{ background: "#cfe4dc" }}
+            />
             Лимит
           </span>
           <span className="np-risk-legend-item">
-            <span className="np-risk-legend-swatch np-risk-legend-swatch--forecast" />
+            <span
+              className="np-risk-legend-swatch"
+              style={{ background: "#e8f1ec", border: "1px solid #d1e0d8" }}
+            />
             Прогноз
           </span>
         </div>
