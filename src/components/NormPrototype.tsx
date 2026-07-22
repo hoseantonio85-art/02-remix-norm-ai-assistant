@@ -152,6 +152,9 @@ interface FocusSource {
     sheet?: string;
     range?: string;
   };
+  provider?: string;
+  domain?: string;
+  url?: string;
 }
 interface FocusPoint {
   id: string;
