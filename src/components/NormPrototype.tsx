@@ -572,6 +572,17 @@ interface CompanySummary {
   sections: SummarySection[];
   discussQuestion: string;
   clarificationQuestion: string;
+  meta: {
+    period: string;
+    incidents: { value: number; label: string };
+    externalSignals: { value: number; label: string };
+    improvingMeasures: { value: number; label: string };
+    highRisks: { value: number; label: string };
+    risksWithoutMeasures: { value: number; label: string };
+    sourcesUsed: number;
+    knowledgeGaps: number;
+    updatedAtShort: string;
+  };
 }
 
 const COMPANY_SUMMARY: CompanySummary = {
@@ -721,6 +732,17 @@ const COMPANY_SUMMARY: CompanySummary = {
       showClarifyButton: true,
     },
   ],
+  meta: {
+    period: "30 дней",
+    incidents: { value: 7, label: "инцидентов поставок" },
+    externalSignals: { value: 1, label: "новый внешний сигнал" },
+    improvingMeasures: { value: 1, label: "мера показывает улучшение" },
+    highRisks: { value: 18, label: "высоких рисков" },
+    risksWithoutMeasures: { value: 6, label: "без эффективных мер" },
+    sourcesUsed: 10,
+    knowledgeGaps: 3,
+    updatedAtShort: "22 июля 2026, 09:30",
+  },
 };
 
 function Donut({ percent, color }: { percent: number; color: string }) {
@@ -2279,68 +2301,57 @@ function CompanySummaryModal({
   const sourceRelation = source?.relation || null;
 
   const renderDetailSection = (sec: SummarySection) => {
-    const preview = sec.sources.slice(0, 3);
-    const more = Math.max(0, sec.sources.length - 3);
+    const preview = sec.sources.slice(0, 2);
+    const more = Math.max(0, sec.sources.length - 2);
     return (
       <section
         key={sec.id}
         className={`np-summary-island np-summary-detail-island np-summary-detail-island--${sec.tone}`}
       >
         <div className="np-summary-detail-body">
-          <div className="np-summary-detail-main">
-            <span className={`np-summary-tag np-summary-tag--${sec.tone}`}>
-              {sec.title}
-            </span>
-            {sec.headline && (
-              <h3 className="np-summary-detail-headline">{sec.headline}</h3>
-            )}
-            <p className="np-summary-detail-text">{sec.text}</p>
-            {sec.actionLabel && sec.actionText && (
-              <p className="np-summary-detail-text">
-                <strong>{sec.actionLabel}:</strong> {sec.actionText}
-              </p>
-            )}
-          </div>
-          {(sec.sources.length > 0 || sec.focusPointId) && (
-            <div className="np-summary-detail-side">
-              {sec.sources.length > 0 && (
-                <>
-                  <div className="np-summary-detail-side-label">
-                    Источники · {sec.sources.length}
-                  </div>
-                  <div className="np-summary-source-tags">
-                    {preview.map((s, i) => (
-                      <button
-                        key={`${sec.id}-src-${i}`}
-                        type="button"
-                        className="np-summary-source-tag"
-                        onClick={() => onOpenSource(s.sourceId)}
-                      >
-                        {s.label}
-                      </button>
-                    ))}
-                    {more > 0 && (
-                      <button
-                        type="button"
-                        className="np-summary-source-tag np-summary-source-tag--more"
-                        onClick={() => onOpenSource(sec.sources[3].sourceId)}
-                      >
-                        ещё {more}
-                      </button>
-                    )}
-                  </div>
-                </>
-              )}
-              {sec.focusPointId && sec.focusPointLabel && (
+          {sec.headline && (
+            <h3 className="np-summary-detail-headline">{sec.headline}</h3>
+          )}
+          <p className="np-summary-detail-text">{sec.text}</p>
+          {sec.actionLabel && sec.actionText && (
+            <p className="np-summary-detail-text">
+              <strong>{sec.actionLabel}:</strong> {sec.actionText}
+            </p>
+          )}
+          {(sec.sources.length > 0 || sec.title) && (
+            <div className="np-summary-tag-row">
+              <span className={`np-summary-tag np-summary-tag--${sec.tone}`}>
+                {sec.title}
+              </span>
+              {preview.map((s, i) => (
+                <button
+                  key={`${sec.id}-src-${i}`}
+                  type="button"
+                  className="np-summary-source-tag"
+                  onClick={() => onOpenSource(s.sourceId)}
+                >
+                  {s.label}
+                </button>
+              ))}
+              {more > 0 && (
                 <button
                   type="button"
-                  className="np-summary-focus-link"
-                  onClick={() => onOpenFocus(sec.focusPointId!)}
+                  className="np-summary-source-tag np-summary-source-tag--more"
+                  onClick={() => onOpenSource(sec.sources[2].sourceId)}
                 >
-                  Подробнее: {sec.focusPointLabel} →
+                  + ещё {more}
                 </button>
               )}
             </div>
+          )}
+          {sec.focusPointId && sec.focusPointLabel && (
+            <button
+              type="button"
+              className="np-summary-focus-link"
+              onClick={() => onOpenFocus(sec.focusPointId!)}
+            >
+              Подробнее: {sec.focusPointLabel} →
+            </button>
           )}
         </div>
       </section>
@@ -2348,57 +2359,37 @@ function CompanySummaryModal({
   };
 
   const renderGapsSection = (sec: SummarySection) => {
-    const preview = sec.sources.slice(0, 3);
-    const more = Math.max(0, sec.sources.length - 3);
     return (
       <section
         key={sec.id}
         className="np-summary-island np-summary-detail-island np-summary-detail-island--neutral"
       >
         <div className="np-summary-detail-body">
-          <div className="np-summary-detail-main">
-            {sec.headline && (
-              <h3 className="np-summary-detail-headline">{sec.headline}</h3>
-            )}
-            <p className="np-summary-detail-text">{sec.text}</p>
-          </div>
-          <div className="np-summary-detail-side">
-            {sec.sources.length > 0 && (
-              <>
-                <div className="np-summary-detail-side-label">
-                  Не хватает · {sec.sources.length}
-                </div>
-                <div className="np-summary-source-tags">
-                  {preview.map((s, i) => (
-                    <button
-                      key={`${sec.id}-src-${i}`}
-                      type="button"
-                      className="np-summary-source-tag"
-                      onClick={() => onOpenSource(s.sourceId)}
-                    >
-                      {s.label}
-                    </button>
-                  ))}
-                  {more > 0 && (
-                    <button
-                      type="button"
-                      className="np-summary-source-tag np-summary-source-tag--more"
-                      onClick={() => onOpenSource(sec.sources[3].sourceId)}
-                    >
-                      ещё {more}
-                    </button>
-                  )}
-                </div>
-              </>
-            )}
-            <button
-              type="button"
-              className="np-summary-clarify-secondary"
-              onClick={onClarify}
-            >
-              Уточнить знания
-            </button>
-          </div>
+          {sec.headline && (
+            <h3 className="np-summary-detail-headline">{sec.headline}</h3>
+          )}
+          <p className="np-summary-detail-text">{sec.text}</p>
+          {sec.sources.length > 0 && (
+            <div className="np-summary-tag-row">
+              {sec.sources.map((s, i) => (
+                <button
+                  key={`${sec.id}-src-${i}`}
+                  type="button"
+                  className="np-summary-source-tag"
+                  onClick={() => onOpenSource(s.sourceId)}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          )}
+          <button
+            type="button"
+            className="np-summary-clarify-secondary"
+            onClick={onClarify}
+          >
+            Уточнить знания
+          </button>
         </div>
       </section>
     );
@@ -2425,7 +2416,7 @@ function CompanySummaryModal({
           <div className="np-company-summary-head-main">
             <LogoMark size={32} />
             <div>
-              <h2 className="np-company-summary-title">Ситуация в компании</h2>
+              <h1 className="np-company-summary-title">Ситуация в компании</h1>
               <div className="np-company-summary-updated">{summary.updatedAt}</div>
             </div>
           </div>
@@ -2448,56 +2439,102 @@ function CompanySummaryModal({
         </header>
 
         <div className="np-company-summary-body">
-          <section className="np-summary-lead-island">
-            <div className="np-summary-lead-kicker">{summary.leadTitle}</div>
-            <h1 className="np-summary-lead-headline">{summary.leadHeadline}</h1>
-            <p className="np-summary-lead-text">{summary.leadText}</p>
-            <div className="np-summary-required-row">
-              <span className="np-summary-tag np-summary-tag--orange">Требует решения</span>
-              <span className="np-summary-required-text">
-                {summary.requiredDecision.replace(/\.$/, "")}
-              </span>
+          <div className="np-summary-layout">
+            <div className="np-summary-main-col">
+              <section className="np-summary-group">
+                <h2 className="np-summary-h2">{summary.leadTitle}</h2>
+                <div className="np-summary-island np-summary-lead-island">
+                  <h3 className="np-summary-detail-headline">{summary.leadHeadline}</h3>
+                  <p className="np-summary-detail-text">{summary.leadText}</p>
+                  <div className="np-summary-lead-tags">
+                    <div className="np-summary-lead-tag-row">
+                      <span className="np-summary-tag np-summary-tag--orange">Требует решения</span>
+                      <span className="np-summary-secondary-text">
+                        {summary.requiredDecision.replace(/\.$/, "")}
+                      </span>
+                    </div>
+                    {summary.secondaryStatuses.map((s, i) => (
+                      <div key={i} className="np-summary-lead-tag-row">
+                        <span className={`np-summary-tag np-summary-tag--${s.tone}`}>
+                          {s.label}
+                        </span>
+                        <span className="np-summary-secondary-text">{s.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              <section className="np-summary-group">
+                <h2 className="np-summary-h2">Ситуация в деталях</h2>
+                <div className="np-summary-details-stack">
+                  {decision && renderDetailSection(decision)}
+                  {check && renderDetailSection(check)}
+                  {watch && renderDetailSection(watch)}
+                </div>
+              </section>
+
+              {gaps && (
+                <section className="np-summary-group">
+                  <h2 className="np-summary-h2">Что Норм пока видит не полностью</h2>
+                  {renderGapsSection(gaps)}
+                </section>
+              )}
             </div>
-            {summary.secondaryStatuses.length > 0 && (
-              <div className="np-summary-secondary-row">
-                {summary.secondaryStatuses.map((s, i) => (
-                  <span key={i} className="np-summary-secondary">
-                    <span className={`np-summary-tag np-summary-tag--${s.tone}`}>
-                      {s.label}
-                    </span>
-                    <span className="np-summary-secondary-text">{s.text}</span>
-                  </span>
-                ))}
+
+            <aside className="np-summary-side-col">
+              <section className="np-summary-island np-summary-meta-island">
+                <h3 className="np-summary-detail-headline np-summary-meta-title">Контекст сводки</h3>
+                <div className="np-summary-meta-group">
+                  <div className="np-summary-meta-group-title">За последние {summary.meta.period}</div>
+                  <ul className="np-summary-meta-list">
+                    <li><span className="np-summary-meta-num">{summary.meta.incidents.value}</span> {summary.meta.incidents.label}</li>
+                    <li><span className="np-summary-meta-num">{summary.meta.externalSignals.value}</span> {summary.meta.externalSignals.label}</li>
+                    <li><span className="np-summary-meta-num">{summary.meta.improvingMeasures.value}</span> {summary.meta.improvingMeasures.label}</li>
+                  </ul>
+                </div>
+                <div className="np-summary-meta-group">
+                  <div className="np-summary-meta-group-title">Риск-профиль</div>
+                  <ul className="np-summary-meta-list">
+                    <li><span className="np-summary-meta-num">{summary.meta.highRisks.value}</span> {summary.meta.highRisks.label}</li>
+                    <li><span className="np-summary-meta-num">{summary.meta.risksWithoutMeasures.value}</span> {summary.meta.risksWithoutMeasures.label}</li>
+                  </ul>
+                </div>
+                <div className="np-summary-meta-group">
+                  <div className="np-summary-meta-group-title">Основание сводки</div>
+                  <ul className="np-summary-meta-list">
+                    <li><span className="np-summary-meta-num">{summary.meta.sourcesUsed}</span> использованных источников</li>
+                    <li><span className="np-summary-meta-num">{summary.meta.knowledgeGaps}</span> области с нехваткой данных</li>
+                    <li>обновлено {summary.meta.updatedAtShort}</li>
+                  </ul>
+                </div>
+              </section>
+              <div className="np-summary-side-actions">
+                <button
+                  type="button"
+                  className="np-focus-discuss np-summary-side-discuss"
+                  onClick={onDiscuss}
+                >
+                  Обсудить с Нормом
+                </button>
+                <button
+                  type="button"
+                  className="np-summary-side-link"
+                  onClick={() => onToast("Открытие раздела рисков в этом прототипе пока не реализовано")}
+                >
+                  Открыть все риски
+                </button>
+                <button
+                  type="button"
+                  className="np-summary-side-link"
+                  onClick={() => onToast("Открытие раздела инцидентов в этом прототипе пока не реализовано")}
+                >
+                  Открыть инциденты
+                </button>
               </div>
-            )}
-          </section>
-
-          <div className="np-summary-details">
-            <h2 className="np-summary-details-title">Ситуация в деталях</h2>
-            <div className="np-summary-details-grid">
-              {decision && renderDetailSection(decision)}
-              {check && renderDetailSection(check)}
-              {watch && renderDetailSection(watch)}
-            </div>
+            </aside>
           </div>
-
-          {gaps && (
-            <div className="np-summary-gaps">
-              <h2 className="np-summary-details-title">Что Норм пока видит не полностью</h2>
-              {renderGapsSection(gaps)}
-            </div>
-          )}
         </div>
-
-        <footer className="np-company-summary-footer">
-          <button
-            type="button"
-            className="np-focus-discuss np-company-summary-discuss"
-            onClick={onDiscuss}
-          >
-            Обсудить ситуацию с Нормом
-          </button>
-        </footer>
 
         {source && (
           <div className="np-summary-source-backdrop" onClick={onCloseSource}>
