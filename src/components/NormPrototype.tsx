@@ -1944,18 +1944,9 @@ function FocusPointModal({
             <span className="np-focus-area">{point.area}</span>
           </div>
           <h2 className="np-focus-modal-title">{point.title}</h2>
-          <div className="np-focus-head-actions">
-            <button
-              type="button"
-              className="np-share-trigger"
-              onClick={() => setShareOpen(true)}
-            >
-              Поделиться
-            </button>
-            <button className="np-icon-btn np-focus-close" onClick={onClose} aria-label="Закрыть">
-              <Icon name="close" size={18} />
-            </button>
-          </div>
+          <button className="np-icon-btn np-focus-close" onClick={onClose} aria-label="Закрыть">
+            <Icon name="close" size={18} />
+          </button>
         </header>
 
         <div className="np-focus-modal-body">
@@ -2119,6 +2110,14 @@ function FocusPointModal({
                 onClick={() => handleAction("Обсудить с Нормом")}
               >
                 Обсудить с Нормом
+              </button>
+              <button
+                type="button"
+                className="np-focus-share-secondary"
+                onClick={() => setShareOpen(true)}
+              >
+                <span aria-hidden className="np-focus-share-icon">↗</span>
+                Поделиться
               </button>
             </div>
           </aside>
