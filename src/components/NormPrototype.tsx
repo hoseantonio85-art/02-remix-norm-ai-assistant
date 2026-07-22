@@ -1897,6 +1897,8 @@ export default function NormPrototype() {
   const [toast, setToast] = useState<string | null>(null);
   const [focusIdx, setFocusIdx] = useState<number | null>(null);
   const [focusSourceIdx, setFocusSourceIdx] = useState<number | "list" | null>(null);
+  const [summaryOpen, setSummaryOpen] = useState(false);
+  const [summarySourceId, setSummarySourceId] = useState<string | null>(null);
   const [activeNav, setActiveNav] = useState<string>("home");
   const [profileAreaOpen, setProfileAreaOpen] = useState(false);
   const [knowledgeBaseRootRequest, setKnowledgeBaseRootRequest] = useState(0);
@@ -1991,8 +1993,16 @@ export default function NormPrototype() {
         ) : (
         <div className="np-page-container">
         <h1 className="np-hello">
-          — Привет, Кирилл! Меня зовут <span className="np-grad">Норм.</span><br/>
-          Я твой <span className="np-grad">виртуальный помощник.</span>
+          — Привет, Кирилл!{" "}
+          <button
+            type="button"
+            className="np-hello-summary"
+            onClick={() => setSummaryOpen(true)}
+          >
+            Ситуация в компании{" "}
+            <span className="np-hello-summary-status">требует внимания</span>
+            <span className="np-hello-summary-arrow" aria-hidden>→</span>
+          </button>
         </h1>
 
         <div className="np-search" onClick={() => openWith(null)}>
@@ -2092,8 +2102,37 @@ export default function NormPrototype() {
           onDiscuss={(q) => {
             setFocusSourceIdx(null);
             setFocusIdx(null);
+            setSummaryOpen(false);
             openWith(q);
           }}
+        />
+      )}
+      {summaryOpen && (
+        <CompanySummaryModal
+          summary={COMPANY_SUMMARY}
+          activeSourceId={summarySourceId}
+          onOpenSource={(id) => setSummarySourceId(id)}
+          onCloseSource={() => setSummarySourceId(null)}
+          onOpenFocus={(fpId) => {
+            const idx = FOCUS_POINTS.findIndex((p) => p.id === fpId);
+            if (idx >= 0) {
+              setSummarySourceId(null);
+              setFocusIdx(idx);
+            }
+          }}
+          onClose={() => { setSummarySourceId(null); setSummaryOpen(false); }}
+          onDiscuss={() => {
+            setSummarySourceId(null);
+            setSummaryOpen(false);
+            openWith(COMPANY_SUMMARY.discussQuestion);
+          }}
+          onClarify={() => {
+            setSummarySourceId(null);
+            setSummaryOpen(false);
+            openWith(COMPANY_SUMMARY.clarificationQuestion);
+          }}
+          onToast={(m) => setToast(m)}
+          focusOnTop={focusIdx !== null}
         />
       )}
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
