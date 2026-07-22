@@ -1,6 +1,29 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import "../styles/norm-prototype.css";
 import KnowledgeBase from "./KnowledgeBase";
+import RiskObjectsChart, { RiskLossCards } from "./RiskObjectsChart";
+
+const LOSS_METRICS = {
+  actual: { value: null as number | null, limitUsage: null as number | null, limitValue: null as number | null },
+  forecast: { value: null as number | null, delta: null as number | null },
+};
+
+const EVENT_WIDGETS = [
+  {
+    id: "in-progress",
+    tone: "violet" as const,
+    title: "У тебя в работе",
+    text: "Не завершена работа над несколькими событиями.",
+    cta: "103 события",
+  },
+  {
+    id: "new-tasks",
+    tone: "yellow" as const,
+    title: "Появились новые задачи",
+    text: "Эти события требуют утверждения риск-менеджером.",
+    cta: "103 события",
+  },
+];
 
 type Role = "user" | "assistant" | "status" | "file" | "summary" | "actions";
 
@@ -2734,6 +2757,35 @@ export default function NormPrototype() {
 
         <section className="np-section">
           <div className="np-sec-head">
+            <h2>Утилизация лимита 🔥</h2>
+          </div>
+          <div className="np-loss-wrap">
+            {[
+              { label: "Прямые потери", p: 50, color: "#f5a623" },
+              { label: "Косвенные потери", p: 85, color: "#ef6f6c" },
+              { label: "Кредитные потери", p: 49, color: "#22c55e" },
+            ].map((c) => (
+              <div key={c.label} className="np-loss-card">
+                <div>
+                  <div className="np-loss-label">{c.label}</div>
+                  <div className="np-loss-amount"><strong>142 500 ₽</strong> <span className="np-muted">из 1 000 000</span></div>
+                  <div className="np-loss-meta">16 320 ₽ за май</div>
+                </div>
+                <Donut percent={c.p} color={c.color} />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="np-section">
+          <div className="np-sec-head">
+            <h2>Объекты управления рисками</h2>
+          </div>
+          <RiskObjectsChart rightSlot={<RiskLossCards metrics={LOSS_METRICS} />} />
+        </section>
+
+        <section className="np-section">
+          <div className="np-sec-head">
             <h2>На что стоит обратить внимание ⚡️</h2>
             <button
               className="np-link"
@@ -2768,21 +2820,21 @@ export default function NormPrototype() {
 
         <section className="np-section">
           <div className="np-sec-head">
-            <h2>Утилизация лимита 🔥</h2>
+            <h2>Работа с событиями ⚡</h2>
           </div>
-          <div className="np-loss-wrap">
-            {[
-              { label: "Прямые потери", p: 50, color: "#f5a623" },
-              { label: "Косвенные потери", p: 85, color: "#ef6f6c" },
-              { label: "Кредитные потери", p: 49, color: "#22c55e" },
-            ].map((c) => (
-              <div key={c.label} className="np-loss-card">
-                <div>
-                  <div className="np-loss-label">{c.label}</div>
-                  <div className="np-loss-amount"><strong>142 500 ₽</strong> <span className="np-muted">из 1 000 000</span></div>
-                  <div className="np-loss-meta">16 320 ₽ за май</div>
-                </div>
-                <Donut percent={c.p} color={c.color} />
+          <div className="np-events-wrap">
+            {EVENT_WIDGETS.map((w) => (
+              <div key={w.id} className={`np-event-widget np-event-widget--${w.tone}`}>
+                <h3 className="np-event-widget-title">{w.title}</h3>
+                <p className="np-event-widget-text">{w.text}</p>
+                <button
+                  type="button"
+                  className="np-event-widget-btn"
+                  onClick={() => setToast("Полный раздел событий появится позже")}
+                >
+                  <span className={`np-event-widget-dot np-event-widget-dot--${w.tone}`} />
+                  {w.cta} <Icon name="arrow" size={14} />
+                </button>
               </div>
             ))}
           </div>
