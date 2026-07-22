@@ -1944,18 +1944,9 @@ function FocusPointModal({
             <span className="np-focus-area">{point.area}</span>
           </div>
           <h2 className="np-focus-modal-title">{point.title}</h2>
-          <div className="np-focus-head-actions">
-            <button
-              type="button"
-              className="np-share-trigger"
-              onClick={() => setShareOpen(true)}
-            >
-              Поделиться
-            </button>
-            <button className="np-icon-btn np-focus-close" onClick={onClose} aria-label="Закрыть">
-              <Icon name="close" size={18} />
-            </button>
-          </div>
+          <button className="np-icon-btn np-focus-close" onClick={onClose} aria-label="Закрыть">
+            <Icon name="close" size={18} />
+          </button>
         </header>
 
         <div className="np-focus-modal-body">
@@ -2120,6 +2111,14 @@ function FocusPointModal({
               >
                 Обсудить с Нормом
               </button>
+              <button
+                type="button"
+                className="np-focus-share-secondary"
+                onClick={() => setShareOpen(true)}
+              >
+                <span aria-hidden className="np-focus-share-icon">↗</span>
+                Поделиться
+              </button>
             </div>
           </aside>
         </div>
@@ -2279,72 +2278,129 @@ function CompanySummaryModal({
   }, [activeSourceId, summary.sections]);
   const sourceRelation = source?.relation || null;
 
-  const sectionCompact = (sec: SummarySection) => {
+  const renderDetailSection = (sec: SummarySection) => {
     const preview = sec.sources.slice(0, 3);
     const more = Math.max(0, sec.sources.length - 3);
     return (
-      <>
-        <div className="np-summary-island-head">
-          <span className={`np-summary-island-kicker np-summary-island-kicker--${sec.tone}`}>
-            {sec.title}
-          </span>
-          {sec.headline && (
-            <h4 className="np-summary-island-headline">{sec.headline}</h4>
-          )}
-        </div>
-        <p className="np-summary-island-text">{sec.text}</p>
-        {sec.actionLabel && sec.actionText && (
-          <div className="np-summary-action-line">
-            <span className={`np-summary-action-label np-summary-action-label--${sec.tone}`}>
-              {sec.actionLabel}:
-            </span>{" "}
-            <span>{sec.actionText}</span>
-          </div>
-        )}
-        {sec.sources.length > 0 && (
-          <div className="np-summary-source-tags">
-            {preview.map((s, i) => (
-              <button
-                key={`${sec.id}-src-${i}`}
-                type="button"
-                className="np-summary-source-tag"
-                onClick={() => onOpenSource(s.sourceId)}
-              >
-                {s.label}
-              </button>
-            ))}
-            {more > 0 && (
-              <button
-                type="button"
-                className="np-summary-source-tag np-summary-source-tag--more"
-                onClick={() => onOpenSource(sec.sources[3].sourceId)}
-              >
-                ещё {more}
-              </button>
+      <section
+        key={sec.id}
+        className={`np-summary-island np-summary-detail-island np-summary-detail-island--${sec.tone}`}
+      >
+        <div className="np-summary-detail-body">
+          <div className="np-summary-detail-main">
+            <span className={`np-summary-tag np-summary-tag--${sec.tone}`}>
+              {sec.title}
+            </span>
+            {sec.headline && (
+              <h3 className="np-summary-detail-headline">{sec.headline}</h3>
+            )}
+            <p className="np-summary-detail-text">{sec.text}</p>
+            {sec.actionLabel && sec.actionText && (
+              <p className="np-summary-detail-text">
+                <strong>{sec.actionLabel}:</strong> {sec.actionText}
+              </p>
             )}
           </div>
-        )}
-        {sec.focusPointId && sec.focusPointLabel && (
-          <button
-            type="button"
-            className="np-summary-focus-link"
-            onClick={() => onOpenFocus(sec.focusPointId!)}
-          >
-            Подробнее: {sec.focusPointLabel} →
-          </button>
-        )}
-        {sec.showClarifyButton && (
-          <div className="np-company-summary-clarify">
+          {(sec.sources.length > 0 || sec.focusPointId) && (
+            <div className="np-summary-detail-side">
+              {sec.sources.length > 0 && (
+                <>
+                  <div className="np-summary-detail-side-label">
+                    Источники · {sec.sources.length}
+                  </div>
+                  <div className="np-summary-source-tags">
+                    {preview.map((s, i) => (
+                      <button
+                        key={`${sec.id}-src-${i}`}
+                        type="button"
+                        className="np-summary-source-tag"
+                        onClick={() => onOpenSource(s.sourceId)}
+                      >
+                        {s.label}
+                      </button>
+                    ))}
+                    {more > 0 && (
+                      <button
+                        type="button"
+                        className="np-summary-source-tag np-summary-source-tag--more"
+                        onClick={() => onOpenSource(sec.sources[3].sourceId)}
+                      >
+                        ещё {more}
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
+              {sec.focusPointId && sec.focusPointLabel && (
+                <button
+                  type="button"
+                  className="np-summary-focus-link"
+                  onClick={() => onOpenFocus(sec.focusPointId!)}
+                >
+                  Подробнее: {sec.focusPointLabel} →
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </section>
+    );
+  };
+
+  const renderGapsSection = (sec: SummarySection) => {
+    const preview = sec.sources.slice(0, 3);
+    const more = Math.max(0, sec.sources.length - 3);
+    return (
+      <section
+        key={sec.id}
+        className="np-summary-island np-summary-detail-island np-summary-detail-island--neutral"
+      >
+        <div className="np-summary-detail-body">
+          <div className="np-summary-detail-main">
+            {sec.headline && (
+              <h3 className="np-summary-detail-headline">{sec.headline}</h3>
+            )}
+            <p className="np-summary-detail-text">{sec.text}</p>
+          </div>
+          <div className="np-summary-detail-side">
+            {sec.sources.length > 0 && (
+              <>
+                <div className="np-summary-detail-side-label">
+                  Не хватает · {sec.sources.length}
+                </div>
+                <div className="np-summary-source-tags">
+                  {preview.map((s, i) => (
+                    <button
+                      key={`${sec.id}-src-${i}`}
+                      type="button"
+                      className="np-summary-source-tag"
+                      onClick={() => onOpenSource(s.sourceId)}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                  {more > 0 && (
+                    <button
+                      type="button"
+                      className="np-summary-source-tag np-summary-source-tag--more"
+                      onClick={() => onOpenSource(sec.sources[3].sourceId)}
+                    >
+                      ещё {more}
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
             <button
               type="button"
-              className="np-btn np-btn-primary np-company-summary-clarify-btn"
+              className="np-summary-clarify-secondary"
               onClick={onClarify}
             >
               Уточнить знания
             </button>
           </div>
-        )}
-      </>
+        </div>
+      </section>
     );
   };
 
@@ -2394,19 +2450,21 @@ function CompanySummaryModal({
         <div className="np-company-summary-body">
           <section className="np-summary-lead-island">
             <div className="np-summary-lead-kicker">{summary.leadTitle}</div>
-            <h3 className="np-summary-lead-headline">{summary.leadHeadline}</h3>
+            <h1 className="np-summary-lead-headline">{summary.leadHeadline}</h1>
             <p className="np-summary-lead-text">{summary.leadText}</p>
-            <div className="np-summary-required-decision">
-              <span className="np-summary-required-label">Требуется решение:</span>{" "}
-              <span>{summary.requiredDecision.replace(/^Требуется решение:\s*/, "")}</span>
+            <div className="np-summary-required-row">
+              <span className="np-summary-tag np-summary-tag--orange">Требует решения</span>
+              <span className="np-summary-required-text">
+                {summary.requiredDecision.replace(/\.$/, "")}
+              </span>
             </div>
             {summary.secondaryStatuses.length > 0 && (
               <div className="np-summary-secondary-row">
                 {summary.secondaryStatuses.map((s, i) => (
-                  <span key={i} className={`np-summary-secondary np-summary-secondary--${s.tone}`}>
-                    <span className="np-summary-secondary-dot" aria-hidden>●</span>
-                    <span className="np-summary-secondary-label">{s.label}</span>
-                    <span className="np-summary-secondary-sep" aria-hidden>·</span>
+                  <span key={i} className="np-summary-secondary">
+                    <span className={`np-summary-tag np-summary-tag--${s.tone}`}>
+                      {s.label}
+                    </span>
                     <span className="np-summary-secondary-text">{s.text}</span>
                   </span>
                 ))}
@@ -2415,30 +2473,20 @@ function CompanySummaryModal({
           </section>
 
           <div className="np-summary-details">
-            <h3 className="np-summary-details-title">Ситуация в деталях</h3>
+            <h2 className="np-summary-details-title">Ситуация в деталях</h2>
             <div className="np-summary-details-grid">
-              {decision && (
-                <section className={`np-summary-island np-summary-island--wide np-summary-island--${decision.tone}`}>
-                  {sectionCompact(decision)}
-                </section>
-              )}
-              {check && (
-                <section className={`np-summary-island np-summary-island--${check.tone}`}>
-                  {sectionCompact(check)}
-                </section>
-              )}
-              {watch && (
-                <section className={`np-summary-island np-summary-island--${watch.tone}`}>
-                  {sectionCompact(watch)}
-                </section>
-              )}
-              {gaps && (
-                <section className={`np-summary-island np-summary-island--wide np-summary-island--${gaps.tone}`}>
-                  {sectionCompact(gaps)}
-                </section>
-              )}
+              {decision && renderDetailSection(decision)}
+              {check && renderDetailSection(check)}
+              {watch && renderDetailSection(watch)}
             </div>
           </div>
+
+          {gaps && (
+            <div className="np-summary-gaps">
+              <h2 className="np-summary-details-title">Что Норм пока видит не полностью</h2>
+              {renderGapsSection(gaps)}
+            </div>
+          )}
         </div>
 
         <footer className="np-company-summary-footer">
