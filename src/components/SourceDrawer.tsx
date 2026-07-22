@@ -116,32 +116,43 @@ function headerMeta(s: UniSource): string {
 function SourceDetail({
   s,
   mode,
-  editable,
   onExternal,
-  onEdit,
-  onDelete,
 }: {
   s: UniSource;
   mode: "conclusion" | "knowledge";
-  editable?: boolean;
   onExternal: (s: UniSource) => void;
-  onEdit?: (s: UniSource) => void;
-  onDelete?: (s: UniSource) => void;
 }) {
   const loc = locationLine(s.location);
   return (
     <div className="np-sd-detail">
       {s.file && (
         <div className="np-sd-file">
-          <span className="np-sd-file-icon" aria-hidden>📄</span>
-          <div className="np-sd-file-main">
-            <div className="np-sd-file-name">{s.file.name}</div>
-            <div className="np-sd-file-meta">
-              {[s.file.format, s.file.size, s.validAt].filter(Boolean).join(" · ")}
-            </div>
-          </div>
+          <button
+            type="button"
+            className="np-sd-file-main-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              onExternal(s);
+            }}
+          >
+            <span className="np-sd-file-icon" aria-hidden>📄</span>
+            <span className="np-sd-file-body">
+              <span className="np-sd-file-name">
+                {s.file.name}
+                <span className="np-sd-ext" aria-hidden> ↗</span>
+              </span>
+              <span className="np-sd-file-meta">
+                {[s.file.format, s.file.size, s.validAt].filter(Boolean).join(" · ")}
+              </span>
+            </span>
+          </button>
           {s.file.downloadUrl && (
-            <a className="np-sd-linkbtn" href={s.file.downloadUrl} download>
+            <a
+              className="np-sd-linkbtn"
+              href={s.file.downloadUrl}
+              download
+              onClick={(e) => e.stopPropagation()}
+            >
               Скачать
             </a>
           )}
@@ -179,29 +190,64 @@ function SourceDetail({
           <div className="np-sd-relation">{s.relationToConclusion}</div>
         </div>
       )}
+    </div>
+  );
+}
 
+function OverflowMenu({
+  s,
+  onEdit,
+  onDelete,
+}: {
+  s: UniSource;
+  onEdit?: (s: UniSource) => void;
+  onDelete?: (s: UniSource) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [open]);
+  if (!onEdit && !onDelete) return null;
+  return (
+    <div className="np-sd-menu" ref={ref}>
       <button
         type="button"
-        className="np-btn np-btn-primary np-sd-primary"
-        onClick={() => onExternal(s)}
+        className="np-icon-btn np-sd-menu-btn"
+        onClick={() => setOpen((v) => !v)}
+        aria-label="Действия с источником"
       >
-        {primaryActionLabel(s.type)}
+        ⋯
       </button>
-
-      {editable && (
-        <div className="np-sd-edit-row">
+      {open && (
+        <div className="np-sd-menu-pop" role="menu">
           {onEdit && (
-            <button type="button" className="np-sd-linkbtn" onClick={() => onEdit(s)}>
-              редактировать
+            <button
+              type="button"
+              className="np-sd-menu-item"
+              onClick={() => {
+                setOpen(false);
+                onEdit(s);
+              }}
+            >
+              Редактировать
             </button>
           )}
           {onDelete && (
             <button
               type="button"
-              className="np-sd-linkbtn np-sd-linkbtn--danger"
-              onClick={() => onDelete(s)}
+              className="np-sd-menu-item np-sd-menu-item--danger"
+              onClick={() => {
+                setOpen(false);
+                onDelete(s);
+              }}
             >
-              удалить
+              Удалить
             </button>
           )}
         </div>
