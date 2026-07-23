@@ -661,23 +661,23 @@ const SOURCES_INDEX: Record<string, FocusSource> = {
 const SOURCE_DECORATIONS: Record<string, Partial<FocusSource>> = {
   "fp-supply-s0": {
     document: {
-      fileName: "Инциденты поставок за июнь 2026.xlsx",
-      mimeType: "XLSX",
-      fileSize: "84 КБ",
-      updatedAt: "1 июля 2026",
+      fileName: "Записи о банкротстве, 22 июля 2026.pdf",
+      mimeType: "PDF",
+      fileSize: "96 КБ",
+      updatedAt: "22 июля 2026",
     },
-    quote: "Пять из семи зарегистрированных задержек связаны с поставщиками «Альфа Фуд», «Север Трейд» и «Фреш Лайн».",
-    locator: { sheet: "Инциденты", range: "18–24" },
+    quote: "Три поставщика внесены в реестр банкротств в 04:35, 06:12 и 07:50.",
+    locator: { section: "Раздел 1. Записи от 22.07.2026" },
   },
   "fp-supply-s1": {
     document: {
-      fileName: "Доступность ассортимента, неделя 22–29.xlsx",
+      fileName: "Договоры с проблемными поставщиками.xlsx",
       mimeType: "XLSX",
-      fileSize: "62 КБ",
-      updatedAt: "20 июля 2026",
+      fileSize: "58 КБ",
+      updatedAt: "22 июля 2026",
     },
-    quote: "Доля отсутствующих товаров выросла с 6% до 24% за четыре недели.",
-    locator: { sheet: "Weekly", range: "3–7" },
+    quote: "Три действующих договора, общая сумма обязательств — 84 млн ₽.",
+    locator: { sheet: "Контракты", range: "2–4" },
   },
   "fp-it-s0": {
     document: {
