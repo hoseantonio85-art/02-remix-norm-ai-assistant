@@ -1653,7 +1653,7 @@ function AssistantModal({ initialQuery, onClose, onToast }: { initialQuery: stri
     if (l.includes("что ещё неизвестно") || l.includes("нужно добавить в профиль")) return runUnknowns();
     if (l.includes("добавить сначала")) return runFirstToAdd();
     if (l.includes("про gpu") || l.includes("известно про ит")) return runGpuKnown();
-    if (l.includes("задержки поставок")) return runSummarySupplies();
+    if (l.includes("задержки поставок") || l.includes("поставщик")) return runSummarySupplies();
     if (l.includes("риск оттока")) return runSummaryChurn();
     if (l.includes("ит-мер") || l.includes("ит меры") || l.includes("результат ит")) return runSummaryIt();
     onToast("Этот переход будет добавлен позже");
