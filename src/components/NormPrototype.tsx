@@ -2286,6 +2286,7 @@ function CompanySummaryModal({
   onClarify,
   onToast,
   focusOnTop,
+  riskOnTop,
 }: {
   summary: CompanySummary;
   activeSourceId: string | null;
@@ -2298,6 +2299,7 @@ function CompanySummaryModal({
   onClarify: () => void;
   onToast: (m: string) => void;
   focusOnTop: boolean;
+  riskOnTop: boolean;
 }) {
   const [shareOpen, setShareOpen] = useState(false);
   useEffect(() => {
@@ -2305,7 +2307,9 @@ function CompanySummaryModal({
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      if (focusOnTop) return; // focus modal handles its own escape
+      // Upper layers own Escape while they are on top.
+      if (riskOnTop) return;
+      if (focusOnTop) return;
       if (shareOpen) {
         e.stopPropagation();
         setShareOpen(false);
@@ -2323,7 +2327,8 @@ function CompanySummaryModal({
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
-  }, [activeSourceId, onClose, onCloseSource, focusOnTop, shareOpen]);
+  }, [activeSourceId, onClose, onCloseSource, focusOnTop, riskOnTop, shareOpen]);
+
 
   const source = activeSourceId ? SOURCES_INDEX[activeSourceId] : null;
   const supportedClaim = useMemo(() => {
