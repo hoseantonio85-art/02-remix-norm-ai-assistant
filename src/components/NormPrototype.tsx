@@ -2397,7 +2397,7 @@ function CompanySummaryModal({
       className="np-company-summary-backdrop"
       onClick={() => {
         if (riskOnTop || focusOnTop) return;
-        if (activeSourceId) onCloseSource();
+        if (activeSummarySource) onCloseSource();
         else onClose();
       }}
       role="dialog"
