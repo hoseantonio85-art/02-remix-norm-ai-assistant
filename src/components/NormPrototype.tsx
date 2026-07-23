@@ -3953,26 +3953,10 @@ export default function NormPrototype() {
             </button>
           </div>
           <div className="np-focus-outer">
-          <div className="np-focus-wrap">
-            {HOME_FOCUS_POINTS.map((fp) => (
-              <button
-                key={fp.id}
-                type="button"
-                className="np-focus-card"
-                onClick={() => setFocusIdx(FOCUS_POINTS.indexOf(fp))}
-              >
-                <div className="np-focus-card-top">
-                  <span className={`np-focus-type np-focus-type--${fp.tone}`}>{fp.type}</span>
-                  <span className="np-focus-area">{fp.area}</span>
-                </div>
-                <h3 className="np-focus-title">{fp.title}</h3>
-                <p className="np-focus-short">{fp.short}</p>
-                <div className="np-focus-cta">
-                  {fp.cta} <Icon name="arrow" size={14} />
-                </div>
-              </button>
-            ))}
-          </div>
+            <FocusCarousel
+              points={HOME_CAROUSEL_POINTS}
+              onOpen={(fp) => setFocusIdx(FOCUS_POINTS.indexOf(fp))}
+            />
           </div>
         </section>
 
