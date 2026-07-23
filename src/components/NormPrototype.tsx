@@ -3031,9 +3031,8 @@ function RiskDetailModal({
   onToast: (m: string) => void;
 }) {
   const [tab, setTab] = useState<"eval" | "util" | "kri" | "factors" | "consequences" | "measures">("eval");
-  const [rationaleOpen, setRationaleOpen] = useState(false);
-  const [knowledgeSourceId, setKnowledgeSourceId] = useState<string | null>(null);
   const [kriOpen, setKriOpen] = useState(false);
+  const [verdictDrawerOpen, setVerdictDrawerOpen] = useState(false);
   const [verdictSourceId, setVerdictSourceId] = useState<string | "list" | null>(null);
 
   useEffect(() => {
@@ -3041,7 +3040,7 @@ function RiskDetailModal({
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      if (knowledgeSourceId || rationaleOpen || kriOpen || verdictSourceId !== null) return; // child handles
+      if (kriOpen || verdictDrawerOpen || verdictSourceId !== null) return; // child handles
       e.stopPropagation();
       onClose();
     };
@@ -3050,11 +3049,7 @@ function RiskDetailModal({
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
-  }, [onClose, knowledgeSourceId, rationaleOpen, kriOpen, verdictSourceId]);
-
-  const activeSource = knowledgeSourceId
-    ? RATIONALE_SOURCES.find((s) => s.id === knowledgeSourceId) ?? null
-    : null;
+  }, [onClose, kriOpen, verdictDrawerOpen, verdictSourceId]);
 
   const verdictUniSources = (risk.verdict?.sourceIds ?? [])
     .map((id) => SOURCES_INDEX[id])
@@ -3065,7 +3060,7 @@ function RiskDetailModal({
     <div
       className="np-risk-modal-backdrop"
       onClick={(e) => {
-        if (knowledgeSourceId || rationaleOpen || kriOpen || verdictSourceId !== null) return;
+        if (kriOpen || verdictDrawerOpen || verdictSourceId !== null) return;
         e.stopPropagation();
         onClose();
       }}
@@ -3110,7 +3105,7 @@ function RiskDetailModal({
               {risk.verdict && (
                 <NormVerdictBlock
                   verdict={risk.verdict}
-                  onOpenSource={(id) => setVerdictSourceId(id)}
+                  onOpen={() => setVerdictDrawerOpen(true)}
                 />
               )}
 
@@ -3303,23 +3298,15 @@ function RiskDetailModal({
           <button className="np-risk-foot-btn">В архив</button>
         </footer>
 
-        {rationaleOpen && (
-          <RationaleModal
-            brief={risk.newRiskBrief ?? ""}
-            dimmed={!!activeSource}
-            onClose={() => setRationaleOpen(false)}
-            onOpenSource={(id) => setKnowledgeSourceId(id)}
-            onGoToProfile={() => { setKnowledgeSourceId(null); setRationaleOpen(false); onClose(); onNavigateToProfile(); }}
-          />
-        )}
-        {activeSource && (
-          <KnowledgeItemModal
-            source={activeSource}
-            onClose={() => setKnowledgeSourceId(null)}
-            onGoToProfile={() => { setKnowledgeSourceId(null); setRationaleOpen(false); onClose(); onNavigateToProfile(); }}
-          />
-        )}
         {kriOpen && <KriDrawer kri={risk.kri} onClose={() => setKriOpen(false)} />}
+        {risk.verdict && verdictDrawerOpen && (
+          <NormVerdictDrawer
+            verdict={risk.verdict}
+            sources={verdictUniSources}
+            onClose={() => setVerdictDrawerOpen(false)}
+            onOpenSource={(id) => setVerdictSourceId(id)}
+          />
+        )}
         {risk.verdict && verdictSourceId !== null && (
           <SourceDrawer
             sources={verdictUniSources}
@@ -3338,59 +3325,103 @@ function RiskDetailModal({
 
 function NormVerdictBlock({
   verdict,
-  onOpenSource,
+  onOpen,
 }: {
   verdict: NormVerdict;
-  onOpenSource: (id: string | "list") => void;
+  onOpen: () => void;
 }) {
-  const sources = verdict.sourceIds
-    .map((id) => ({ id, s: SOURCES_INDEX[id] }))
-    .filter((x) => !!x.s);
-  const visible = sources.slice(0, 2);
-  const extra = sources.length - visible.length;
   return (
-    <div className={`np-risk-alert np-verdict np-verdict--${verdict.status}`}>
-      <div className="np-risk-alert-ic">◆</div>
-      <div className="np-risk-alert-body">
+    <button
+      type="button"
+      className={`np-verdict-banner np-verdict-banner--${verdict.status}`}
+      onClick={onOpen}
+      aria-label={`Вывод Норма: ${verdict.title}`}
+    >
+      <span className={`np-verdict-banner-ic np-verdict-banner-ic--${verdict.status}`}>◆</span>
+      <span className="np-verdict-banner-body">
         <span className={`np-verdict-status np-verdict-status--${verdict.status}`}>
           {verdict.statusLabel}
         </span>
-        <div className="np-risk-alert-title np-verdict-title">{verdict.title}</div>
-        <div className="np-risk-alert-text np-verdict-text">{verdict.text}</div>
-        <div className="np-verdict-action">
-          <span className="np-verdict-action-label">Ближайшее действие</span>
-          <span className="np-verdict-action-text">{verdict.nextAction}</span>
-        </div>
-        {sources.length > 0 && (
-          <div className="np-verdict-sources">
-            <span className="np-verdict-sources-label">Основания:</span>{" "}
-            {visible.map((x, i) => (
-              <span key={x.id}>
-                <button
-                  type="button"
-                  className="np-verdict-source-link"
-                  onClick={() => onOpenSource(x.id)}
-                >
-                  {x.s.title}
-                </button>
-                {i < visible.length - 1 && <span className="np-verdict-sep"> · </span>}
-              </span>
-            ))}
-            {extra > 0 && (
-              <>
-                <span className="np-verdict-sep"> · </span>
-                <button
-                  type="button"
-                  className="np-verdict-source-link"
-                  onClick={() => onOpenSource("list")}
-                >
-                  + ещё {extra}
-                </button>
-              </>
-            )}
+        <span className="np-verdict-banner-title">{verdict.title}</span>
+      </span>
+      <span className="np-verdict-banner-cta">Подробнее →</span>
+    </button>
+  );
+}
+
+function NormVerdictDrawer({
+  verdict,
+  sources,
+  onClose,
+  onOpenSource,
+}: {
+  verdict: NormVerdict;
+  sources: ReturnType<typeof focusSourceToUni>[];
+  onClose: () => void;
+  onOpenSource: (id: string | "list") => void;
+}) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      e.stopPropagation();
+      onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+  return (
+    <div className="np-verdict-drawer-backdrop" onClick={onClose}>
+      <aside
+        className={`np-verdict-drawer np-verdict-drawer--${verdict.status}`}
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Вывод Норма"
+      >
+        <header className="np-verdict-drawer-head">
+          <div className="np-verdict-drawer-head-main">
+            <div className="np-verdict-drawer-eyebrow">Вывод Норма</div>
+            <span className={`np-verdict-status np-verdict-status--${verdict.status}`}>
+              {verdict.statusLabel}
+            </span>
+            <h3 className="np-verdict-drawer-title">{verdict.title}</h3>
           </div>
-        )}
-      </div>
+          <button
+            type="button"
+            className="np-icon-btn np-verdict-drawer-close"
+            onClick={onClose}
+            aria-label="Закрыть"
+          >
+            ✕
+          </button>
+        </header>
+        <div className="np-verdict-drawer-body">
+          <p className="np-verdict-drawer-text">{verdict.text}</p>
+
+          <div className="np-verdict-drawer-action">
+            <span className="np-verdict-action-label">Ближайшее действие</span>
+            <span className="np-verdict-action-text">{verdict.nextAction}</span>
+          </div>
+
+          {sources.length > 0 && (
+            <div className="np-verdict-drawer-sources">
+              <div className="np-verdict-drawer-sources-label">Основания</div>
+              <div className="np-verdict-drawer-source-chips">
+                {sources.map((s) => (
+                  <button
+                    key={s.id}
+                    type="button"
+                    className="np-verdict-source-chip"
+                    onClick={() => onOpenSource(s.id)}
+                  >
+                    {s.title}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </aside>
     </div>
   );
 }
