@@ -1756,7 +1756,7 @@ function AssistantModal({ initialQuery, onClose, onToast }: { initialQuery: stri
   );
 }
 
-type ShareKind = "summary" | "fp-delivery" | "fp-supply" | "fp-it";
+type ShareKind = SuggestedKind;
 interface SharePreview {
   status: string;
   statusTone: "orange" | "blue" | "green" | "neutral";
