@@ -461,6 +461,11 @@ const HOME_FOCUS_IDS: readonly string[] = ["fp-delivery", "fp-supply", "fp-it"];
 const HOME_FOCUS_POINTS: FocusPoint[] = HOME_FOCUS_IDS
   .map((id) => FOCUS_POINTS.find((p) => p.id === id))
   .filter((p): p is FocusPoint => !!p);
+// Home carousel: pinned order first, then the rest of FOCUS_POINTS.
+const HOME_CAROUSEL_POINTS: FocusPoint[] = [
+  ...HOME_FOCUS_POINTS,
+  ...FOCUS_POINTS.filter((p) => !HOME_FOCUS_IDS.includes(p.id)),
+];
 
 // ============ Canonical sources registry ============
 // FocusPoint no longer owns source objects. All source metadata lives here
