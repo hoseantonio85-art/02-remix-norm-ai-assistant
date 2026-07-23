@@ -2494,61 +2494,53 @@ function CompanySummaryModal({
             <section className="np-summary-group">
               <h2 className="np-summary-h2">Фокусные точки</h2>
               <div className="np-summary-focus-stack">
-                {focusSections.map((sec) => {
-                  const fp = FOCUS_POINTS.find((p) => p.id === sec.focusPointId);
-                  const relRisk = fp ? getRiskById(fp.riskId) : undefined;
-                  return (
-                    <div
-                      key={sec.id}
-                      className={`np-summary-island np-summary-focus-island np-summary-focus-island--${sec.tone}`}
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => onOpenFocus(sec.focusPointId!)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          onOpenFocus(sec.focusPointId!);
-                        }
-                      }}
-                    >
-                      <div className="np-summary-focus-head">
-                        <span className={`np-summary-tag np-summary-tag--${sec.tone}`}>
-                          {sec.title}
-                        </span>
-                        <span className="np-summary-focus-arrow" aria-hidden>→</span>
-                      </div>
-                      <p className="np-summary-detail-text">{sec.shortText || sec.text}</p>
-                      {renderSourceLine(sec)}
-                      {relRisk && (
-                        <button
-                          type="button"
-                          className="np-summary-risk-link"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onOpenRisks({ riskId: relRisk.id });
-                          }}
-                        >
-                          {relRisk.id} · {relRisk.title}
-                        </button>
-                      )}
+                {focusSections.map((sec) => (
+                  <div
+                    key={sec.id}
+                    className={`np-summary-island np-summary-focus-island np-summary-focus-island--${sec.tone}`}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => onOpenFocus(sec.focusPointId!)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        onOpenFocus(sec.focusPointId!);
+                      }
+                    }}
+                  >
+                    <div className="np-summary-focus-head">
+                      <span className={`np-summary-tag np-summary-tag--${sec.tone}`}>
+                        {sec.title}
+                      </span>
+                      <span className="np-summary-focus-arrow" aria-hidden>→</span>
                     </div>
-                  );
-                })}
+                    <p className="np-summary-detail-text">{sec.shortText || sec.text}</p>
+                    {renderSourceLine(sec)}
+                  </div>
+                ))}
               </div>
             </section>
           </div>
         </div>
 
-        {source && (() => {
-          const uni = focusSourceToUni(source, { supportedClaim });
-          if (sourceRelation) uni.relationToConclusion = sourceRelation;
+        {activeSummarySource && activeSection && (() => {
+          const uniSources = activeSection.sources
+            .map((sref) => {
+              const raw = SOURCES_INDEX[sref.sourceId];
+              if (!raw) return null;
+              const uni = focusSourceToUni(raw, { supportedClaim: sref.supportedClaim });
+              if (raw.relation) uni.relationToConclusion = raw.relation;
+              return uni;
+            })
+            .filter((s): s is NonNullable<typeof s> => s !== null);
+          if (uniSources.length === 0) return null;
           return (
             <SourceDrawer
-              sources={[uni]}
-              activeId={uni.id}
+              sources={uniSources}
+              activeId={activeSummarySource.sourceId}
               mode="conclusion"
               placement="modal"
-              onOpen={() => {}}
+              onOpen={(id) => onOpenSummarySource(activeSummarySource.sectionId, id)}
               onClose={onCloseSource}
               onExternal={(s) => {
                 if (s.url) window.open(s.url, "_blank", "noopener,noreferrer");
