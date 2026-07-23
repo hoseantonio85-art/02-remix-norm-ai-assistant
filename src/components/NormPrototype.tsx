@@ -131,7 +131,7 @@ const NAV = [
   { id: "kb", label: "База знаний", icon: "book" },
 ];
 
-type RiskFilter = "all" | "new" | "high" | "reassessed";
+type RiskFilter = "all" | "new" | "high" | "reassessed" | "withoutMeasures";
 
 interface FocusSource {
   id?: string;
@@ -180,15 +180,11 @@ interface FocusPoint {
   clarificationValue: string;
   clarificationChatQuestion: string;
   related: string[];
-  relatedRisk: {
-    id: string;
-    title: string;
-    level: string;
-    levelTone: "high" | "medium" | "low";
-    status: string;
-  };
+  /** Canonical link into RISKS_REGISTRY. Resolve via getRiskById(). */
+  riskId: string;
   relatedOther: string[];
-  sources: FocusSource[];
+  /** IDs into the canonical SOURCES_INDEX. FocusPoint no longer owns source objects. */
+  sourceIds: string[];
   primaryAction: string;
   secondaryActions: string[];
   chatQuestion: string;
@@ -206,7 +202,10 @@ interface FocusCheckpoint {
   response: string;
 }
 
-const FOCUS_POINTS: FocusPoint[] = [
+// Raw focus point definitions. Declared in any convenient order; the
+// exported FOCUS_POINTS array below reorders them into the canonical
+// product order.
+const _FOCUS_POINTS_RAW: FocusPoint[] = [
   {
     id: "fp-delivery",
     type: "Внешний сигнал",
@@ -252,23 +251,12 @@ const FOCUS_POINTS: FocusPoint[] = [
       "продукт «Экспресс-доставка»",
       "12 городов присутствия",
     ],
-    relatedRisk: {
-      id: "QNR-0187",
-      title: "Снижение клиентской активности",
-      level: "Средний",
-      levelTone: "medium",
-      status: "Действующий",
-    },
+    riskId: "QNR-0187",
     relatedOther: [
       "Продукт · Экспресс-доставка",
       "География · 12 городов присутствия",
     ],
-    sources: [
-      { type: "Внешняя новость", title: "Конкурент запускает бесплатную доставку в 12 городах", date: "12 июля 2026", excerpt: "Крупный игрок объявил о бесплатной доставке во всех городах-миллионниках без ограничения по сумме заказа.", relation: "Основной внешний триггер: именно это изменение может повлиять на решения клиентов о заказе.", provider: "Ведомости", domain: "vedomosti.ru", url: "https://www.vedomosti.ru/business/news/2026/07/12/free-delivery" },
-      { type: "Профиль компании", title: "География присутствия компании", date: "актуально на 1 июля 2026", excerpt: "Компания представлена в 34 городах России, в 12 из них — прямое пересечение с зоной действия акции.", relation: "Позволяет определить регионы, где новое предложение конкурента будет заметно клиентам." },
-      { type: "Аналитика", title: "Причины отказа от заказа, июнь 2026", date: "июнь 2026", excerpt: "Стоимость доставки — вторая по частоте причина отмены заказа после длительной доставки.", relation: "Показывает, что цена доставки уже сейчас чувствительна для клиентов." },
-      { type: "Реестр рисков", title: "Снижение клиентской активности", excerpt: "Риск среднего уровня, оценивается ежеквартально.", relation: "Возможные последствия сценария оцениваются в рамках этого риска." },
-    ],
+    sourceIds: ["fp-delivery-s0", "fp-delivery-s1", "fp-delivery-s2", "fp-delivery-s3"],
     primaryAction: "Передать данные",
     secondaryActions: ["Обсудить с Нормом"],
     chatQuestion: "Помоги оценить, как бесплатная доставка конкурента может повлиять на отток клиентов",
@@ -325,24 +313,13 @@ const FOCUS_POINTS: FocusPoint[] = [
       "поставщики «Альфа Фуд», «Север Трейд» и «Фреш Лайн»",
       "показатель доступности товаров",
     ],
-    relatedRisk: {
-      id: "QNR-0214",
-      title: "Нарушение непрерывности поставок",
-      level: "Высокий",
-      levelTone: "high",
-      status: "Действующий",
-    },
+    riskId: "QNR-0214",
     relatedOther: [
       "Поставщики · «Альфа Фуд», «Север Трейд», «Фреш Лайн»",
       "Инциденты · 3 задержки за месяц",
       "Показатель · Доступность товаров",
     ],
-    sources: [
-      { type: "Инциденты", title: "Инциденты поставок за июнь 2026", date: "июнь 2026", excerpt: "Зафиксировано 7 задержек, из них 5 — по трём ключевым поставщикам.", relation: "Показывает повторяемость и концентрацию задержек у одних и тех же контрагентов." },
-      { type: "Аналитика", title: "Доступность ассортимента по неделям", date: "июнь–июль 2026", excerpt: "Доля отсутствующих SKU выросла с 6% до 24% за 4 недели.", relation: "Демонстрирует связь задержек с ухудшением наличия товаров." },
-      { type: "Профиль компании", title: "Договоры с ключевыми поставщиками", excerpt: "В контрактах указаны SLA по срокам, но нет явного плана замены.", relation: "Помогает понять, есть ли у компании формальный резерв." },
-      { type: "Реестр рисков", title: "Нарушение непрерывности поставок", excerpt: "Риск высокого уровня. Текущая динамика подтверждает необходимость оперативно проверить зависимость от поставщиков и возможный масштаб потерь.", relation: "Именно этот риск может измениться по итогам проверки." },
-    ],
+    sourceIds: ["fp-supply-s0", "fp-supply-s1", "fp-supply-s2", "fp-supply-s3"],
     primaryAction: "Проверить резервных поставщиков",
     secondaryActions: ["Обсудить с Нормом"],
     chatQuestion: "Помоги проверить зависимость от поставщиков с повторяющимися задержками",
@@ -393,39 +370,118 @@ const FOCUS_POINTS: FocusPoint[] = [
       "риск «Массовые сбои в системе онлайн-расчётов»",
       "история связанных инцидентов",
     ],
-    relatedRisk: {
-      id: "QNR-0331",
-      title: "Массовые сбои в системе онлайн-расчётов",
-      level: "Высокий",
-      levelTone: "high",
-      status: "Под контролем",
-    },
+    riskId: "QNR-0331",
     relatedOther: [
       "Мера · Дополнительный мониторинг онлайн-расчётов",
       "Инциденты · история связанных сбоев",
     ],
-    sources: [
-      { type: "Отчёт", title: "Отчёт мониторинга ИТ-систем", date: "июль 2026", excerpt: "Снижение количества критичных ошибок на 37% за последние 3 недели.", relation: "Основные числовые данные для оценки эффекта меры." },
-      { type: "Мера", title: "Дополнительный мониторинг онлайн-расчётов", excerpt: "Мера внедрена 30 июня 2026, включает автоматические алерты и еженедельный обзор.", relation: "Именно эта мера могла привести к наблюдаемому улучшению." },
-      { type: "Инциденты", title: "Журнал инцидентов за июнь–июль 2026", date: "июнь–июль 2026", excerpt: "После 30 июня массовых сбоев не зарегистрировано.", relation: "Подтверждает отсутствие повторных инцидентов в период наблюдения." },
-    ],
+    sourceIds: ["fp-it-s0", "fp-it-s1", "fp-it-s2"],
     primaryAction: "Открыть меру",
     secondaryActions: ["Обсудить с Нормом"],
     chatQuestion: "Покажи, как новая мера повлияла на количество ИТ-сбоев",
     signalDate: "21 июля 2026",
   },
+  {
+    id: "fp-gpu",
+    type: "Новый риск",
+    area: "ИТ и инфраструктура",
+    state: "Требует решения",
+    tone: "warning",
+    title: "Мощностей GPU может не хватить для запуска AI-продукта",
+    short: "Компания анонсировала запуск AI-рекомендаций, а по отчёту 2026 года уже фиксируется дефицит GPU для инференса.",
+    missing: "Нет подтверждённого плана расширения GPU-мощностей под запуск продукта.",
+    cta: "Оценить дефицит",
+    impact: "сильное",
+    impactTone: "strong",
+    confidence: "средняя",
+    situation: "Компания публично анонсировала запуск системы AI-рекомендаций товаров. При этом отчёт по загрузке GPU-инфраструктуры на 2026 год фиксирует дефицит вычислительных мощностей для инференса моделей. Планового запаса мощностей под новый продукт в текущем плане закупок не зафиксировано.",
+    cause: "Публичный анонс задал внешние обязательства по срокам, а внутренний план расширения GPU-парка на них не рассчитан. Заказ и поставка GPU у поставщиков требует нескольких месяцев, поэтому даже верное решение сегодня даст мощности не мгновенно.",
+    businessImpact: "При нехватке мощностей возможно замедление ответов рекомендательной модели, деградация качества персонализации или сдвиг публичного запуска. Наиболее уязвимы активные жители мегаполисов и офисные сотрудники — ядро аудитории AI-продукта, чувствительное к качеству персонализации.",
+    recommendations: [
+      {
+        stage: "Сейчас",
+        action: "Согласовать целевую нагрузку продукта и требуемый объём GPU-мощностей с командой инфраструктуры и владельцем продукта.",
+        expectedEffect: "Компания получит единую цифру потребности и сможет сопоставить её с текущим планом закупок.",
+      },
+      {
+        stage: "Следующий шаг",
+        action: "Проверить возможность аренды дополнительных GPU-мощностей в облаке на переходный период и оценить стоимость.",
+        expectedEffect: "Появится сценарий, при котором запуск не блокируется сроком поставки собственного оборудования.",
+      },
+      {
+        stage: "Управленческое решение",
+        action: "Утвердить сценарий обеспечения мощностей до публичной даты запуска и зафиксировать ответственных.",
+        expectedEffect: "Компания снизит вероятность срыва анонсированных сроков и связанного репутационного эффекта.",
+      },
+    ],
+    checkpoint: {
+      condition: "Целевая нагрузка продукта превышает подтверждённый на дату запуска объём GPU-мощностей.",
+      response: "Активировать резервный сценарий (облако или перераспределение мощностей) и уведомить владельца продукта о рисках сроков.",
+    },
+    clarification: "Целевая нагрузка AI-продукта, текущая утилизация GPU и сроки поставки нового оборудования.",
+    clarificationValue: "Эти данные нужны, чтобы оценить реальный размер дефицита и стоимость его закрытия до публичной даты запуска.",
+    clarificationChatQuestion: "Хочу уточнить целевую нагрузку AI-продукта, текущую утилизацию GPU и сроки поставки нового оборудования",
+    related: [
+      "риск «Дефицит GPU для инференса моделей»",
+      "продукт «AI-рекомендации товаров»",
+    ],
+    riskId: "QNR-0119",
+    relatedOther: [
+      "Продукт · AI-рекомендации товаров",
+      "Инфраструктура · GPU для инференса",
+    ],
+    sourceIds: [
+      "risk-gpu-product-announce",
+      "risk-gpu-shortage-report",
+      "risk-gpu-key-clients",
+    ],
+    primaryAction: "Оценить дефицит",
+    secondaryActions: ["Обсудить с Нормом"],
+    chatQuestion: "Помоги оценить дефицит GPU-мощностей под запуск AI-рекомендаций",
+    signalDate: "24 сентября 2025",
+  },
 ];
 
-// assign stable ids to focus sources and build a lookup index
-FOCUS_POINTS.forEach((fp) => {
-  fp.sources.forEach((s, i) => {
-    if (!s.id) s.id = `${fp.id}-s${i}`;
-  });
-});
-const SOURCES_INDEX: Record<string, FocusSource> = {};
-FOCUS_POINTS.forEach((fp) => fp.sources.forEach((s) => { SOURCES_INDEX[s.id!] = s; }));
+// Canonical product order. Adding a new focus point starts here.
+const FOCUS_POINTS_ORDER: readonly string[] = [
+  "fp-supply",
+  "fp-gpu",
+  "fp-delivery",
+  "fp-it",
+];
+const FOCUS_POINTS: FocusPoint[] = FOCUS_POINTS_ORDER
+  .map((id) => _FOCUS_POINTS_RAW.find((p) => p.id === id))
+  .filter((p): p is FocusPoint => !!p);
 
-// extra state-of-knowledge sources used only in the gap section of the summary
+// Phase 1 TEMPORARY selector. Freezes the home page to the original three
+// cards in the original visual order while the canonical FOCUS_POINTS
+// already contains fp-gpu. Removed in Phase 3, when the home carousel
+// consumes the whole canonical list.
+const HOME_FOCUS_IDS: readonly string[] = ["fp-delivery", "fp-supply", "fp-it"];
+const HOME_FOCUS_POINTS: FocusPoint[] = HOME_FOCUS_IDS
+  .map((id) => FOCUS_POINTS.find((p) => p.id === id))
+  .filter((p): p is FocusPoint => !!p);
+
+// ============ Canonical sources registry ============
+// FocusPoint no longer owns source objects. All source metadata lives here
+// keyed by stable ID. FocusPoint.sourceIds references entries in this map.
+
+// Sources originally attached to focus points. IDs preserved.
+const FOCUS_POINT_SOURCES: Record<string, FocusSource> = {
+  "fp-delivery-s0": { id: "fp-delivery-s0", type: "Внешняя новость", title: "Конкурент запускает бесплатную доставку в 12 городах", date: "12 июля 2026", excerpt: "Крупный игрок объявил о бесплатной доставке во всех городах-миллионниках без ограничения по сумме заказа.", relation: "Основной внешний триггер: именно это изменение может повлиять на решения клиентов о заказе.", provider: "Ведомости", domain: "vedomosti.ru", url: "https://www.vedomosti.ru/business/news/2026/07/12/free-delivery" },
+  "fp-delivery-s1": { id: "fp-delivery-s1", type: "Профиль компании", title: "География присутствия компании", date: "актуально на 1 июля 2026", excerpt: "Компания представлена в 34 городах России, в 12 из них — прямое пересечение с зоной действия акции.", relation: "Позволяет определить регионы, где новое предложение конкурента будет заметно клиентам." },
+  "fp-delivery-s2": { id: "fp-delivery-s2", type: "Аналитика", title: "Причины отказа от заказа, июнь 2026", date: "июнь 2026", excerpt: "Стоимость доставки — вторая по частоте причина отмены заказа после длительной доставки.", relation: "Показывает, что цена доставки уже сейчас чувствительна для клиентов." },
+  "fp-delivery-s3": { id: "fp-delivery-s3", type: "Реестр рисков", title: "Снижение клиентской активности", excerpt: "Риск среднего уровня, оценивается ежеквартально.", relation: "Возможные последствия сценария оцениваются в рамках этого риска." },
+  "fp-supply-s0": { id: "fp-supply-s0", type: "Инциденты", title: "Инциденты поставок за июнь 2026", date: "июнь 2026", excerpt: "Зафиксировано 7 задержек, из них 5 — по трём ключевым поставщикам.", relation: "Показывает повторяемость и концентрацию задержек у одних и тех же контрагентов." },
+  "fp-supply-s1": { id: "fp-supply-s1", type: "Аналитика", title: "Доступность ассортимента по неделям", date: "июнь–июль 2026", excerpt: "Доля отсутствующих SKU выросла с 6% до 24% за 4 недели.", relation: "Демонстрирует связь задержек с ухудшением наличия товаров." },
+  "fp-supply-s2": { id: "fp-supply-s2", type: "Профиль компании", title: "Договоры с ключевыми поставщиками", excerpt: "В контрактах указаны SLA по срокам, но нет явного плана замены.", relation: "Помогает понять, есть ли у компании формальный резерв." },
+  "fp-supply-s3": { id: "fp-supply-s3", type: "Реестр рисков", title: "Нарушение непрерывности поставок", excerpt: "Риск высокого уровня. Текущая динамика подтверждает необходимость оперативно проверить зависимость от поставщиков и возможный масштаб потерь.", relation: "Именно этот риск может измениться по итогам проверки." },
+  "fp-it-s0": { id: "fp-it-s0", type: "Отчёт", title: "Отчёт мониторинга ИТ-систем", date: "июль 2026", excerpt: "Снижение количества критичных ошибок на 37% за последние 3 недели.", relation: "Основные числовые данные для оценки эффекта меры." },
+  "fp-it-s1": { id: "fp-it-s1", type: "Мера", title: "Дополнительный мониторинг онлайн-расчётов", excerpt: "Мера внедрена 30 июня 2026, включает автоматические алерты и еженедельный обзор.", relation: "Именно эта мера могла привести к наблюдаемому улучшению." },
+  "fp-it-s2": { id: "fp-it-s2", type: "Инциденты", title: "Журнал инцидентов за июнь–июль 2026", date: "июнь–июль 2026", excerpt: "После 30 июня массовых сбоев не зарегистрировано.", relation: "Подтверждает отсутствие повторных инцидентов в период наблюдения." },
+};
+
+// State-of-knowledge markers used only in the gap section of the summary.
 const GAP_SOURCES: Record<string, FocusSource> = {
   "gap-sales": {
     id: "gap-sales",
@@ -455,11 +511,8 @@ const GAP_SOURCES: Record<string, FocusSource> = {
       "Без этих данных возможный отток остаётся ранним сигналом, а не подтверждённым эффектом.",
   },
 };
-Object.assign(SOURCES_INDEX, GAP_SOURCES);
 
-// Extra sources used by risk-level Norm verdicts that don't come from a
-// focus point. Registered into the same SOURCES_INDEX so the universal
-// SourceDrawer can resolve them.
+// Sources referenced by risk-level Norm verdicts (and shared by fp-gpu).
 const RISK_VERDICT_SOURCES: Record<string, FocusSource> = {
   "risk-gpu-product-announce": {
     id: "risk-gpu-product-announce",
@@ -491,7 +544,12 @@ const RISK_VERDICT_SOURCES: Record<string, FocusSource> = {
       "Позволяет оценить, кого затронут сбои или задержки запуска продукта.",
   },
 };
-Object.assign(SOURCES_INDEX, RISK_VERDICT_SOURCES);
+
+const SOURCES_INDEX: Record<string, FocusSource> = {
+  ...FOCUS_POINT_SOURCES,
+  ...GAP_SOURCES,
+  ...RISK_VERDICT_SOURCES,
+};
 
 // Decorate a subset of sources with document / quote / locator so the unified
 // source card can show honest document cards or system-object cards.
@@ -556,6 +614,11 @@ Object.entries(SOURCE_DECORATIONS).forEach(([id, dec]) => {
   if (s) Object.assign(s, dec);
 });
 
+/** Resolve a risk by canonical ID. Returns undefined for unknown IDs. */
+function getRiskById(id: string): RiskRow | undefined {
+  return RISKS_REGISTRY.find((r) => r.id === id);
+}
+
 // Recipients directory used by the ShareDrawer. Static demo data.
 interface Recipient {
   id: string;
@@ -575,7 +638,8 @@ const RECIPIENTS: Recipient[] = [
   { id: "r8", name: "Наталья Гусева", role: "Владелец риска QNR-0331", dept: "Управление рисками", initials: "НГ" },
 ];
 
-function pickSuggested(kind: "summary" | "fp-delivery" | "fp-supply" | "fp-it"): { id: string; reason: string }[] {
+type SuggestedKind = "summary" | "fp-delivery" | "fp-supply" | "fp-it" | "fp-gpu";
+function pickSuggested(kind: SuggestedKind): { id: string; reason: string }[] {
   switch (kind) {
     case "fp-supply":
       return [
@@ -594,6 +658,10 @@ function pickSuggested(kind: "summary" | "fp-delivery" | "fp-supply" | "fp-it"):
         { id: "r7", reason: "Ответственный за меру мониторинга" },
         { id: "r8", reason: "Владелец риска QNR-0331" },
       ];
+    case "fp-gpu":
+      // Owners for fp-gpu are not defined yet. Return a neutral, empty
+      // list rather than falling back to fp-it recipients.
+      return [];
     case "summary":
     default:
       return [
@@ -1688,7 +1756,7 @@ function AssistantModal({ initialQuery, onClose, onToast }: { initialQuery: stri
   );
 }
 
-type ShareKind = "summary" | "fp-delivery" | "fp-supply" | "fp-it";
+type ShareKind = SuggestedKind;
 interface SharePreview {
   status: string;
   statusTone: "orange" | "blue" | "green" | "neutral";
@@ -1895,7 +1963,9 @@ function FocusPointModal({
   onClose,
   onToast,
   onDiscuss,
+  onOpenRisk,
   overSummary,
+  riskOnTop,
 }: {
   point: FocusPoint;
   activeSourceIdx: number | "list" | null;
@@ -1904,7 +1974,9 @@ function FocusPointModal({
   onClose: () => void;
   onToast: (m: string) => void;
   onDiscuss: (q: string) => void;
+  onOpenRisk: (riskId: string) => void;
   overSummary?: boolean;
+  riskOnTop?: boolean;
 }) {
   const [shareOpen, setShareOpen] = useState(false);
   useEffect(() => {
@@ -1912,6 +1984,8 @@ function FocusPointModal({
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
+      // A stacked risk modal owns Escape while it is on top.
+      if (riskOnTop) return;
       if (shareOpen) {
         e.stopPropagation();
         setShareOpen(false);
@@ -1929,7 +2003,7 @@ function FocusPointModal({
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
-  }, [activeSourceIdx, onClose, onCloseSource, shareOpen]);
+  }, [activeSourceIdx, onClose, onCloseSource, shareOpen, riskOnTop]);
 
   const handleAction = (label: string) => {
     if (label === "Обсудить с Нормом") {
@@ -1939,16 +2013,26 @@ function FocusPointModal({
     onToast(`«${label}» — этот раздел прототипа пока не реализован`);
   };
 
+  const pointSources = useMemo(
+    () =>
+      point.sourceIds
+        .map((id) => SOURCES_INDEX[id])
+        .filter((s): s is FocusSource => !!s),
+    [point.sourceIds],
+  );
   const drawerOpen = activeSourceIdx !== null;
   const selectedIdx = typeof activeSourceIdx === "number" ? activeSourceIdx : null;
-  const source = selectedIdx !== null ? point.sources[selectedIdx] : null;
-  const previewSources = point.sources.slice(0, 2);
-  const remainingSources = Math.max(0, point.sources.length - 2);
+  const source = selectedIdx !== null ? pointSources[selectedIdx] : null;
+  const previewSources = pointSources.slice(0, 2);
+  const remainingSources = Math.max(0, pointSources.length - 2);
+
+  const relatedRisk = getRiskById(point.riskId);
 
   const uniSources = useMemo(
-    () => point.sources.map((s) => focusSourceToUni(s)),
-    [point.sources],
+    () => pointSources.map((s) => focusSourceToUni(s)),
+    [pointSources],
   );
+
   const sdActiveId: string | "list" | null = !drawerOpen
     ? null
     : selectedIdx !== null
@@ -1958,7 +2042,7 @@ function FocusPointModal({
   return (
     <div
       className={`np-focus-backdrop${overSummary ? " np-focus-backdrop--over-summary" : ""}`}
-      onClick={onClose}
+      onClick={() => { if (!riskOnTop) onClose(); }}
       role="dialog"
       aria-modal="true"
       aria-label={point.title}
@@ -2030,30 +2114,30 @@ function FocusPointModal({
             </section>
             <section className="np-focus-island">
               <h4 className="np-focus-island-title">Связанные объекты</h4>
-              <button
-                type="button"
-                className="np-focus-risk-link"
-                onClick={() =>
-                  onToast(`Переход к риску ${point.relatedRisk.id} появится позже`)
-                }
-              >
-                <div className="np-focus-risk-main">
-                  <div className="np-focus-risk-head">
-                    <span className="np-focus-risk-kind">Риск</span>
-                    <span className="np-focus-risk-id">{point.relatedRisk.id}</span>
+              {relatedRisk && (
+                <button
+                  type="button"
+                  className="np-focus-risk-link"
+                  onClick={() => onOpenRisk(relatedRisk.id)}
+                >
+                  <div className="np-focus-risk-main">
+                    <div className="np-focus-risk-head">
+                      <span className="np-focus-risk-kind">Риск</span>
+                      <span className="np-focus-risk-id">{relatedRisk.id}</span>
+                    </div>
+                    <div className="np-focus-risk-title">{relatedRisk.title}</div>
+                    <div className="np-focus-risk-meta">
+                      <span
+                        className={`np-focus-risk-level np-focus-risk-level--${relatedRisk.level}`}
+                      >
+                        {relatedRisk.levelLabel}
+                      </span>
+                      <span className="np-focus-risk-status">{relatedRisk.status}</span>
+                    </div>
                   </div>
-                  <div className="np-focus-risk-title">{point.relatedRisk.title}</div>
-                  <div className="np-focus-risk-meta">
-                    <span
-                      className={`np-focus-risk-level np-focus-risk-level--${point.relatedRisk.levelTone}`}
-                    >
-                      {point.relatedRisk.level}
-                    </span>
-                    <span className="np-focus-risk-status">{point.relatedRisk.status}</span>
-                  </div>
-                </div>
-                <span className="np-focus-risk-chev" aria-hidden>→</span>
-              </button>
+                  <span className="np-focus-risk-chev" aria-hidden>→</span>
+                </button>
+              )}
               {point.relatedOther.length > 0 && (
                 <ul className="np-focus-related-list">
                   {point.relatedOther.map((r, i) => (
@@ -2073,6 +2157,7 @@ function FocusPointModal({
                 </ul>
               )}
             </section>
+
           </div>
 
           <aside className="np-focus-col np-focus-col--side">
@@ -2097,7 +2182,7 @@ function FocusPointModal({
 
             <div className="np-focus-island np-focus-side-block">
               <div className="np-focus-side-label">
-                Источники · {point.sources.length}
+                Источники · {pointSources.length}
               </div>
               <ul className="np-focus-src-links">
                 {previewSources.map((s, i) => (
@@ -2172,7 +2257,16 @@ function FocusPointModal({
         />
         {shareOpen && (
           <ShareDrawer
-            kind={point.id === "fp-delivery" ? "fp-delivery" : point.id === "fp-supply" ? "fp-supply" : "fp-it"}
+            kind={(() => {
+              // Explicit contract — never fall back to fp-it for unknown IDs.
+              switch (point.id) {
+                case "fp-delivery": return "fp-delivery";
+                case "fp-supply": return "fp-supply";
+                case "fp-it": return "fp-it";
+                case "fp-gpu": return "fp-gpu";
+                default: return "summary";
+              }
+            })()}
             title="Отправить фокусную точку"
             preview={{
               status: point.type,
@@ -2206,6 +2300,7 @@ function CompanySummaryModal({
   onClarify,
   onToast,
   focusOnTop,
+  riskOnTop,
 }: {
   summary: CompanySummary;
   activeSourceId: string | null;
@@ -2218,6 +2313,7 @@ function CompanySummaryModal({
   onClarify: () => void;
   onToast: (m: string) => void;
   focusOnTop: boolean;
+  riskOnTop: boolean;
 }) {
   const [shareOpen, setShareOpen] = useState(false);
   useEffect(() => {
@@ -2225,7 +2321,9 @@ function CompanySummaryModal({
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      if (focusOnTop) return; // focus modal handles its own escape
+      // Upper layers own Escape while they are on top.
+      if (riskOnTop) return;
+      if (focusOnTop) return;
       if (shareOpen) {
         e.stopPropagation();
         setShareOpen(false);
@@ -2243,7 +2341,8 @@ function CompanySummaryModal({
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
-  }, [activeSourceId, onClose, onCloseSource, focusOnTop, shareOpen]);
+  }, [activeSourceId, onClose, onCloseSource, focusOnTop, riskOnTop, shareOpen]);
+
 
   const source = activeSourceId ? SOURCES_INDEX[activeSourceId] : null;
   const supportedClaim = useMemo(() => {
@@ -2305,6 +2404,7 @@ function CompanySummaryModal({
     <div
       className="np-company-summary-backdrop"
       onClick={() => {
+        if (riskOnTop || focusOnTop) return;
         if (activeSourceId) onCloseSource();
         else onClose();
       }}
@@ -2364,7 +2464,7 @@ function CompanySummaryModal({
                 <button
                   type="button"
                   className="np-summary-risk-chip np-summary-risk-chip--action"
-                  onClick={() => onOpenRisks({ filter: "reassessed" })}
+                  onClick={() => onOpenRisks({ filter: "withoutMeasures" })}
                 >
                   <span className="np-summary-risk-num">{summary.meta.risksWithoutMeasures.value}</span>
                   <span className="np-summary-risk-label">{summary.meta.risksWithoutMeasures.label}</span>
@@ -2404,7 +2504,7 @@ function CompanySummaryModal({
               <div className="np-summary-focus-stack">
                 {focusSections.map((sec) => {
                   const fp = FOCUS_POINTS.find((p) => p.id === sec.focusPointId);
-                  const relRisk = fp?.relatedRisk;
+                  const relRisk = fp ? getRiskById(fp.riskId) : undefined;
                   return (
                     <div
                       key={sec.id}
@@ -3021,11 +3121,15 @@ function KriDrawer({ kri, onClose }: { kri: RiskDetail["kri"]; onClose: () => vo
 
 function RiskDetailModal({
   risk,
+  stacked,
   onClose,
   onNavigateToProfile,
   onToast,
 }: {
   risk: RiskDetail;
+  /** When true, the modal renders above another modal (summary/focus).
+   *  Uses higher z-index so it correctly overlays layered backdrops. */
+  stacked?: boolean;
   onClose: () => void;
   onNavigateToProfile: () => void;
   onToast: (m: string) => void;
@@ -3058,7 +3162,7 @@ function RiskDetailModal({
 
   return (
     <div
-      className="np-risk-modal-backdrop"
+      className={`np-risk-modal-backdrop${stacked ? " np-risk-modal-backdrop--stacked" : ""}`}
       onClick={(e) => {
         if (kriOpen || verdictDrawerOpen || verdictSourceId !== null) return;
         e.stopPropagation();
@@ -3067,6 +3171,7 @@ function RiskDetailModal({
       role="dialog"
       aria-modal="true"
       aria-label={risk.title}
+
     >
       <div className="np-modal np-risk-modal" onClick={(e) => e.stopPropagation()}>
         <button className="np-icon-btn np-risk-modal-close" onClick={onClose} aria-label="Закрыть">
@@ -3453,6 +3558,7 @@ function RisksPage({
     if (filter === "new") return !!r.isNew;
     if (filter === "high") return r.level === "high";
     if (filter === "reassessed") return !!r.reassessed;
+    if (filter === "withoutMeasures") return !r.hasEffectiveMeasures;
     return true;
   });
 
@@ -3577,6 +3683,13 @@ export default function NormPrototype() {
   const [summarySourceId, setSummarySourceId] = useState<string | null>(null);
   const [risksPageFilter, setRisksPageFilter] = useState<RiskFilter | undefined>(undefined);
   const [openRiskRow, setOpenRiskRow] = useState<RiskRow | null>(null);
+  const [openRiskOrigin, setOpenRiskOrigin] = useState<"risks" | "focus" | "summary">("risks");
+  const openRiskFromFocusOrSummary = (riskId: string, origin: "focus" | "summary") => {
+    const row = getRiskById(riskId);
+    if (!row) return;
+    setOpenRiskOrigin(origin);
+    setOpenRiskRow(row);
+  };
   const [activeNav, setActiveNav] = useState<string>("home");
   const [profileAreaOpen, setProfileAreaOpen] = useState(false);
   const [knowledgeBaseRootRequest, setKnowledgeBaseRootRequest] = useState(0);
@@ -3750,7 +3863,7 @@ export default function NormPrototype() {
           </div>
           <div className="np-focus-outer">
           <div className="np-focus-wrap">
-            {FOCUS_POINTS.map((fp) => (
+            {HOME_FOCUS_POINTS.map((fp) => (
               <button
                 key={fp.id}
                 type="button"
@@ -3771,6 +3884,7 @@ export default function NormPrototype() {
           </div>
           </div>
         </section>
+
 
         <section className="np-section">
           <div className="np-sec-head">
@@ -3812,12 +3926,17 @@ export default function NormPrototype() {
           onCloseSource={() => setFocusSourceIdx(null)}
           onClose={() => { setFocusSourceIdx(null); setFocusIdx(null); }}
           overSummary={summaryOpen}
+          riskOnTop={openRiskRow !== null}
           onToast={(m) => setToast(m)}
           onDiscuss={(q) => {
             setFocusSourceIdx(null);
             setFocusIdx(null);
             setSummaryOpen(false);
             openWith(q);
+          }}
+          onOpenRisk={(riskId) => {
+            setFocusSourceIdx(null);
+            openRiskFromFocusOrSummary(riskId, "focus");
           }}
         />
       )}
@@ -3836,17 +3955,18 @@ export default function NormPrototype() {
           }}
           onClose={() => { setSummarySourceId(null); setSummaryOpen(false); }}
           onOpenRisks={(opts) => {
-            const row = opts.riskId ? RISKS_REGISTRY.find((r) => r.id === opts.riskId) : null;
-            if (row) {
+            // Opening a specific risk from summary → keep summary open,
+            // stack the risk modal on top (origin="summary").
+            if (opts.riskId) {
               setSummarySourceId(null);
-              setSummaryOpen(false);
-              setOpenRiskRow(row);
-            } else {
-              setSummarySourceId(null);
-              setSummaryOpen(false);
-              setRisksPageFilter(opts.filter ?? "high");
-              handleNavigation("risks");
+              openRiskFromFocusOrSummary(opts.riskId, "summary");
+              return;
             }
+            // Opening the risks list → leave the summary and navigate.
+            setSummarySourceId(null);
+            setSummaryOpen(false);
+            setRisksPageFilter(opts.filter ?? "high");
+            handleNavigation("risks");
           }}
           onDiscuss={() => {
             setSummarySourceId(null);
@@ -3860,16 +3980,19 @@ export default function NormPrototype() {
           }}
           onToast={(m) => setToast(m)}
           focusOnTop={focusIdx !== null}
+          riskOnTop={openRiskRow !== null}
         />
       )}
       {openRiskRow && (
         <RiskDetailModal
           risk={buildRiskDetail(openRiskRow)}
+          stacked={openRiskOrigin !== "risks"}
           onClose={() => setOpenRiskRow(null)}
           onNavigateToProfile={() => { setOpenRiskRow(null); handleNavigation("kb"); }}
           onToast={(m) => setToast(m)}
         />
       )}
+
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
     </div>
   );
