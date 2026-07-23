@@ -605,6 +605,19 @@ export default function KnowledgeBase({
     setTab("profile");
   }, [rootRequest]);
 
+  const [flashKnowledgeId, setFlashKnowledgeId] = useState<string | null>(null);
+  useEffect(() => {
+    if (!focus) return;
+    setTab("profile");
+    setActiveAreaId(focus.areaId);
+    if (focus.knowledgeId) {
+      setFlashKnowledgeId(focus.knowledgeId);
+      const t = setTimeout(() => setFlashKnowledgeId(null), 2400);
+      return () => clearTimeout(t);
+    }
+  }, [focus?.nonce]);
+
+
   useEffect(() => {
     if (activeAreaId && typeof window !== "undefined") {
       window.scrollTo({ top: 0, left: 0, behavior: "auto" });
