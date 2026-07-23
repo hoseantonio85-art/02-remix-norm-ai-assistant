@@ -2449,7 +2449,7 @@ function CompanySummaryModal({
                 <button
                   type="button"
                   className="np-summary-risk-chip np-summary-risk-chip--action"
-                  onClick={() => onOpenRisks({ filter: "reassessed" })}
+                  onClick={() => onOpenRisks({ filter: "withoutMeasures" })}
                 >
                   <span className="np-summary-risk-num">{summary.meta.risksWithoutMeasures.value}</span>
                   <span className="np-summary-risk-label">{summary.meta.risksWithoutMeasures.label}</span>
