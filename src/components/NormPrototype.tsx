@@ -2109,30 +2109,30 @@ function FocusPointModal({
             </section>
             <section className="np-focus-island">
               <h4 className="np-focus-island-title">Связанные объекты</h4>
-              <button
-                type="button"
-                className="np-focus-risk-link"
-                onClick={() =>
-                  onToast(`Переход к риску ${point.relatedRisk.id} появится позже`)
-                }
-              >
-                <div className="np-focus-risk-main">
-                  <div className="np-focus-risk-head">
-                    <span className="np-focus-risk-kind">Риск</span>
-                    <span className="np-focus-risk-id">{point.relatedRisk.id}</span>
+              {relatedRisk && (
+                <button
+                  type="button"
+                  className="np-focus-risk-link"
+                  onClick={() => onOpenRisk(relatedRisk.id)}
+                >
+                  <div className="np-focus-risk-main">
+                    <div className="np-focus-risk-head">
+                      <span className="np-focus-risk-kind">Риск</span>
+                      <span className="np-focus-risk-id">{relatedRisk.id}</span>
+                    </div>
+                    <div className="np-focus-risk-title">{relatedRisk.title}</div>
+                    <div className="np-focus-risk-meta">
+                      <span
+                        className={`np-focus-risk-level np-focus-risk-level--${relatedRisk.level}`}
+                      >
+                        {relatedRisk.levelLabel}
+                      </span>
+                      <span className="np-focus-risk-status">{relatedRisk.status}</span>
+                    </div>
                   </div>
-                  <div className="np-focus-risk-title">{point.relatedRisk.title}</div>
-                  <div className="np-focus-risk-meta">
-                    <span
-                      className={`np-focus-risk-level np-focus-risk-level--${point.relatedRisk.levelTone}`}
-                    >
-                      {point.relatedRisk.level}
-                    </span>
-                    <span className="np-focus-risk-status">{point.relatedRisk.status}</span>
-                  </div>
-                </div>
-                <span className="np-focus-risk-chev" aria-hidden>→</span>
-              </button>
+                  <span className="np-focus-risk-chev" aria-hidden>→</span>
+                </button>
+              )}
               {point.relatedOther.length > 0 && (
                 <ul className="np-focus-related-list">
                   {point.relatedOther.map((r, i) => (
@@ -2152,6 +2152,7 @@ function FocusPointModal({
                 </ul>
               )}
             </section>
+
           </div>
 
           <aside className="np-focus-col np-focus-col--side">
