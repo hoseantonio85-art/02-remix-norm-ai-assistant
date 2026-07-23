@@ -3775,6 +3775,10 @@
   display: flex; justify-content: center; align-items: stretch;
   overflow: hidden;
 }
+/* Stacked variant: risk modal opened on top of Summary (z=1000) or Focus
+   (z=1100 when over Summary). Backdrop must sit above both. */
+.np-risk-modal-backdrop--stacked { z-index: 1200; }
+.np-risk-modal-backdrop--stacked .np-risk-modal { z-index: 1201; }
 .np-risk-modal {
   background: #fff; border-radius: 20px; overflow: hidden;
   display: flex; flex-direction: column;
