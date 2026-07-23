@@ -638,7 +638,8 @@ const RECIPIENTS: Recipient[] = [
   { id: "r8", name: "Наталья Гусева", role: "Владелец риска QNR-0331", dept: "Управление рисками", initials: "НГ" },
 ];
 
-function pickSuggested(kind: "summary" | "fp-delivery" | "fp-supply" | "fp-it"): { id: string; reason: string }[] {
+type SuggestedKind = "summary" | "fp-delivery" | "fp-supply" | "fp-it" | "fp-gpu";
+function pickSuggested(kind: SuggestedKind): { id: string; reason: string }[] {
   switch (kind) {
     case "fp-supply":
       return [
@@ -657,6 +658,10 @@ function pickSuggested(kind: "summary" | "fp-delivery" | "fp-supply" | "fp-it"):
         { id: "r7", reason: "Ответственный за меру мониторинга" },
         { id: "r8", reason: "Владелец риска QNR-0331" },
       ];
+    case "fp-gpu":
+      // Owners for fp-gpu are not defined yet. Return a neutral, empty
+      // list rather than falling back to fp-it recipients.
+      return [];
     case "summary":
     default:
       return [
