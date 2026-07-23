@@ -3107,11 +3107,15 @@ function KriDrawer({ kri, onClose }: { kri: RiskDetail["kri"]; onClose: () => vo
 
 function RiskDetailModal({
   risk,
+  stacked,
   onClose,
   onNavigateToProfile,
   onToast,
 }: {
   risk: RiskDetail;
+  /** When true, the modal renders above another modal (summary/focus).
+   *  Uses higher z-index so it correctly overlays layered backdrops. */
+  stacked?: boolean;
   onClose: () => void;
   onNavigateToProfile: () => void;
   onToast: (m: string) => void;
@@ -3144,7 +3148,7 @@ function RiskDetailModal({
 
   return (
     <div
-      className="np-risk-modal-backdrop"
+      className={`np-risk-modal-backdrop${stacked ? " np-risk-modal-backdrop--stacked" : ""}`}
       onClick={(e) => {
         if (kriOpen || verdictDrawerOpen || verdictSourceId !== null) return;
         e.stopPropagation();
@@ -3153,6 +3157,7 @@ function RiskDetailModal({
       role="dialog"
       aria-modal="true"
       aria-label={risk.title}
+
     >
       <div className="np-modal np-risk-modal" onClick={(e) => e.stopPropagation()}>
         <button className="np-icon-btn np-risk-modal-close" onClick={onClose} aria-label="Закрыть">
