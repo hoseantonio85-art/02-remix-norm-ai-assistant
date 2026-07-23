@@ -3,5 +3,5 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  base: "/norm-ai-assistant-v2/",
+  base: "/no-01-norm-ai-assistant/",
 });
