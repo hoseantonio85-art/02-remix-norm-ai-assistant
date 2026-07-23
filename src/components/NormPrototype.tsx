@@ -461,6 +461,111 @@ const HOME_FOCUS_IDS: readonly string[] = ["fp-delivery", "fp-supply", "fp-it"];
 const HOME_FOCUS_POINTS: FocusPoint[] = HOME_FOCUS_IDS
   .map((id) => FOCUS_POINTS.find((p) => p.id === id))
   .filter((p): p is FocusPoint => !!p);
+// Home carousel: pinned order first, then the rest of FOCUS_POINTS.
+const HOME_CAROUSEL_POINTS: FocusPoint[] = [
+  ...HOME_FOCUS_POINTS,
+  ...FOCUS_POINTS.filter((p) => !HOME_FOCUS_IDS.includes(p.id)),
+];
+
+// ============ Focus carousel (home) ============
+function FocusCarousel({
+  points,
+  onOpen,
+}: {
+  points: FocusPoint[];
+  onOpen: (fp: FocusPoint) => void;
+}) {
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const [canLeft, setCanLeft] = useState(false);
+  const [canRight, setCanRight] = useState(false);
+
+  const update = () => {
+    const el = trackRef.current;
+    if (!el) return;
+    setCanLeft(el.scrollLeft > 4);
+    setCanRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  };
+
+  useEffect(() => {
+    update();
+    const el = trackRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      el.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
+  const scrollBy = (dir: 1 | -1) => {
+    const el = trackRef.current;
+    if (!el) return;
+    const step = Math.max(el.clientWidth * 0.8, 280);
+    el.scrollBy({ left: dir * step, behavior: "smooth" });
+  };
+
+  const onKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "ArrowRight") { e.preventDefault(); scrollBy(1); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); scrollBy(-1); }
+  };
+
+  return (
+    <div className="np-focus-carousel">
+      <div
+        ref={trackRef}
+        className="np-focus-carousel-track"
+        role="list"
+        tabIndex={0}
+        onKeyDown={onKey}
+      >
+        {points.map((fp) => (
+          <button
+            key={fp.id}
+            type="button"
+            role="listitem"
+            className="np-focus-card np-focus-carousel-card"
+            onClick={() => onOpen(fp)}
+          >
+            <div className="np-focus-card-top">
+              <span className={`np-focus-type np-focus-type--${fp.tone}`}>{fp.type}</span>
+              <span className="np-focus-area">{fp.area}</span>
+            </div>
+            <h3 className="np-focus-title">{fp.title}</h3>
+            <p className="np-focus-short">{fp.short}</p>
+            <div className="np-focus-cta">
+              {fp.cta} <Icon name="arrow" size={14} />
+            </div>
+          </button>
+        ))}
+      </div>
+      <span className={`np-focus-carousel-fade np-focus-carousel-fade--left${canLeft ? " is-visible" : ""}`} aria-hidden />
+      <span className={`np-focus-carousel-fade np-focus-carousel-fade--right${canRight ? " is-visible" : ""}`} aria-hidden />
+      {canLeft && (
+        <button
+          type="button"
+          className="np-focus-carousel-nav np-focus-carousel-nav--left"
+          onClick={() => scrollBy(-1)}
+          aria-label="Прокрутить назад"
+        >
+          ‹
+        </button>
+      )}
+      {canRight && (
+        <button
+          type="button"
+          className="np-focus-carousel-nav np-focus-carousel-nav--right"
+          onClick={() => scrollBy(1)}
+          aria-label="Прокрутить вперёд"
+        >
+          ›
+        </button>
+      )}
+    </div>
+  );
+}
+
+
 
 // ============ Canonical sources registry ============
 // FocusPoint no longer owns source objects. All source metadata lives here
@@ -3848,26 +3953,10 @@ export default function NormPrototype() {
             </button>
           </div>
           <div className="np-focus-outer">
-          <div className="np-focus-wrap">
-            {HOME_FOCUS_POINTS.map((fp) => (
-              <button
-                key={fp.id}
-                type="button"
-                className="np-focus-card"
-                onClick={() => setFocusIdx(FOCUS_POINTS.indexOf(fp))}
-              >
-                <div className="np-focus-card-top">
-                  <span className={`np-focus-type np-focus-type--${fp.tone}`}>{fp.type}</span>
-                  <span className="np-focus-area">{fp.area}</span>
-                </div>
-                <h3 className="np-focus-title">{fp.title}</h3>
-                <p className="np-focus-short">{fp.short}</p>
-                <div className="np-focus-cta">
-                  {fp.cta} <Icon name="arrow" size={14} />
-                </div>
-              </button>
-            ))}
-          </div>
+            <FocusCarousel
+              points={HOME_CAROUSEL_POINTS}
+              onOpen={(fp) => setFocusIdx(FOCUS_POINTS.indexOf(fp))}
+            />
           </div>
         </section>
 
