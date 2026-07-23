@@ -782,6 +782,7 @@ export default function KnowledgeBase({
           filter={filter}
           setFilter={setFilter}
           searchQuery={hideChrome ? "" : (searchOpen ? searchQuery : "")}
+          flashKnowledgeId={flashKnowledgeId}
         />
       )}
       {tab === "docs" && (
