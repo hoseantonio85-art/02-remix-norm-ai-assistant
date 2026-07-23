@@ -826,6 +826,7 @@ interface CompanySummary {
   leadTitle: string;
   leadHeadline: string;
   leadText: string;
+  leadBullets: { title: string; text: string; tone?: "red" | "orange" | "blue" | "green" }[];
   requiredDecision: string;
   secondaryStatuses: {
     tone: "blue" | "green";
