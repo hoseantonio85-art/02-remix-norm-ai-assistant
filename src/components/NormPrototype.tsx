@@ -3657,6 +3657,13 @@ export default function NormPrototype() {
   const [summarySourceId, setSummarySourceId] = useState<string | null>(null);
   const [risksPageFilter, setRisksPageFilter] = useState<RiskFilter | undefined>(undefined);
   const [openRiskRow, setOpenRiskRow] = useState<RiskRow | null>(null);
+  const [openRiskOrigin, setOpenRiskOrigin] = useState<"risks" | "focus" | "summary">("risks");
+  const openRiskFromFocusOrSummary = (riskId: string, origin: "focus" | "summary") => {
+    const row = getRiskById(riskId);
+    if (!row) return;
+    setOpenRiskOrigin(origin);
+    setOpenRiskRow(row);
+  };
   const [activeNav, setActiveNav] = useState<string>("home");
   const [profileAreaOpen, setProfileAreaOpen] = useState(false);
   const [knowledgeBaseRootRequest, setKnowledgeBaseRootRequest] = useState(0);
