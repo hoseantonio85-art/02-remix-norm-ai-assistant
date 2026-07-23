@@ -2595,7 +2595,17 @@ function CompanySummaryModal({
               <h2 className="np-summary-h2">Главное за 30 секунд</h2>
               <div className="np-summary-island np-summary-lead-island">
                 <h3 className="np-summary-detail-headline">{summary.leadHeadline}</h3>
-                <p className="np-summary-detail-text">{summary.leadText}</p>
+                <ul className="np-summary-lead-bullets">
+                  {summary.leadBullets.map((b, i) => (
+                    <li key={i} className={`np-summary-lead-bullet np-summary-lead-bullet--${b.tone || "neutral"}`}>
+                      <span className="np-summary-lead-bullet-dot" aria-hidden />
+                      <div className="np-summary-lead-bullet-body">
+                        <div className="np-summary-lead-bullet-title">{b.title}</div>
+                        <div className="np-summary-lead-bullet-text">{b.text}</div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </section>
 
