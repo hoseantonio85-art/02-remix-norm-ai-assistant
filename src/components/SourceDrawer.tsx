@@ -39,6 +39,8 @@ export interface UniSource {
     downloadUrl?: string | null;
   } | null;
   url?: string | null;
+  targetAreaId?: string | null;
+  targetKnowledgeId?: string | null;
 }
 
 function isExternalType(s: UniSource): boolean {
@@ -127,10 +129,12 @@ function SourceDetail({
   s,
   mode,
   onExternal,
+  onOpenKnowledge,
 }: {
   s: UniSource;
   mode: "conclusion" | "knowledge";
   onExternal: (s: UniSource) => void;
+  onOpenKnowledge?: (areaId: string, knowledgeId?: string | null) => void;
 }) {
   const loc = locationLine(s.location);
   const isGap = s.type === "state_of_knowledge";
@@ -164,6 +168,18 @@ function SourceDetail({
           >
             Скачать
           </a>
+        )}
+        {onOpenKnowledge && s.targetAreaId && (
+          <button
+            type="button"
+            className="np-sd-linkbtn np-sd-linkbtn--kb"
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenKnowledge(s.targetAreaId!, s.targetKnowledgeId ?? null);
+            }}
+          >
+            Открыть в базе знаний →
+          </button>
         )}
       </div>
 
@@ -282,6 +298,7 @@ export interface SourceDrawerProps {
   onEdit?: (s: UniSource) => void;
   onDelete?: (s: UniSource) => void;
   placement: "viewport" | "modal";
+  onOpenKnowledge?: (areaId: string, knowledgeId?: string | null) => void;
 }
 
 export function SourceDrawer({
@@ -296,6 +313,7 @@ export function SourceDrawer({
   onEdit,
   onDelete,
   placement,
+  onOpenKnowledge,
 }: SourceDrawerProps) {
   useEffect(() => {
     if (activeId === null) return;
@@ -378,6 +396,7 @@ export function SourceDrawer({
               s={selected}
               mode={mode}
               onExternal={handleExternal}
+              onOpenKnowledge={onOpenKnowledge}
             />
           ) : showList ? (
             <ul className="np-sd-list">
@@ -433,6 +452,8 @@ export interface FocusSourceLike {
   provider?: string;
   domain?: string;
   url?: string;
+  targetAreaId?: string | null;
+  targetKnowledgeId?: string | null;
 }
 
 function classifyFocusType(s: FocusSourceLike): { type: SourceType; typeLabel: string } {
@@ -486,6 +507,8 @@ export function focusSourceToUni(
         }
       : null,
     url,
+    targetAreaId: s.targetAreaId ?? null,
+    targetKnowledgeId: s.targetKnowledgeId ?? null,
   };
 }
 

@@ -3576,6 +3576,23 @@
 }
 .np-sd-linkbtn:hover { text-decoration: underline; }
 .np-sd-linkbtn--danger { color: #b91c1c; }
+.np-sd-linkbtn--kb {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 6px 10px; border: 1px solid #0f766e33;
+  border-radius: 8px; background: #ecfdf5; color: #0f766e;
+  font-weight: 500;
+}
+.np-sd-linkbtn--kb:hover { background: #d1fae5; text-decoration: none; }
+
+@keyframes np-kb-flash {
+  0%   { box-shadow: 0 0 0 0 rgba(15,118,110,.55); background: #ecfdf5; }
+  60%  { box-shadow: 0 0 0 8px rgba(15,118,110,0);  background: #ecfdf5; }
+  100% { box-shadow: 0 0 0 0 rgba(15,118,110,0);    background: transparent; }
+}
+.np-k-acc.is-flash {
+  animation: np-kb-flash 1.6s ease-out;
+  border-radius: 12px;
+}
 
 .np-sd-block { display: flex; flex-direction: column; gap: 6px; }
 .np-sd-label {

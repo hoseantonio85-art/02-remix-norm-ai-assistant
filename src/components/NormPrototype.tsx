@@ -157,6 +157,8 @@ interface FocusSource {
   provider?: string;
   domain?: string;
   url?: string;
+  targetAreaId?: string | null;
+  targetKnowledgeId?: string | null;
 }
 interface FocusPoint {
   id: string;
@@ -717,6 +719,28 @@ const SOURCE_DECORATIONS: Record<string, Partial<FocusSource>> = {
 Object.entries(SOURCE_DECORATIONS).forEach(([id, dec]) => {
   const s = SOURCES_INDEX[id];
   if (s) Object.assign(s, dec);
+});
+
+// Deep-link map: from source id to a specific place in the knowledge base.
+const RISK_KNOWLEDGE_LINKS: Record<string, { areaId: string; knowledgeId?: string }> = {
+  "risk-gpu-product-announce": { areaId: "products_business_model", knowledgeId: "products.investment_projects" },
+  "risk-gpu-shortage-report":  { areaId: "it_data_technology",      knowledgeId: "it.platform_project" },
+  "risk-gpu-key-clients":      { areaId: "products_business_model", knowledgeId: "products.business_profile" },
+  "fp-supply-s0":              { areaId: "counterparties",          knowledgeId: "counterparties.main_debtors" },
+  "fp-supply-s1":              { areaId: "counterparties",          knowledgeId: "counterparties.main_debtors" },
+  "fp-supply-s2":              { areaId: "counterparties",          knowledgeId: "counterparties.main_debtors" },
+  "fp-supply-s3":              { areaId: "counterparties",          knowledgeId: "counterparties.main_debtors" },
+  "fp-it-s0":                  { areaId: "it_data_technology",      knowledgeId: "it.platform_project" },
+  "fp-it-s2":                  { areaId: "it_data_technology",      knowledgeId: "it.platform_project" },
+  "fp-delivery-s0":            { areaId: "products_business_model", knowledgeId: "products.business_profile" },
+  "fp-delivery-s2":            { areaId: "products_business_model", knowledgeId: "products.business_profile" },
+};
+Object.entries(RISK_KNOWLEDGE_LINKS).forEach(([id, link]) => {
+  const s = SOURCES_INDEX[id];
+  if (s) {
+    s.targetAreaId = link.areaId;
+    s.targetKnowledgeId = link.knowledgeId ?? null;
+  }
 });
 
 /** Resolve a risk by canonical ID. Returns undefined for unknown IDs. */
@@ -2070,6 +2094,7 @@ function FocusPointModal({
   onToast,
   onDiscuss,
   onOpenRisk,
+  onOpenKnowledge,
   overSummary,
   riskOnTop,
 }: {
@@ -2081,6 +2106,7 @@ function FocusPointModal({
   onToast: (m: string) => void;
   onDiscuss: (q: string) => void;
   onOpenRisk: (riskId: string) => void;
+  onOpenKnowledge?: (areaId: string, knowledgeId?: string | null) => void;
   overSummary?: boolean;
   riskOnTop?: boolean;
 }) {
@@ -2355,6 +2381,7 @@ function FocusPointModal({
             }
           }}
           onClose={onCloseSource}
+          onOpenKnowledge={onOpenKnowledge}
           onExternal={(s) => {
             if (s.url) window.open(s.url, "_blank", "noopener,noreferrer");
             else if (s.file?.downloadUrl) window.open(s.file.downloadUrl, "_blank", "noopener,noreferrer");
@@ -2401,6 +2428,7 @@ function CompanySummaryModal({
   onCloseSource,
   onOpenFocus,
   onOpenRisks,
+  onOpenKnowledge,
   onClose,
   onDiscuss,
   onClarify,
@@ -2414,6 +2442,7 @@ function CompanySummaryModal({
   onCloseSource: () => void;
   onOpenFocus: (fpId: string) => void;
   onOpenRisks: (opts: { filter?: RiskFilter; riskId?: string }) => void;
+  onOpenKnowledge?: (areaId: string, knowledgeId?: string | null) => void;
   onClose: () => void;
   onDiscuss: () => void;
   onClarify: () => void;
@@ -2648,6 +2677,7 @@ function CompanySummaryModal({
               placement="modal"
               onOpen={(id) => onOpenSummarySource(activeSummarySource.sectionId, id)}
               onClose={onCloseSource}
+              onOpenKnowledge={onOpenKnowledge}
               onExternal={(s) => {
                 if (s.url) window.open(s.url, "_blank", "noopener,noreferrer");
                 else if (s.file?.downloadUrl) window.open(s.file.downloadUrl, "_blank", "noopener,noreferrer");
@@ -3214,6 +3244,7 @@ function RiskDetailModal({
   stacked,
   onClose,
   onNavigateToProfile,
+  onOpenKnowledge,
   onToast,
 }: {
   risk: RiskDetail;
@@ -3222,6 +3253,7 @@ function RiskDetailModal({
   stacked?: boolean;
   onClose: () => void;
   onNavigateToProfile: () => void;
+  onOpenKnowledge?: (areaId: string, knowledgeId?: string | null) => void;
   onToast: (m: string) => void;
 }) {
   const [tab, setTab] = useState<"eval" | "util" | "kri" | "factors" | "consequences" | "measures">("eval");
@@ -3511,6 +3543,7 @@ function RiskDetailModal({
             placement="modal"
             onOpen={(id) => setVerdictSourceId(id)}
             onClose={() => setVerdictSourceId(null)}
+            onOpenKnowledge={onOpenKnowledge}
           />
         )}
       </div>
@@ -3785,6 +3818,21 @@ export default function NormPrototype() {
   const [activeNav, setActiveNav] = useState<string>("home");
   const [profileAreaOpen, setProfileAreaOpen] = useState(false);
   const [knowledgeBaseRootRequest, setKnowledgeBaseRootRequest] = useState(0);
+  const [knowledgeFocus, setKnowledgeFocus] = useState<
+    { areaId: string; knowledgeId?: string | null; nonce: number } | null
+  >(null);
+  const handleOpenKnowledge = (areaId: string, knowledgeId?: string | null) => {
+    // Close any stacked modal/drawer so the KB is visible.
+    setOpenRiskRow(null);
+    setFocusIdx(null);
+    setFocusSourceIdx(null);
+    setSummaryOpen(false);
+    setSummarySource(null);
+    setModalOpen(false);
+    setProfileAreaOpen(false);
+    setActiveNav("kb");
+    setKnowledgeFocus({ areaId, knowledgeId: knowledgeId ?? null, nonce: Date.now() });
+  };
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     return window.localStorage.getItem("norm-sidebar-collapsed") === "1";
@@ -3873,6 +3921,7 @@ export default function NormPrototype() {
             onOpenChat={(q) => openWith(q)}
             onAreaViewChange={setProfileAreaOpen}
             rootRequest={knowledgeBaseRootRequest}
+            focus={knowledgeFocus}
           />
         ) : activeNav === "risks" ? (
           <RisksPage
@@ -4014,6 +4063,7 @@ export default function NormPrototype() {
             setFocusSourceIdx(null);
             openRiskFromFocusOrSummary(riskId, "focus");
           }}
+          onOpenKnowledge={handleOpenKnowledge}
         />
       )}
       {summaryOpen && (
@@ -4054,6 +4104,7 @@ export default function NormPrototype() {
           onToast={(m) => setToast(m)}
           focusOnTop={focusIdx !== null}
           riskOnTop={openRiskRow !== null}
+          onOpenKnowledge={handleOpenKnowledge}
         />
       )}
       {openRiskRow && (
@@ -4062,6 +4113,7 @@ export default function NormPrototype() {
           stacked={openRiskOrigin !== "risks"}
           onClose={() => setOpenRiskRow(null)}
           onNavigateToProfile={() => { setOpenRiskRow(null); handleNavigation("kb"); }}
+          onOpenKnowledge={handleOpenKnowledge}
           onToast={(m) => setToast(m)}
         />
       )}
