@@ -3945,38 +3945,35 @@ export default function NormPrototype() {
       {summaryOpen && (
         <CompanySummaryModal
           summary={COMPANY_SUMMARY}
-          activeSourceId={summarySourceId}
-          onOpenSource={(id) => setSummarySourceId(id)}
-          onCloseSource={() => setSummarySourceId(null)}
+          activeSummarySource={summarySource}
+          onOpenSummarySource={(sectionId, sourceId) => setSummarySource({ sectionId, sourceId })}
+          onCloseSource={() => setSummarySource(null)}
           onOpenFocus={(fpId) => {
             const idx = FOCUS_POINTS.findIndex((p) => p.id === fpId);
             if (idx >= 0) {
-              setSummarySourceId(null);
+              setSummarySource(null);
               setFocusIdx(idx);
             }
           }}
-          onClose={() => { setSummarySourceId(null); setSummaryOpen(false); }}
+          onClose={() => { setSummarySource(null); setSummaryOpen(false); }}
           onOpenRisks={(opts) => {
-            // Opening a specific risk from summary → keep summary open,
-            // stack the risk modal on top (origin="summary").
             if (opts.riskId) {
-              setSummarySourceId(null);
+              setSummarySource(null);
               openRiskFromFocusOrSummary(opts.riskId, "summary");
               return;
             }
-            // Opening the risks list → leave the summary and navigate.
-            setSummarySourceId(null);
+            setSummarySource(null);
             setSummaryOpen(false);
             setRisksPageFilter(opts.filter ?? "high");
             handleNavigation("risks");
           }}
           onDiscuss={() => {
-            setSummarySourceId(null);
+            setSummarySource(null);
             setSummaryOpen(false);
             openWith(COMPANY_SUMMARY.discussQuestion);
           }}
           onClarify={() => {
-            setSummarySourceId(null);
+            setSummarySource(null);
             setSummaryOpen(false);
             openWith(COMPANY_SUMMARY.clarificationQuestion);
           }}
