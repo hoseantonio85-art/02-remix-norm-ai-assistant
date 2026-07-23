@@ -556,10 +556,12 @@ export default function KnowledgeBase({
   onOpenChat,
   onAreaViewChange,
   rootRequest,
+  focus,
 }: {
   onOpenChat?: (q: string) => void;
   onAreaViewChange?: (isOpen: boolean) => void;
   rootRequest?: number;
+  focus?: { areaId: string; knowledgeId?: string | null; nonce: number } | null;
 }) {
   const [tab, setTab] = useState<"profile" | "docs" | "methodology">("profile");
   const [toast, setToast] = useState<string | null>(null);
