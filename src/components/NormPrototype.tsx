@@ -2037,7 +2037,7 @@ function FocusPointModal({
   return (
     <div
       className={`np-focus-backdrop${overSummary ? " np-focus-backdrop--over-summary" : ""}`}
-      onClick={onClose}
+      onClick={() => { if (!riskOnTop) onClose(); }}
       role="dialog"
       aria-modal="true"
       aria-label={point.title}
