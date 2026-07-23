@@ -131,7 +131,7 @@ const NAV = [
   { id: "kb", label: "База знаний", icon: "book" },
 ];
 
-type RiskFilter = "all" | "new" | "high" | "reassessed";
+type RiskFilter = "all" | "new" | "high" | "reassessed" | "withoutMeasures";
 
 interface FocusSource {
   id?: string;
@@ -180,15 +180,11 @@ interface FocusPoint {
   clarificationValue: string;
   clarificationChatQuestion: string;
   related: string[];
-  relatedRisk: {
-    id: string;
-    title: string;
-    level: string;
-    levelTone: "high" | "medium" | "low";
-    status: string;
-  };
+  /** Canonical link into RISKS_REGISTRY. Resolve via getRiskById(). */
+  riskId: string;
   relatedOther: string[];
-  sources: FocusSource[];
+  /** IDs into the canonical SOURCES_INDEX. FocusPoint no longer owns source objects. */
+  sourceIds: string[];
   primaryAction: string;
   secondaryActions: string[];
   chatQuestion: string;
@@ -206,7 +202,10 @@ interface FocusCheckpoint {
   response: string;
 }
 
-const FOCUS_POINTS: FocusPoint[] = [
+// Raw focus point definitions. Declared in any convenient order; the
+// exported FOCUS_POINTS array below reorders them into the canonical
+// product order.
+const _FOCUS_POINTS_RAW: FocusPoint[] = [
   {
     id: "fp-delivery",
     type: "Внешний сигнал",
@@ -252,23 +251,12 @@ const FOCUS_POINTS: FocusPoint[] = [
       "продукт «Экспресс-доставка»",
       "12 городов присутствия",
     ],
-    relatedRisk: {
-      id: "QNR-0187",
-      title: "Снижение клиентской активности",
-      level: "Средний",
-      levelTone: "medium",
-      status: "Действующий",
-    },
+    riskId: "QNR-0187",
     relatedOther: [
       "Продукт · Экспресс-доставка",
       "География · 12 городов присутствия",
     ],
-    sources: [
-      { type: "Внешняя новость", title: "Конкурент запускает бесплатную доставку в 12 городах", date: "12 июля 2026", excerpt: "Крупный игрок объявил о бесплатной доставке во всех городах-миллионниках без ограничения по сумме заказа.", relation: "Основной внешний триггер: именно это изменение может повлиять на решения клиентов о заказе.", provider: "Ведомости", domain: "vedomosti.ru", url: "https://www.vedomosti.ru/business/news/2026/07/12/free-delivery" },
-      { type: "Профиль компании", title: "География присутствия компании", date: "актуально на 1 июля 2026", excerpt: "Компания представлена в 34 городах России, в 12 из них — прямое пересечение с зоной действия акции.", relation: "Позволяет определить регионы, где новое предложение конкурента будет заметно клиентам." },
-      { type: "Аналитика", title: "Причины отказа от заказа, июнь 2026", date: "июнь 2026", excerpt: "Стоимость доставки — вторая по частоте причина отмены заказа после длительной доставки.", relation: "Показывает, что цена доставки уже сейчас чувствительна для клиентов." },
-      { type: "Реестр рисков", title: "Снижение клиентской активности", excerpt: "Риск среднего уровня, оценивается ежеквартально.", relation: "Возможные последствия сценария оцениваются в рамках этого риска." },
-    ],
+    sourceIds: ["fp-delivery-s0", "fp-delivery-s1", "fp-delivery-s2", "fp-delivery-s3"],
     primaryAction: "Передать данные",
     secondaryActions: ["Обсудить с Нормом"],
     chatQuestion: "Помоги оценить, как бесплатная доставка конкурента может повлиять на отток клиентов",
@@ -325,24 +313,13 @@ const FOCUS_POINTS: FocusPoint[] = [
       "поставщики «Альфа Фуд», «Север Трейд» и «Фреш Лайн»",
       "показатель доступности товаров",
     ],
-    relatedRisk: {
-      id: "QNR-0214",
-      title: "Нарушение непрерывности поставок",
-      level: "Высокий",
-      levelTone: "high",
-      status: "Действующий",
-    },
+    riskId: "QNR-0214",
     relatedOther: [
       "Поставщики · «Альфа Фуд», «Север Трейд», «Фреш Лайн»",
       "Инциденты · 3 задержки за месяц",
       "Показатель · Доступность товаров",
     ],
-    sources: [
-      { type: "Инциденты", title: "Инциденты поставок за июнь 2026", date: "июнь 2026", excerpt: "Зафиксировано 7 задержек, из них 5 — по трём ключевым поставщикам.", relation: "Показывает повторяемость и концентрацию задержек у одних и тех же контрагентов." },
-      { type: "Аналитика", title: "Доступность ассортимента по неделям", date: "июнь–июль 2026", excerpt: "Доля отсутствующих SKU выросла с 6% до 24% за 4 недели.", relation: "Демонстрирует связь задержек с ухудшением наличия товаров." },
-      { type: "Профиль компании", title: "Договоры с ключевыми поставщиками", excerpt: "В контрактах указаны SLA по срокам, но нет явного плана замены.", relation: "Помогает понять, есть ли у компании формальный резерв." },
-      { type: "Реестр рисков", title: "Нарушение непрерывности поставок", excerpt: "Риск высокого уровня. Текущая динамика подтверждает необходимость оперативно проверить зависимость от поставщиков и возможный масштаб потерь.", relation: "Именно этот риск может измениться по итогам проверки." },
-    ],
+    sourceIds: ["fp-supply-s0", "fp-supply-s1", "fp-supply-s2", "fp-supply-s3"],
     primaryAction: "Проверить резервных поставщиков",
     secondaryActions: ["Обсудить с Нормом"],
     chatQuestion: "Помоги проверить зависимость от поставщиков с повторяющимися задержками",
@@ -393,39 +370,118 @@ const FOCUS_POINTS: FocusPoint[] = [
       "риск «Массовые сбои в системе онлайн-расчётов»",
       "история связанных инцидентов",
     ],
-    relatedRisk: {
-      id: "QNR-0331",
-      title: "Массовые сбои в системе онлайн-расчётов",
-      level: "Высокий",
-      levelTone: "high",
-      status: "Под контролем",
-    },
+    riskId: "QNR-0331",
     relatedOther: [
       "Мера · Дополнительный мониторинг онлайн-расчётов",
       "Инциденты · история связанных сбоев",
     ],
-    sources: [
-      { type: "Отчёт", title: "Отчёт мониторинга ИТ-систем", date: "июль 2026", excerpt: "Снижение количества критичных ошибок на 37% за последние 3 недели.", relation: "Основные числовые данные для оценки эффекта меры." },
-      { type: "Мера", title: "Дополнительный мониторинг онлайн-расчётов", excerpt: "Мера внедрена 30 июня 2026, включает автоматические алерты и еженедельный обзор.", relation: "Именно эта мера могла привести к наблюдаемому улучшению." },
-      { type: "Инциденты", title: "Журнал инцидентов за июнь–июль 2026", date: "июнь–июль 2026", excerpt: "После 30 июня массовых сбоев не зарегистрировано.", relation: "Подтверждает отсутствие повторных инцидентов в период наблюдения." },
-    ],
+    sourceIds: ["fp-it-s0", "fp-it-s1", "fp-it-s2"],
     primaryAction: "Открыть меру",
     secondaryActions: ["Обсудить с Нормом"],
     chatQuestion: "Покажи, как новая мера повлияла на количество ИТ-сбоев",
     signalDate: "21 июля 2026",
   },
+  {
+    id: "fp-gpu",
+    type: "Новый риск",
+    area: "ИТ и инфраструктура",
+    state: "Требует решения",
+    tone: "warning",
+    title: "Мощностей GPU может не хватить для запуска AI-продукта",
+    short: "Компания анонсировала запуск AI-рекомендаций, а по отчёту 2026 года уже фиксируется дефицит GPU для инференса.",
+    missing: "Нет подтверждённого плана расширения GPU-мощностей под запуск продукта.",
+    cta: "Оценить дефицит",
+    impact: "сильное",
+    impactTone: "strong",
+    confidence: "средняя",
+    situation: "Компания публично анонсировала запуск системы AI-рекомендаций товаров. При этом отчёт по загрузке GPU-инфраструктуры на 2026 год фиксирует дефицит вычислительных мощностей для инференса моделей. Планового запаса мощностей под новый продукт в текущем плане закупок не зафиксировано.",
+    cause: "Публичный анонс задал внешние обязательства по срокам, а внутренний план расширения GPU-парка на них не рассчитан. Заказ и поставка GPU у поставщиков требует нескольких месяцев, поэтому даже верное решение сегодня даст мощности не мгновенно.",
+    businessImpact: "При нехватке мощностей возможно замедление ответов рекомендательной модели, деградация качества персонализации или сдвиг публичного запуска. Наиболее уязвимы активные жители мегаполисов и офисные сотрудники — ядро аудитории AI-продукта, чувствительное к качеству персонализации.",
+    recommendations: [
+      {
+        stage: "Сейчас",
+        action: "Согласовать целевую нагрузку продукта и требуемый объём GPU-мощностей с командой инфраструктуры и владельцем продукта.",
+        expectedEffect: "Компания получит единую цифру потребности и сможет сопоставить её с текущим планом закупок.",
+      },
+      {
+        stage: "Следующий шаг",
+        action: "Проверить возможность аренды дополнительных GPU-мощностей в облаке на переходный период и оценить стоимость.",
+        expectedEffect: "Появится сценарий, при котором запуск не блокируется сроком поставки собственного оборудования.",
+      },
+      {
+        stage: "Управленческое решение",
+        action: "Утвердить сценарий обеспечения мощностей до публичной даты запуска и зафиксировать ответственных.",
+        expectedEffect: "Компания снизит вероятность срыва анонсированных сроков и связанного репутационного эффекта.",
+      },
+    ],
+    checkpoint: {
+      condition: "Целевая нагрузка продукта превышает подтверждённый на дату запуска объём GPU-мощностей.",
+      response: "Активировать резервный сценарий (облако или перераспределение мощностей) и уведомить владельца продукта о рисках сроков.",
+    },
+    clarification: "Целевая нагрузка AI-продукта, текущая утилизация GPU и сроки поставки нового оборудования.",
+    clarificationValue: "Эти данные нужны, чтобы оценить реальный размер дефицита и стоимость его закрытия до публичной даты запуска.",
+    clarificationChatQuestion: "Хочу уточнить целевую нагрузку AI-продукта, текущую утилизацию GPU и сроки поставки нового оборудования",
+    related: [
+      "риск «Дефицит GPU для инференса моделей»",
+      "продукт «AI-рекомендации товаров»",
+    ],
+    riskId: "QNR-0119",
+    relatedOther: [
+      "Продукт · AI-рекомендации товаров",
+      "Инфраструктура · GPU для инференса",
+    ],
+    sourceIds: [
+      "risk-gpu-product-announce",
+      "risk-gpu-shortage-report",
+      "risk-gpu-key-clients",
+    ],
+    primaryAction: "Оценить дефицит",
+    secondaryActions: ["Обсудить с Нормом"],
+    chatQuestion: "Помоги оценить дефицит GPU-мощностей под запуск AI-рекомендаций",
+    signalDate: "24 сентября 2025",
+  },
 ];
 
-// assign stable ids to focus sources and build a lookup index
-FOCUS_POINTS.forEach((fp) => {
-  fp.sources.forEach((s, i) => {
-    if (!s.id) s.id = `${fp.id}-s${i}`;
-  });
-});
-const SOURCES_INDEX: Record<string, FocusSource> = {};
-FOCUS_POINTS.forEach((fp) => fp.sources.forEach((s) => { SOURCES_INDEX[s.id!] = s; }));
+// Canonical product order. Adding a new focus point starts here.
+const FOCUS_POINTS_ORDER: readonly string[] = [
+  "fp-supply",
+  "fp-gpu",
+  "fp-delivery",
+  "fp-it",
+];
+const FOCUS_POINTS: FocusPoint[] = FOCUS_POINTS_ORDER
+  .map((id) => _FOCUS_POINTS_RAW.find((p) => p.id === id))
+  .filter((p): p is FocusPoint => !!p);
 
-// extra state-of-knowledge sources used only in the gap section of the summary
+// Phase 1 TEMPORARY selector. Freezes the home page to the original three
+// cards in the original visual order while the canonical FOCUS_POINTS
+// already contains fp-gpu. Removed in Phase 3, when the home carousel
+// consumes the whole canonical list.
+const HOME_FOCUS_IDS: readonly string[] = ["fp-delivery", "fp-supply", "fp-it"];
+const HOME_FOCUS_POINTS: FocusPoint[] = HOME_FOCUS_IDS
+  .map((id) => FOCUS_POINTS.find((p) => p.id === id))
+  .filter((p): p is FocusPoint => !!p);
+
+// ============ Canonical sources registry ============
+// FocusPoint no longer owns source objects. All source metadata lives here
+// keyed by stable ID. FocusPoint.sourceIds references entries in this map.
+
+// Sources originally attached to focus points. IDs preserved.
+const FOCUS_POINT_SOURCES: Record<string, FocusSource> = {
+  "fp-delivery-s0": { id: "fp-delivery-s0", type: "Внешняя новость", title: "Конкурент запускает бесплатную доставку в 12 городах", date: "12 июля 2026", excerpt: "Крупный игрок объявил о бесплатной доставке во всех городах-миллионниках без ограничения по сумме заказа.", relation: "Основной внешний триггер: именно это изменение может повлиять на решения клиентов о заказе.", provider: "Ведомости", domain: "vedomosti.ru", url: "https://www.vedomosti.ru/business/news/2026/07/12/free-delivery" },
+  "fp-delivery-s1": { id: "fp-delivery-s1", type: "Профиль компании", title: "География присутствия компании", date: "актуально на 1 июля 2026", excerpt: "Компания представлена в 34 городах России, в 12 из них — прямое пересечение с зоной действия акции.", relation: "Позволяет определить регионы, где новое предложение конкурента будет заметно клиентам." },
+  "fp-delivery-s2": { id: "fp-delivery-s2", type: "Аналитика", title: "Причины отказа от заказа, июнь 2026", date: "июнь 2026", excerpt: "Стоимость доставки — вторая по частоте причина отмены заказа после длительной доставки.", relation: "Показывает, что цена доставки уже сейчас чувствительна для клиентов." },
+  "fp-delivery-s3": { id: "fp-delivery-s3", type: "Реестр рисков", title: "Снижение клиентской активности", excerpt: "Риск среднего уровня, оценивается ежеквартально.", relation: "Возможные последствия сценария оцениваются в рамках этого риска." },
+  "fp-supply-s0": { id: "fp-supply-s0", type: "Инциденты", title: "Инциденты поставок за июнь 2026", date: "июнь 2026", excerpt: "Зафиксировано 7 задержек, из них 5 — по трём ключевым поставщикам.", relation: "Показывает повторяемость и концентрацию задержек у одних и тех же контрагентов." },
+  "fp-supply-s1": { id: "fp-supply-s1", type: "Аналитика", title: "Доступность ассортимента по неделям", date: "июнь–июль 2026", excerpt: "Доля отсутствующих SKU выросла с 6% до 24% за 4 недели.", relation: "Демонстрирует связь задержек с ухудшением наличия товаров." },
+  "fp-supply-s2": { id: "fp-supply-s2", type: "Профиль компании", title: "Договоры с ключевыми поставщиками", excerpt: "В контрактах указаны SLA по срокам, но нет явного плана замены.", relation: "Помогает понять, есть ли у компании формальный резерв." },
+  "fp-supply-s3": { id: "fp-supply-s3", type: "Реестр рисков", title: "Нарушение непрерывности поставок", excerpt: "Риск высокого уровня. Текущая динамика подтверждает необходимость оперативно проверить зависимость от поставщиков и возможный масштаб потерь.", relation: "Именно этот риск может измениться по итогам проверки." },
+  "fp-it-s0": { id: "fp-it-s0", type: "Отчёт", title: "Отчёт мониторинга ИТ-систем", date: "июль 2026", excerpt: "Снижение количества критичных ошибок на 37% за последние 3 недели.", relation: "Основные числовые данные для оценки эффекта меры." },
+  "fp-it-s1": { id: "fp-it-s1", type: "Мера", title: "Дополнительный мониторинг онлайн-расчётов", excerpt: "Мера внедрена 30 июня 2026, включает автоматические алерты и еженедельный обзор.", relation: "Именно эта мера могла привести к наблюдаемому улучшению." },
+  "fp-it-s2": { id: "fp-it-s2", type: "Инциденты", title: "Журнал инцидентов за июнь–июль 2026", date: "июнь–июль 2026", excerpt: "После 30 июня массовых сбоев не зарегистрировано.", relation: "Подтверждает отсутствие повторных инцидентов в период наблюдения." },
+};
+
+// State-of-knowledge markers used only in the gap section of the summary.
 const GAP_SOURCES: Record<string, FocusSource> = {
   "gap-sales": {
     id: "gap-sales",
@@ -455,11 +511,8 @@ const GAP_SOURCES: Record<string, FocusSource> = {
       "Без этих данных возможный отток остаётся ранним сигналом, а не подтверждённым эффектом.",
   },
 };
-Object.assign(SOURCES_INDEX, GAP_SOURCES);
 
-// Extra sources used by risk-level Norm verdicts that don't come from a
-// focus point. Registered into the same SOURCES_INDEX so the universal
-// SourceDrawer can resolve them.
+// Sources referenced by risk-level Norm verdicts (and shared by fp-gpu).
 const RISK_VERDICT_SOURCES: Record<string, FocusSource> = {
   "risk-gpu-product-announce": {
     id: "risk-gpu-product-announce",
@@ -491,7 +544,12 @@ const RISK_VERDICT_SOURCES: Record<string, FocusSource> = {
       "Позволяет оценить, кого затронут сбои или задержки запуска продукта.",
   },
 };
-Object.assign(SOURCES_INDEX, RISK_VERDICT_SOURCES);
+
+const SOURCES_INDEX: Record<string, FocusSource> = {
+  ...FOCUS_POINT_SOURCES,
+  ...GAP_SOURCES,
+  ...RISK_VERDICT_SOURCES,
+};
 
 // Decorate a subset of sources with document / quote / locator so the unified
 // source card can show honest document cards or system-object cards.
@@ -555,6 +613,11 @@ Object.entries(SOURCE_DECORATIONS).forEach(([id, dec]) => {
   const s = SOURCES_INDEX[id];
   if (s) Object.assign(s, dec);
 });
+
+/** Resolve a risk by canonical ID. Returns undefined for unknown IDs. */
+function getRiskById(id: string): RiskRow | undefined {
+  return RISKS_REGISTRY.find((r) => r.id === id);
+}
 
 // Recipients directory used by the ShareDrawer. Static demo data.
 interface Recipient {
