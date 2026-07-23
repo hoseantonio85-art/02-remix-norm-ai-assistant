@@ -2390,6 +2390,7 @@ function CompanySummaryModal({
     <div
       className="np-company-summary-backdrop"
       onClick={() => {
+        if (riskOnTop || focusOnTop) return;
         if (activeSourceId) onCloseSource();
         else onClose();
       }}
