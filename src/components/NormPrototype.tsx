@@ -578,6 +578,7 @@ interface SummarySection {
   tone: "orange" | "blue" | "green" | "neutral";
   headline: string;
   text: string;
+  shortText?: string;
   actionLabel?: string;
   actionText?: string;
   sources: SummarySourceRef[];
