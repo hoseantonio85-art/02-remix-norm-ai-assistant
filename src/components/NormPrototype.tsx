@@ -2524,7 +2524,7 @@ const RISKS_REGISTRY: RiskRow[] = [
   { id: "QNR-0356", title: "Штрафы за нарушение сроков доставки маркетплейса", area: "Комплаенс", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: true },
 ];
 
-type RiskFilter = "all" | "new" | "high" | "reassessed";
+// (RiskFilter is declared near the top of the file)
 
 // ============ Risks page & Risk detail modal ============
 
