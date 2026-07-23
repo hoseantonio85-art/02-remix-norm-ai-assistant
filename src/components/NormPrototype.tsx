@@ -3900,12 +3900,17 @@ export default function NormPrototype() {
           onCloseSource={() => setFocusSourceIdx(null)}
           onClose={() => { setFocusSourceIdx(null); setFocusIdx(null); }}
           overSummary={summaryOpen}
+          riskOnTop={openRiskRow !== null}
           onToast={(m) => setToast(m)}
           onDiscuss={(q) => {
             setFocusSourceIdx(null);
             setFocusIdx(null);
             setSummaryOpen(false);
             openWith(q);
+          }}
+          onOpenRisk={(riskId) => {
+            setFocusSourceIdx(null);
+            openRiskFromFocusOrSummary(riskId, "focus");
           }}
         />
       )}
@@ -3924,17 +3929,18 @@ export default function NormPrototype() {
           }}
           onClose={() => { setSummarySourceId(null); setSummaryOpen(false); }}
           onOpenRisks={(opts) => {
-            const row = opts.riskId ? RISKS_REGISTRY.find((r) => r.id === opts.riskId) : null;
-            if (row) {
+            // Opening a specific risk from summary → keep summary open,
+            // stack the risk modal on top (origin="summary").
+            if (opts.riskId) {
               setSummarySourceId(null);
-              setSummaryOpen(false);
-              setOpenRiskRow(row);
-            } else {
-              setSummarySourceId(null);
-              setSummaryOpen(false);
-              setRisksPageFilter(opts.filter ?? "high");
-              handleNavigation("risks");
+              openRiskFromFocusOrSummary(opts.riskId, "summary");
+              return;
             }
+            // Opening the risks list → leave the summary and navigate.
+            setSummarySourceId(null);
+            setSummaryOpen(false);
+            setRisksPageFilter(opts.filter ?? "high");
+            handleNavigation("risks");
           }}
           onDiscuss={() => {
             setSummarySourceId(null);
@@ -3948,16 +3954,19 @@ export default function NormPrototype() {
           }}
           onToast={(m) => setToast(m)}
           focusOnTop={focusIdx !== null}
+          riskOnTop={openRiskRow !== null}
         />
       )}
       {openRiskRow && (
         <RiskDetailModal
           risk={buildRiskDetail(openRiskRow)}
+          stacked={openRiskOrigin !== "risks"}
           onClose={() => setOpenRiskRow(null)}
           onNavigateToProfile={() => { setOpenRiskRow(null); handleNavigation("kb"); }}
           onToast={(m) => setToast(m)}
         />
       )}
+
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
     </div>
   );
