@@ -143,13 +143,27 @@ function applyOverrides(k: UniversalKnowledge, ov?: SourceOverride): UniversalKn
 /* ---------- unified accordion ---------- */
 
 function KnowledgeAccordion({
-  k, defaultOpen, onOpenSources,
+  k, defaultOpen, onOpenSources, forceOpen, flash,
 }: {
   k: UniversalKnowledge;
   defaultOpen?: boolean;
   onOpenSources: (k: UniversalKnowledge) => void;
+  forceOpen?: boolean;
+  flash?: boolean;
 }) {
   const [open, setOpen] = useState(!!defaultOpen);
+  const ref = useRef<HTMLElement | null>(null);
+  useEffect(() => { if (forceOpen) setOpen(true); }, [forceOpen]);
+  useEffect(() => {
+    if (!flash) return;
+    setOpen(true);
+    const el = ref.current;
+    if (el) {
+      requestAnimationFrame(() => {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    }
+  }, [flash]);
   const freshness = k.metadata?.freshness;
   const badge = pickBadge(k);
   const badgeClass =
@@ -165,7 +179,11 @@ function KnowledgeAccordion({
   const openSources = () => onOpenSources(k);
 
   return (
-    <article className={`np-k-acc ${open ? "is-open" : ""}`}>
+    <article
+      ref={ref}
+      data-knowledge-id={k.id}
+      className={`np-k-acc ${open ? "is-open" : ""} ${flash ? "is-flash" : ""}`}
+    >
       <button
         type="button"
         className="np-k-acc-head"
@@ -297,7 +315,7 @@ function ImproveBlock({
 }
 
 function AreaView({
-  area, areas, onSelect, onBack, onOpenChat, onOpenSources,
+  area, areas, onSelect, onBack, onOpenChat, onOpenSources, flashKnowledgeId,
 }: {
   area: UniversalArea;
   areas: UniversalArea[];
@@ -305,6 +323,7 @@ function AreaView({
   onBack: () => void;
   onOpenChat?: (q: string) => void;
   onOpenSources: (k: UniversalKnowledge) => void;
+  flashKnowledgeId?: string | null;
 }) {
   const cov = coverageForArea(area.id);
   const percent = cov?.percent ?? 0;
@@ -375,6 +394,8 @@ function AreaView({
                   k={k}
                   defaultOpen={i === 0}
                   onOpenSources={onOpenSources}
+                  forceOpen={flashKnowledgeId === k.id}
+                  flash={flashKnowledgeId === k.id}
                 />
               ))}
               {visibleKnowledge.length === 0 && (
@@ -471,7 +492,7 @@ function KbToast({ message, onDone }: { message: string; onDone: () => void }) {
 
 function ProfileTab({
   areas, totalKnowledge, onOpenChat, onOpenSources, activeId, setActiveId,
-  filter, setFilter, searchQuery,
+  filter, setFilter, searchQuery, flashKnowledgeId,
 }: {
   areas: UniversalArea[];
   totalKnowledge: number;
@@ -483,6 +504,7 @@ function ProfileTab({
   filter: "all" | "lowKnowledge" | "needsUpdate";
   setFilter: (f: "all" | "lowKnowledge" | "needsUpdate") => void;
   searchQuery: string;
+  flashKnowledgeId?: string | null;
 }) {
   const active = activeId ? areas.find((a) => a.id === activeId) ?? null : null;
 
@@ -495,6 +517,7 @@ function ProfileTab({
         onBack={() => setActiveId(null)}
         onOpenChat={onOpenChat}
         onOpenSources={onOpenSources}
+        flashKnowledgeId={flashKnowledgeId}
       />
     );
   }
