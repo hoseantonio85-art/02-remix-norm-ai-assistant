@@ -3318,6 +3318,76 @@ function RiskDetailModal({
           />
         )}
         {kriOpen && <KriDrawer kri={risk.kri} onClose={() => setKriOpen(false)} />}
+        {risk.verdict && verdictSourceId !== null && (
+          <SourceDrawer
+            sources={verdictUniSources}
+            activeId={verdictSourceId}
+            mode="conclusion"
+            listTitle="Основания вывода Норма"
+            placement="modal"
+            onOpen={(id) => setVerdictSourceId(id)}
+            onClose={() => setVerdictSourceId(null)}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function NormVerdictBlock({
+  verdict,
+  onOpenSource,
+}: {
+  verdict: NormVerdict;
+  onOpenSource: (id: string | "list") => void;
+}) {
+  const sources = verdict.sourceIds
+    .map((id) => ({ id, s: SOURCES_INDEX[id] }))
+    .filter((x) => !!x.s);
+  const visible = sources.slice(0, 2);
+  const extra = sources.length - visible.length;
+  return (
+    <div className={`np-risk-alert np-verdict np-verdict--${verdict.status}`}>
+      <div className="np-risk-alert-ic">◆</div>
+      <div className="np-risk-alert-body">
+        <span className={`np-verdict-status np-verdict-status--${verdict.status}`}>
+          {verdict.statusLabel}
+        </span>
+        <div className="np-risk-alert-title np-verdict-title">{verdict.title}</div>
+        <div className="np-risk-alert-text np-verdict-text">{verdict.text}</div>
+        <div className="np-verdict-action">
+          <span className="np-verdict-action-label">Ближайшее действие</span>
+          <span className="np-verdict-action-text">{verdict.nextAction}</span>
+        </div>
+        {sources.length > 0 && (
+          <div className="np-verdict-sources">
+            <span className="np-verdict-sources-label">Основания:</span>{" "}
+            {visible.map((x, i) => (
+              <span key={x.id}>
+                <button
+                  type="button"
+                  className="np-verdict-source-link"
+                  onClick={() => onOpenSource(x.id)}
+                >
+                  {x.s.title}
+                </button>
+                {i < visible.length - 1 && <span className="np-verdict-sep"> · </span>}
+              </span>
+            ))}
+            {extra > 0 && (
+              <>
+                <span className="np-verdict-sep"> · </span>
+                <button
+                  type="button"
+                  className="np-verdict-source-link"
+                  onClick={() => onOpenSource("list")}
+                >
+                  + ещё {extra}
+                </button>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
