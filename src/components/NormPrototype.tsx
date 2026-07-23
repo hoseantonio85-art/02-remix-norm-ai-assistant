@@ -3680,7 +3680,9 @@ export default function NormPrototype() {
   const [focusIdx, setFocusIdx] = useState<number | null>(null);
   const [focusSourceIdx, setFocusSourceIdx] = useState<number | "list" | null>(null);
   const [summaryOpen, setSummaryOpen] = useState(false);
-  const [summarySourceId, setSummarySourceId] = useState<string | null>(null);
+  const [summarySource, setSummarySource] = useState<
+    { sectionId: string; sourceId: string | "list" } | null
+  >(null);
   const [risksPageFilter, setRisksPageFilter] = useState<RiskFilter | undefined>(undefined);
   const [openRiskRow, setOpenRiskRow] = useState<RiskRow | null>(null);
   const [openRiskOrigin, setOpenRiskOrigin] = useState<"risks" | "focus" | "summary">("risks");
