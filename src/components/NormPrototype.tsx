@@ -2290,8 +2290,8 @@ function FocusPointModal({
 
 function CompanySummaryModal({
   summary,
-  activeSourceId,
-  onOpenSource,
+  activeSummarySource,
+  onOpenSummarySource,
   onCloseSource,
   onOpenFocus,
   onOpenRisks,
@@ -2303,8 +2303,8 @@ function CompanySummaryModal({
   riskOnTop,
 }: {
   summary: CompanySummary;
-  activeSourceId: string | null;
-  onOpenSource: (id: string) => void;
+  activeSummarySource: { sectionId: string; sourceId: string | "list" } | null;
+  onOpenSummarySource: (sectionId: string, sourceId: string | "list") => void;
   onCloseSource: () => void;
   onOpenFocus: (fpId: string) => void;
   onOpenRisks: (opts: { filter?: RiskFilter; riskId?: string }) => void;
@@ -2321,7 +2321,6 @@ function CompanySummaryModal({
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      // Upper layers own Escape while they are on top.
       if (riskOnTop) return;
       if (focusOnTop) return;
       if (shareOpen) {
@@ -2329,7 +2328,7 @@ function CompanySummaryModal({
         setShareOpen(false);
         return;
       }
-      if (activeSourceId) {
+      if (activeSummarySource) {
         e.stopPropagation();
         onCloseSource();
       } else {
@@ -2341,19 +2340,11 @@ function CompanySummaryModal({
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
-  }, [activeSourceId, onClose, onCloseSource, focusOnTop, riskOnTop, shareOpen]);
+  }, [activeSummarySource, onClose, onCloseSource, focusOnTop, riskOnTop, shareOpen]);
 
-
-  const source = activeSourceId ? SOURCES_INDEX[activeSourceId] : null;
-  const supportedClaim = useMemo(() => {
-    if (!activeSourceId) return null;
-    for (const sec of summary.sections) {
-      const found = sec.sources.find((s) => s.sourceId === activeSourceId);
-      if (found) return found.supportedClaim;
-    }
-    return null;
-  }, [activeSourceId, summary.sections]);
-  const sourceRelation = source?.relation || null;
+  const activeSection = activeSummarySource
+    ? summary.sections.find((s) => s.id === activeSummarySource.sectionId) ?? null
+    : null;
 
   const renderSourceLine = (sec: SummarySection) => {
     if (!sec.sources.length) return null;
@@ -2369,7 +2360,7 @@ function CompanySummaryModal({
               className="np-summary-source-linkbtn"
               onClick={(e) => {
                 e.stopPropagation();
-                onOpenSource(s.sourceId);
+                onOpenSummarySource(sec.id, s.sourceId);
               }}
             >
               {s.label}
@@ -2385,7 +2376,7 @@ function CompanySummaryModal({
               className="np-summary-source-linkbtn np-summary-source-linkbtn--more"
               onClick={(e) => {
                 e.stopPropagation();
-                if (sec.sources[2]) onOpenSource(sec.sources[2].sourceId);
+                onOpenSummarySource(sec.id, "list");
               }}
             >
               + ещё {more}
@@ -2395,6 +2386,7 @@ function CompanySummaryModal({
       </div>
     );
   };
+
 
   const focusSections = summary.sections.filter(
     (s) => s.id !== "gaps" && s.focusPointId,
