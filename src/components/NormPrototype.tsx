@@ -1958,7 +1958,9 @@ function FocusPointModal({
   onClose,
   onToast,
   onDiscuss,
+  onOpenRisk,
   overSummary,
+  riskOnTop,
 }: {
   point: FocusPoint;
   activeSourceIdx: number | "list" | null;
@@ -1967,7 +1969,9 @@ function FocusPointModal({
   onClose: () => void;
   onToast: (m: string) => void;
   onDiscuss: (q: string) => void;
+  onOpenRisk: (riskId: string) => void;
   overSummary?: boolean;
+  riskOnTop?: boolean;
 }) {
   const [shareOpen, setShareOpen] = useState(false);
   useEffect(() => {
@@ -1975,6 +1979,8 @@ function FocusPointModal({
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
+      // A stacked risk modal owns Escape while it is on top.
+      if (riskOnTop) return;
       if (shareOpen) {
         e.stopPropagation();
         setShareOpen(false);
@@ -1992,7 +1998,7 @@ function FocusPointModal({
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
-  }, [activeSourceIdx, onClose, onCloseSource, shareOpen]);
+  }, [activeSourceIdx, onClose, onCloseSource, shareOpen, riskOnTop]);
 
   const handleAction = (label: string) => {
     if (label === "Обсудить с Нормом") {
@@ -2002,16 +2008,26 @@ function FocusPointModal({
     onToast(`«${label}» — этот раздел прототипа пока не реализован`);
   };
 
+  const pointSources = useMemo(
+    () =>
+      point.sourceIds
+        .map((id) => SOURCES_INDEX[id])
+        .filter((s): s is FocusSource => !!s),
+    [point.sourceIds],
+  );
   const drawerOpen = activeSourceIdx !== null;
   const selectedIdx = typeof activeSourceIdx === "number" ? activeSourceIdx : null;
-  const source = selectedIdx !== null ? point.sources[selectedIdx] : null;
-  const previewSources = point.sources.slice(0, 2);
-  const remainingSources = Math.max(0, point.sources.length - 2);
+  const source = selectedIdx !== null ? pointSources[selectedIdx] : null;
+  const previewSources = pointSources.slice(0, 2);
+  const remainingSources = Math.max(0, pointSources.length - 2);
+
+  const relatedRisk = getRiskById(point.riskId);
 
   const uniSources = useMemo(
-    () => point.sources.map((s) => focusSourceToUni(s)),
-    [point.sources],
+    () => pointSources.map((s) => focusSourceToUni(s)),
+    [pointSources],
   );
+
   const sdActiveId: string | "list" | null = !drawerOpen
     ? null
     : selectedIdx !== null
