@@ -455,6 +455,42 @@ const GAP_SOURCES: Record<string, FocusSource> = {
 };
 Object.assign(SOURCES_INDEX, GAP_SOURCES);
 
+// Extra sources used by risk-level Norm verdicts that don't come from a
+// focus point. Registered into the same SOURCES_INDEX so the universal
+// SourceDrawer can resolve them.
+const RISK_VERDICT_SOURCES: Record<string, FocusSource> = {
+  "risk-gpu-product-announce": {
+    id: "risk-gpu-product-announce",
+    type: "Профиль компании",
+    title: "Анонс запуска системы AI-рекомендаций товаров",
+    date: "актуально на 24 сентября 2025",
+    excerpt:
+      "Компания анонсировала запуск системы AI-рекомендаций товаров на публичном сайте.",
+    relation:
+      "Подтверждает, что запуск AI-продукта запланирован и завязан на достаточные GPU-мощности.",
+  },
+  "risk-gpu-shortage-report": {
+    id: "risk-gpu-shortage-report",
+    type: "Отчёт",
+    title: "Отчёт по загрузке GPU-инфраструктуры на 2026",
+    date: "январь 2026",
+    excerpt:
+      "На начало 2026 года фиксируется дефицит вычислительных мощностей GPU для инференса моделей.",
+    relation:
+      "Показывает, что доступных мощностей может не хватить для запуска нового AI-продукта.",
+  },
+  "risk-gpu-key-clients": {
+    id: "risk-gpu-key-clients",
+    type: "Профиль компании",
+    title: "Ключевые клиенты AI-продукта",
+    excerpt:
+      "Ядро аудитории AI-рекомендаций — активные жители мегаполисов и офисные сотрудники, чувствительные к качеству персонализации.",
+    relation:
+      "Позволяет оценить, кого затронут сбои или задержки запуска продукта.",
+  },
+};
+Object.assign(SOURCES_INDEX, RISK_VERDICT_SOURCES);
+
 // Decorate a subset of sources with document / quote / locator so the unified
 // source card can show honest document cards or system-object cards.
 const SOURCE_DECORATIONS: Record<string, Partial<FocusSource>> = {
