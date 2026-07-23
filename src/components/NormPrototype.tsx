@@ -2177,7 +2177,7 @@ function FocusPointModal({
 
             <div className="np-focus-island np-focus-side-block">
               <div className="np-focus-side-label">
-                Источники · {point.sources.length}
+                Источники · {pointSources.length}
               </div>
               <ul className="np-focus-src-links">
                 {previewSources.map((s, i) => (
