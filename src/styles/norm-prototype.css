@@ -54,17 +54,16 @@
     #D97706 100%
   );
   background-size: 400% 100%;
-  background-repeat: no-repeat;
-  background-position: 150% 0;
+  background-repeat: repeat;
+  background-position: 0% 0;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: np-hello-status-shimmer 11s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 @keyframes np-hello-status-shimmer {
-  0%   { background-position: 150% 0; }
-  45%  { background-position: -50% 0; }
-  100% { background-position: -50% 0; }
+  0%   { background-position: 0% 0; }
+  100% { background-position: -400% 0; }
 }
 .np-hello-summary:hover .np-hello-summary-status {
   color: #B45309;
