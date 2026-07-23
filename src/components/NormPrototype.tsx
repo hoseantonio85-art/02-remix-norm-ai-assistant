@@ -2290,8 +2290,8 @@ function FocusPointModal({
 
 function CompanySummaryModal({
   summary,
-  activeSourceId,
-  onOpenSource,
+  activeSummarySource,
+  onOpenSummarySource,
   onCloseSource,
   onOpenFocus,
   onOpenRisks,
@@ -2303,8 +2303,8 @@ function CompanySummaryModal({
   riskOnTop,
 }: {
   summary: CompanySummary;
-  activeSourceId: string | null;
-  onOpenSource: (id: string) => void;
+  activeSummarySource: { sectionId: string; sourceId: string | "list" } | null;
+  onOpenSummarySource: (sectionId: string, sourceId: string | "list") => void;
   onCloseSource: () => void;
   onOpenFocus: (fpId: string) => void;
   onOpenRisks: (opts: { filter?: RiskFilter; riskId?: string }) => void;
@@ -2321,7 +2321,6 @@ function CompanySummaryModal({
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      // Upper layers own Escape while they are on top.
       if (riskOnTop) return;
       if (focusOnTop) return;
       if (shareOpen) {
@@ -2329,7 +2328,7 @@ function CompanySummaryModal({
         setShareOpen(false);
         return;
       }
-      if (activeSourceId) {
+      if (activeSummarySource) {
         e.stopPropagation();
         onCloseSource();
       } else {
@@ -2341,19 +2340,11 @@ function CompanySummaryModal({
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
-  }, [activeSourceId, onClose, onCloseSource, focusOnTop, riskOnTop, shareOpen]);
+  }, [activeSummarySource, onClose, onCloseSource, focusOnTop, riskOnTop, shareOpen]);
 
-
-  const source = activeSourceId ? SOURCES_INDEX[activeSourceId] : null;
-  const supportedClaim = useMemo(() => {
-    if (!activeSourceId) return null;
-    for (const sec of summary.sections) {
-      const found = sec.sources.find((s) => s.sourceId === activeSourceId);
-      if (found) return found.supportedClaim;
-    }
-    return null;
-  }, [activeSourceId, summary.sections]);
-  const sourceRelation = source?.relation || null;
+  const activeSection = activeSummarySource
+    ? summary.sections.find((s) => s.id === activeSummarySource.sectionId) ?? null
+    : null;
 
   const renderSourceLine = (sec: SummarySection) => {
     if (!sec.sources.length) return null;
@@ -2369,7 +2360,7 @@ function CompanySummaryModal({
               className="np-summary-source-linkbtn"
               onClick={(e) => {
                 e.stopPropagation();
-                onOpenSource(s.sourceId);
+                onOpenSummarySource(sec.id, s.sourceId);
               }}
             >
               {s.label}
@@ -2385,7 +2376,7 @@ function CompanySummaryModal({
               className="np-summary-source-linkbtn np-summary-source-linkbtn--more"
               onClick={(e) => {
                 e.stopPropagation();
-                if (sec.sources[2]) onOpenSource(sec.sources[2].sourceId);
+                onOpenSummarySource(sec.id, "list");
               }}
             >
               + ещё {more}
@@ -2396,6 +2387,7 @@ function CompanySummaryModal({
     );
   };
 
+
   const focusSections = summary.sections.filter(
     (s) => s.id !== "gaps" && s.focusPointId,
   );
@@ -2405,7 +2397,7 @@ function CompanySummaryModal({
       className="np-company-summary-backdrop"
       onClick={() => {
         if (riskOnTop || focusOnTop) return;
-        if (activeSourceId) onCloseSource();
+        if (activeSummarySource) onCloseSource();
         else onClose();
       }}
       role="dialog"
@@ -2502,61 +2494,53 @@ function CompanySummaryModal({
             <section className="np-summary-group">
               <h2 className="np-summary-h2">Фокусные точки</h2>
               <div className="np-summary-focus-stack">
-                {focusSections.map((sec) => {
-                  const fp = FOCUS_POINTS.find((p) => p.id === sec.focusPointId);
-                  const relRisk = fp ? getRiskById(fp.riskId) : undefined;
-                  return (
-                    <div
-                      key={sec.id}
-                      className={`np-summary-island np-summary-focus-island np-summary-focus-island--${sec.tone}`}
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => onOpenFocus(sec.focusPointId!)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          onOpenFocus(sec.focusPointId!);
-                        }
-                      }}
-                    >
-                      <div className="np-summary-focus-head">
-                        <span className={`np-summary-tag np-summary-tag--${sec.tone}`}>
-                          {sec.title}
-                        </span>
-                        <span className="np-summary-focus-arrow" aria-hidden>→</span>
-                      </div>
-                      <p className="np-summary-detail-text">{sec.shortText || sec.text}</p>
-                      {renderSourceLine(sec)}
-                      {relRisk && (
-                        <button
-                          type="button"
-                          className="np-summary-risk-link"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onOpenRisks({ riskId: relRisk.id });
-                          }}
-                        >
-                          {relRisk.id} · {relRisk.title}
-                        </button>
-                      )}
+                {focusSections.map((sec) => (
+                  <div
+                    key={sec.id}
+                    className={`np-summary-island np-summary-focus-island np-summary-focus-island--${sec.tone}`}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => onOpenFocus(sec.focusPointId!)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        onOpenFocus(sec.focusPointId!);
+                      }
+                    }}
+                  >
+                    <div className="np-summary-focus-head">
+                      <span className={`np-summary-tag np-summary-tag--${sec.tone}`}>
+                        {sec.title}
+                      </span>
+                      <span className="np-summary-focus-arrow" aria-hidden>→</span>
                     </div>
-                  );
-                })}
+                    <p className="np-summary-detail-text">{sec.shortText || sec.text}</p>
+                    {renderSourceLine(sec)}
+                  </div>
+                ))}
               </div>
             </section>
           </div>
         </div>
 
-        {source && (() => {
-          const uni = focusSourceToUni(source, { supportedClaim });
-          if (sourceRelation) uni.relationToConclusion = sourceRelation;
+        {activeSummarySource && activeSection && (() => {
+          const uniSources = activeSection.sources
+            .map((sref) => {
+              const raw = SOURCES_INDEX[sref.sourceId];
+              if (!raw) return null;
+              const uni = focusSourceToUni(raw, { supportedClaim: sref.supportedClaim });
+              if (raw.relation) uni.relationToConclusion = raw.relation;
+              return uni;
+            })
+            .filter((s): s is NonNullable<typeof s> => s !== null);
+          if (uniSources.length === 0) return null;
           return (
             <SourceDrawer
-              sources={[uni]}
-              activeId={uni.id}
+              sources={uniSources}
+              activeId={activeSummarySource.sourceId}
               mode="conclusion"
               placement="modal"
-              onOpen={() => {}}
+              onOpen={(id) => onOpenSummarySource(activeSummarySource.sectionId, id)}
               onClose={onCloseSource}
               onExternal={(s) => {
                 if (s.url) window.open(s.url, "_blank", "noopener,noreferrer");
@@ -3680,7 +3664,9 @@ export default function NormPrototype() {
   const [focusIdx, setFocusIdx] = useState<number | null>(null);
   const [focusSourceIdx, setFocusSourceIdx] = useState<number | "list" | null>(null);
   const [summaryOpen, setSummaryOpen] = useState(false);
-  const [summarySourceId, setSummarySourceId] = useState<string | null>(null);
+  const [summarySource, setSummarySource] = useState<
+    { sectionId: string; sourceId: string | "list" } | null
+  >(null);
   const [risksPageFilter, setRisksPageFilter] = useState<RiskFilter | undefined>(undefined);
   const [openRiskRow, setOpenRiskRow] = useState<RiskRow | null>(null);
   const [openRiskOrigin, setOpenRiskOrigin] = useState<"risks" | "focus" | "summary">("risks");
@@ -3943,38 +3929,35 @@ export default function NormPrototype() {
       {summaryOpen && (
         <CompanySummaryModal
           summary={COMPANY_SUMMARY}
-          activeSourceId={summarySourceId}
-          onOpenSource={(id) => setSummarySourceId(id)}
-          onCloseSource={() => setSummarySourceId(null)}
+          activeSummarySource={summarySource}
+          onOpenSummarySource={(sectionId, sourceId) => setSummarySource({ sectionId, sourceId })}
+          onCloseSource={() => setSummarySource(null)}
           onOpenFocus={(fpId) => {
             const idx = FOCUS_POINTS.findIndex((p) => p.id === fpId);
             if (idx >= 0) {
-              setSummarySourceId(null);
+              setSummarySource(null);
               setFocusIdx(idx);
             }
           }}
-          onClose={() => { setSummarySourceId(null); setSummaryOpen(false); }}
+          onClose={() => { setSummarySource(null); setSummaryOpen(false); }}
           onOpenRisks={(opts) => {
-            // Opening a specific risk from summary → keep summary open,
-            // stack the risk modal on top (origin="summary").
             if (opts.riskId) {
-              setSummarySourceId(null);
+              setSummarySource(null);
               openRiskFromFocusOrSummary(opts.riskId, "summary");
               return;
             }
-            // Opening the risks list → leave the summary and navigate.
-            setSummarySourceId(null);
+            setSummarySource(null);
             setSummaryOpen(false);
             setRisksPageFilter(opts.filter ?? "high");
             handleNavigation("risks");
           }}
           onDiscuss={() => {
-            setSummarySourceId(null);
+            setSummarySource(null);
             setSummaryOpen(false);
             openWith(COMPANY_SUMMARY.discussQuestion);
           }}
           onClarify={() => {
-            setSummarySourceId(null);
+            setSummarySource(null);
             setSummaryOpen(false);
             openWith(COMPANY_SUMMARY.clarificationQuestion);
           }}
