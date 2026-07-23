@@ -3558,6 +3558,7 @@ function RisksPage({
     if (filter === "new") return !!r.isNew;
     if (filter === "high") return r.level === "high";
     if (filter === "reassessed") return !!r.reassessed;
+    if (filter === "withoutMeasures") return !r.hasEffectiveMeasures;
     return true;
   });
 
