@@ -3837,7 +3837,7 @@ export default function NormPrototype() {
           </div>
           <div className="np-focus-outer">
           <div className="np-focus-wrap">
-            {FOCUS_POINTS.map((fp) => (
+            {HOME_FOCUS_POINTS.map((fp) => (
               <button
                 key={fp.id}
                 type="button"
@@ -3858,6 +3858,7 @@ export default function NormPrototype() {
           </div>
           </div>
         </section>
+
 
         <section className="np-section">
           <div className="np-sec-head">
