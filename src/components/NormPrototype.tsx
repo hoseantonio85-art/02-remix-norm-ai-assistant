@@ -2257,7 +2257,16 @@ function FocusPointModal({
         />
         {shareOpen && (
           <ShareDrawer
-            kind={point.id === "fp-delivery" ? "fp-delivery" : point.id === "fp-supply" ? "fp-supply" : "fp-it"}
+            kind={(() => {
+              // Explicit contract — never fall back to fp-it for unknown IDs.
+              switch (point.id) {
+                case "fp-delivery": return "fp-delivery";
+                case "fp-supply": return "fp-supply";
+                case "fp-it": return "fp-it";
+                case "fp-gpu": return "fp-gpu";
+                default: return "summary";
+              }
+            })()}
             title="Отправить фокусную точку"
             preview={{
               status: point.type,
