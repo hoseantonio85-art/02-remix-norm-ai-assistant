@@ -817,6 +817,7 @@ function KbSourcesDrawer({
       activeId={activeId}
       mode="knowledge"
       listTitle="Источники знания"
+      placement="viewport"
       onOpen={(id) => setActiveId(id)}
       onClose={onClose}
       editable

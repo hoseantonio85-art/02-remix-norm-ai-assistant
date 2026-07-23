@@ -281,7 +281,7 @@ export interface SourceDrawerProps {
   editable?: boolean;
   onEdit?: (s: UniSource) => void;
   onDelete?: (s: UniSource) => void;
-  placement?: "viewport" | "modal";
+  placement: "viewport" | "modal";
 }
 
 export function SourceDrawer({
@@ -295,7 +295,7 @@ export function SourceDrawer({
   editable,
   onEdit,
   onDelete,
-  placement = "viewport",
+  placement,
 }: SourceDrawerProps) {
   useEffect(() => {
     if (activeId === null) return;
