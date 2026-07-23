@@ -2484,7 +2484,7 @@ function CompanySummaryModal({
               <div className="np-summary-focus-stack">
                 {focusSections.map((sec) => {
                   const fp = FOCUS_POINTS.find((p) => p.id === sec.focusPointId);
-                  const relRisk = fp?.relatedRisk;
+                  const relRisk = fp ? getRiskById(fp.riskId) : undefined;
                   return (
                     <div
                       key={sec.id}
