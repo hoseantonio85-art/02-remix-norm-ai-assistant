@@ -3032,13 +3032,14 @@ function RiskDetailModal({
   const [rationaleOpen, setRationaleOpen] = useState(false);
   const [knowledgeSourceId, setKnowledgeSourceId] = useState<string | null>(null);
   const [kriOpen, setKriOpen] = useState(false);
+  const [verdictSourceId, setVerdictSourceId] = useState<string | "list" | null>(null);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      if (knowledgeSourceId || rationaleOpen || kriOpen) return; // child handles
+      if (knowledgeSourceId || rationaleOpen || kriOpen || verdictSourceId !== null) return; // child handles
       e.stopPropagation();
       onClose();
     };
@@ -3047,17 +3048,22 @@ function RiskDetailModal({
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
-  }, [onClose, knowledgeSourceId, rationaleOpen, kriOpen]);
+  }, [onClose, knowledgeSourceId, rationaleOpen, kriOpen, verdictSourceId]);
 
   const activeSource = knowledgeSourceId
     ? RATIONALE_SOURCES.find((s) => s.id === knowledgeSourceId) ?? null
     : null;
 
+  const verdictUniSources = (risk.verdict?.sourceIds ?? [])
+    .map((id) => SOURCES_INDEX[id])
+    .filter((s): s is FocusSource => !!s)
+    .map((s) => focusSourceToUni(s, { supportedClaim: risk.verdict?.title ?? null }));
+
   return (
     <div
       className="np-risk-modal-backdrop"
       onClick={(e) => {
-        if (knowledgeSourceId || rationaleOpen || kriOpen) return;
+        if (knowledgeSourceId || rationaleOpen || kriOpen || verdictSourceId !== null) return;
         e.stopPropagation();
         onClose();
       }}
