@@ -3099,21 +3099,11 @@ function RiskDetailModal({
                 ))}
               </div>
 
-              {risk.hasNewRiskAlert && risk.newRiskBrief && (
-                <div className="np-risk-alert">
-                  <div className="np-risk-alert-ic">◆</div>
-                  <div className="np-risk-alert-body">
-                    <div className="np-risk-alert-title">Обнаружен новый риск</div>
-                    <div className="np-risk-alert-text">{risk.newRiskBrief}</div>
-                    <button
-                      type="button"
-                      className="np-risk-alert-link"
-                      onClick={() => setRationaleOpen(true)}
-                    >
-                      Подробнее об оценке →
-                    </button>
-                  </div>
-                </div>
+              {risk.verdict && (
+                <NormVerdictBlock
+                  verdict={risk.verdict}
+                  onOpenSource={(id) => setVerdictSourceId(id)}
+                />
               )}
 
               <section className="np-risk-block">
