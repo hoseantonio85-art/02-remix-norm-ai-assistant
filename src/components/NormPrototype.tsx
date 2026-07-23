@@ -2488,36 +2488,780 @@ const RISKS_REGISTRY: RiskRow[] = [
 
 type RiskFilter = "all" | "high" | "no-measures";
 
-function RisksModal({
-  initialFilter,
-  initialRiskId,
+// ============ Risks page & Risk detail modal ============
+
+interface RiskDetail {
+  id: string;
+  title: string;
+  category: string;
+  status: string; // "Активен"
+  levelKey: "high" | "medium" | "low";
+  levelLabel: string; // Высокий
+  probability: number; // 1..5
+  impact: number; // 1..5
+  strategy: string; // Снижение
+  potentialLossFormatted?: string;
+  createdAt: string;
+  updatedAt: string;
+  author: string;
+  sourceSystem: string;
+  objectLabel: string;
+  objectMeta: string;
+  hasNewRiskAlert?: boolean;
+  newRiskBrief?: string;
+  utilization: {
+    kind: "direct" | "indirect" | "credit";
+    label: string;
+    used: number;
+    limit: number;
+    usedFormatted: string;
+    limitFormatted: string;
+    forecast: string;
+  }[];
+  kri: {
+    name: string;
+    hint: string;
+    value: string;
+    delta: string;
+    zone: string;
+    comment: string;
+  };
+  description: string;
+  factors: string[];
+  consequences: string[];
+  recommendations: string[];
+  measures: {
+    id: string;
+    title: string;
+    date: string;
+    dateKind: "plan" | "fact";
+    status: "new" | "done";
+    statusLabel: string;
+  }[];
+  currentEffectiveness: number; // percent
+  ownerPath: string;
+}
+
+const DEFAULT_RISK_DETAIL: Omit<RiskDetail, "id" | "title" | "category" | "levelKey" | "levelLabel"> = {
+  status: "Активен",
+  probability: 3,
+  impact: 4,
+  strategy: "Снижение",
+  potentialLossFormatted: "10 млн ₽",
+  createdAt: "01 февраля 2024",
+  updatedAt: "01 февраля 2024",
+  author: "NORM AI",
+  sourceSystem: "АС Сенат",
+  objectLabel: "Проект",
+  objectMeta: "Петрушкины истории и многое …",
+  hasNewRiskAlert: false,
+  utilization: [
+    {
+      kind: "direct",
+      label: "Прямые потери",
+      used: 1340500,
+      limit: 12000000,
+      usedFormatted: "1 340 500 ₽",
+      limitFormatted: "12 000 000 ₽",
+      forecast: "10 млн ₽",
+    },
+    {
+      kind: "indirect",
+      label: "Косвенные потери",
+      used: 6500000,
+      limit: 8000000,
+      usedFormatted: "6 500 000 ₽",
+      limitFormatted: "8 000 000 ₽",
+      forecast: "10 млн ₽",
+    },
+    {
+      kind: "credit",
+      label: "Кредитные потери",
+      used: 1250000,
+      limit: 2000000,
+      usedFormatted: "1 250 000 ₽",
+      limitFormatted: "2 000 000 ₽",
+      forecast: "1,85 млн ₽",
+    },
+  ],
+  kri: {
+    name: "Потери к выручке",
+    hint: "Отношение потерь к общей выручке",
+    value: "0,06%",
+    delta: "↗ 10% за январь",
+    zone: "Жёлтая зона",
+    comment: "Выручка падает при стабильных потерях",
+  },
+  description:
+    "Ранее сегодня было отправлено 5 предупреждений о том, что SQS службы расчёта заработной платы превысил пороговое значение. Быстрое расследование показало, что события о выплатах сотрудникам не срабатывают, а пользователи не могут войти в систему. Я определил приоритет как критический, потому что это день выплаты зарплаты.",
+  factors: [
+    "Нарушение регламентов защиты данных в условиях ужесточения требований ФЗ-420",
+    "Зависимость от стабильности работы IT-инфраструктуры",
+  ],
+  consequences: [
+    "Штраф в размере до 5 000 000 руб. или до 4% годового оборота",
+    "Репутационные потери и отток клиентов",
+    "Судебные иски от пострадавших клиентов",
+    "Временная приостановка лицензии на деятельность",
+  ],
+  recommendations: [
+    "Внедрить автоматизированную систему контроля температурного режима",
+    "Провести обучение персонала по санитарным нормам",
+    "Разработать регламент внутренних проверок",
+  ],
+  measures: [
+    { id: "MSR-171185", title: "Проведение тестирования на проникновение внешним подрядчиком", date: "Плановая дата: 05.03.2024", dateKind: "plan", status: "new", statusLabel: "Новая" },
+    { id: "MSR-171185", title: "Обновление политики парольной защиты", date: "Фактическая дата: 15.01.2024", dateKind: "fact", status: "done", statusLabel: "Реализована" },
+    { id: "MSR-171185", title: "Сегментация сети и разграничение доступа к базам данных", date: "Фактическая дата: 28.01.2024", dateKind: "fact", status: "done", statusLabel: "Реализована" },
+    { id: "MSR-171185", title: "Внедрение двухфакторной аутентификации для всех сотрудников", date: "Фактическая дата: 10.02.2024", dateKind: "fact", status: "done", statusLabel: "Реализована" },
+    { id: "MSR-171185", title: "Шифрование данных в состоянии покоя", date: "Фактическая дата: 20.02.2024", dateKind: "fact", status: "done", statusLabel: "Реализована" },
+  ],
+  currentEffectiveness: 48,
+  ownerPath:
+    "ДубльКИС / Департамент исследований и разработок / Управление информационных технологий / Отдел технического сопровождения",
+};
+
+const RISK_DETAIL_OVERRIDES: Record<string, Partial<RiskDetail>> = {
+  "QNR-0102": {
+    id: "RSK-41242001",
+    title: "Утечка персональных данных клиентов",
+    category: "Риск информационной безопасности",
+    hasNewRiskAlert: true,
+    newRiskBrief:
+      "Компания готовит запуск нового AI-продукта, при этом уже зафиксирован дефицит GPU-мощностей. Это может привести к сбоям, задержке запуска или снижению качества работы продукта.",
+  },
+};
+
+function buildRiskDetail(row: RiskRow): RiskDetail {
+  const base: RiskDetail = {
+    ...DEFAULT_RISK_DETAIL,
+    id: row.id,
+    title: row.title,
+    category: row.area,
+    levelKey: row.level,
+    levelLabel: row.levelLabel,
+  };
+  const ov = RISK_DETAIL_OVERRIDES[row.id];
+  return ov ? { ...base, ...ov } : base;
+}
+
+// ---------- Rationale (Обоснование анализа) ----------
+
+interface RationaleSource {
+  id: string;
+  area: string;
+  areaTone: "green" | "blue" | "amber" | "violet";
+  title: string;
+  points: string[];
+  sourceLabel: string;
+  detailKind: "planned_product" | "key_clients" | "gpu_shortage";
+}
+
+const RATIONALE_SOURCES: RationaleSource[] = [
+  {
+    id: "key_clients",
+    area: "Продукты и рынок",
+    areaTone: "green",
+    title: "Ключевые клиенты",
+    points: [
+      "Активные жители мегаполисов 25-40 лет",
+      "Офисные сотрудники (доставка в рабочее время)",
+    ],
+    sourceLabel: "Источник: Маркетинг исследование 2025.pdf",
+    detailKind: "key_clients",
+  },
+  {
+    id: "planned_product",
+    area: "Продукты и рынок",
+    areaTone: "green",
+    title: "Планируемый продукт",
+    points: ["Система ai-рекомендаций товаров"],
+    sourceLabel: "Источник: Анонс на сайте компании",
+    detailKind: "planned_product",
+  },
+  {
+    id: "gpu_shortage",
+    area: "ИТ и кибербезопасность",
+    areaTone: "blue",
+    title: "Дефицит GPU",
+    points: [
+      "На начало 2026 года фиксируется дефицит вычислительных мощностей GPU",
+    ],
+    sourceLabel: "Источник: Отчёт ИТ-инфраструктуры 2026.pdf",
+    detailKind: "gpu_shortage",
+  },
+];
+
+function RationaleModal({
+  brief,
   onClose,
+  onOpenSource,
+  onGoToProfile,
+  dimmed,
 }: {
-  initialFilter?: RiskFilter;
-  initialRiskId?: string;
+  brief: string;
   onClose: () => void;
+  onOpenSource: (id: string) => void;
+  onGoToProfile: () => void;
+  dimmed: boolean;
 }) {
-  const [filter, setFilter] = useState<RiskFilter>(initialFilter ?? "high");
-  const highlightId = initialRiskId ?? null;
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !dimmed) { e.stopPropagation(); onClose(); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose, dimmed]);
+
+  return (
+    <div
+      className={`np-risk-rationale-backdrop ${dimmed ? "is-dimmed" : ""}`}
+      onClick={(e) => { e.stopPropagation(); if (!dimmed) onClose(); }}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Обоснование анализа"
+    >
+      <div className="np-risk-rationale" onClick={(e) => e.stopPropagation()}>
+        <button className="np-icon-btn np-risk-rationale-close" onClick={onClose} aria-label="Закрыть">
+          <Icon name="close" size={18} />
+        </button>
+        <div className="np-risk-rationale-body">
+          <h2 className="np-risk-rationale-title">Обоснование анализа</h2>
+          <p className="np-risk-rationale-brief">
+            Компания готовит запуск нового AI-продукта —{" "}
+            <mark className="np-mark-violet">Система ai-рекомендаций товаров</mark>,
+            при этом уже зафиксирован <mark className="np-mark-violet">дефицит GPU-мощностей</mark>.
+            Это может привести к сбоям, задержке запуска или снижению качества работы продукта.
+            {brief ? "" : ""}
+          </p>
+          <h3 className="np-risk-rationale-h3">Источники вывода</h3>
+          <div className="np-risk-rationale-list">
+            {RATIONALE_SOURCES.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                className="np-risk-rationale-card"
+                onClick={() => onOpenSource(s.id)}
+              >
+                <span className={`np-risk-area-chip np-risk-area-chip--${s.areaTone}`}>{s.area}</span>
+                <div className="np-risk-rationale-card-title">{s.title}</div>
+                <ul className="np-risk-rationale-points">
+                  {s.points.map((p, i) => <li key={i}>{p}</li>)}
+                </ul>
+                <div className="np-risk-rationale-card-src">{s.sourceLabel}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="np-risk-rationale-foot">
+          <button className="np-risk-rationale-cta" onClick={onGoToProfile}>Перейти в профиль компании</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function KnowledgeItemModal({
+  source,
+  onClose,
+  onGoToProfile,
+}: {
+  source: RationaleSource;
+  onClose: () => void;
+  onGoToProfile: () => void;
+}) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { e.stopPropagation(); onClose(); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const isKeyClients = source.detailKind === "key_clients";
+  const isPlanned = source.detailKind === "planned_product";
+
+  return (
+    <div
+      className="np-risk-rationale-backdrop"
+      onClick={(e) => { e.stopPropagation(); onClose(); }}
+      role="dialog"
+      aria-modal="true"
+      aria-label={source.title}
+    >
+      <div className="np-risk-knowledge" onClick={(e) => e.stopPropagation()}>
+        <button className="np-icon-btn np-risk-rationale-close" onClick={onClose} aria-label="Закрыть">
+          <Icon name="close" size={18} />
+        </button>
+        <div className="np-risk-rationale-body">
+          <span className={`np-risk-area-chip np-risk-area-chip--${source.areaTone}`}>{source.area}</span>
+          <h2 className="np-risk-knowledge-title">{source.title}</h2>
+
+          {isKeyClients && (
+            <>
+              <div className="np-risk-knowledge-card">
+                <div className="np-risk-knowledge-card-head">
+                  <h3>Активные жители мегаполисов 25-40 лет</h3>
+                  <div className="np-risk-knowledge-card-actions">
+                    <button className="np-icon-btn" aria-label="Редактировать">✎</button>
+                    <button className="np-icon-btn np-danger" aria-label="Удалить">🗑</button>
+                  </div>
+                </div>
+                <p className="np-risk-knowledge-quote">
+                  «Ядро аудитории — жители мегаполисов 25–40 лет, доход выше среднего, частота заказа 2,8 раза/нед.; 68% — женщины; средний чек 1 240 ₽.»
+                </p>
+                <div className="np-risk-knowledge-file">
+                  <span className="np-risk-knowledge-file-ic">📄</span>
+                  <span className="np-risk-knowledge-file-name">Маркетинг исследование 2025.pdf</span>
+                  <button className="np-icon-btn" aria-label="Скачать">⬇</button>
+                </div>
+                <div className="np-risk-knowledge-updated">Дата обновления: 24.09.2025</div>
+              </div>
+              <div className="np-risk-knowledge-card">
+                <div className="np-risk-knowledge-card-head">
+                  <h3>Офисные сотрудники (доставка в рабочее время)</h3>
+                  <div className="np-risk-knowledge-card-actions">
+                    <button className="np-icon-btn" aria-label="Редактировать">✎</button>
+                    <button className="np-icon-btn np-danger" aria-label="Удалить">🗑</button>
+                  </div>
+                </div>
+                <p className="np-risk-knowledge-quote">
+                  «До 25% заказов в крупных городах в будние дни приходится на офисных работников.»
+                </p>
+                <div className="np-risk-knowledge-file">
+                  <span className="np-risk-knowledge-file-ic">📄</span>
+                  <span className="np-risk-knowledge-file-name">Маркетинг исследование 2025.pdf</span>
+                  <button className="np-icon-btn" aria-label="Скачать">⬇</button>
+                </div>
+                <div className="np-risk-knowledge-updated">Дата обновления: 24.09.2025</div>
+              </div>
+            </>
+          )}
+
+          {isPlanned && (
+            <div className="np-risk-knowledge-card">
+              <div className="np-risk-knowledge-card-head">
+                <h3>Система AI-рекомендаций товаров</h3>
+                <div className="np-risk-knowledge-card-actions">
+                  <button className="np-icon-btn" aria-label="Редактировать">✎</button>
+                  <button className="np-icon-btn np-danger" aria-label="Удалить">🗑</button>
+                </div>
+              </div>
+              <a className="np-risk-knowledge-link" href="#" onClick={(e) => e.preventDefault()}>
+                🔗 Анонс на сайте компании
+              </a>
+              <div className="np-risk-knowledge-updated">Дата обновления: 24.09.2025</div>
+            </div>
+          )}
+
+          {!isKeyClients && !isPlanned && (
+            <div className="np-risk-knowledge-card">
+              <div className="np-risk-knowledge-card-head">
+                <h3>{source.title}</h3>
+              </div>
+              <ul className="np-risk-rationale-points">
+                {source.points.map((p, i) => <li key={i}>{p}</li>)}
+              </ul>
+              <div className="np-risk-knowledge-updated">{source.sourceLabel}</div>
+            </div>
+          )}
+        </div>
+        <div className="np-risk-rationale-foot">
+          <button className="np-risk-rationale-cta" onClick={onGoToProfile}>Перейти в профиль компании</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function KriDrawer({ kri, onClose }: { kri: RiskDetail["kri"]; onClose: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { e.stopPropagation(); onClose(); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+  return (
+    <div
+      className="np-sd-backdrop np-sd-backdrop--modal"
+      onClick={(e) => { e.stopPropagation(); onClose(); }}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div className="np-sd-drawer np-kri-drawer" onClick={(e) => e.stopPropagation()}>
+        <div className="np-sd-head">
+          <div className="np-sd-head-main">
+            <div className="np-sd-type">Ключевой индикатор риска</div>
+            <h2 className="np-sd-title">{kri.name}</h2>
+          </div>
+          <button className="np-sd-close" onClick={onClose} aria-label="Закрыть">✕</button>
+        </div>
+        <div className="np-sd-body">
+          <div className="np-kri-alert">
+            <span className="np-kri-alert-ic">⚠</span>
+            <div>
+              <div className="np-kri-alert-title">Индикатор в жёлтой зоне</div>
+              <div className="np-kri-alert-text">{kri.comment}</div>
+            </div>
+          </div>
+          <div className="np-kri-metrics">
+            <div className="np-kri-metric">
+              <div className="np-kri-metric-label">Текущее значение</div>
+              <div className="np-kri-metric-value">{kri.value}</div>
+            </div>
+            <div className="np-kri-metric">
+              <div className="np-kri-metric-label">Динамика</div>
+              <div className="np-kri-metric-value np-kri-up">{kri.delta}</div>
+            </div>
+            <div className="np-kri-metric">
+              <div className="np-kri-metric-label">Зона</div>
+              <div className="np-kri-metric-value"><span className="np-kri-zone np-kri-zone--yellow">{kri.zone}</span></div>
+            </div>
+          </div>
+          <div className="np-kri-chart">
+            <svg viewBox="0 0 300 120" preserveAspectRatio="none" width="100%" height="140">
+              <defs>
+                <linearGradient id="kriGrad" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor="#f5b64f" stopOpacity="0.35"/>
+                  <stop offset="100%" stopColor="#f5b64f" stopOpacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M0,90 L30,80 L60,85 L90,70 L120,72 L150,60 L180,55 L210,58 L240,45 L270,50 L300,40 L300,120 L0,120 Z" fill="url(#kriGrad)"/>
+              <path d="M0,90 L30,80 L60,85 L90,70 L120,72 L150,60 L180,55 L210,58 L240,45 L270,50 L300,40" fill="none" stroke="#f5a623" strokeWidth="2"/>
+            </svg>
+            <div className="np-kri-chart-caption">Динамика за последние 12 месяцев</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RiskDetailModal({
+  risk,
+  onClose,
+  onNavigateToProfile,
+  onToast,
+}: {
+  risk: RiskDetail;
+  onClose: () => void;
+  onNavigateToProfile: () => void;
+  onToast: (m: string) => void;
+}) {
+  const [tab, setTab] = useState<"eval" | "util" | "kri" | "factors" | "consequences" | "measures">("eval");
+  const [rationaleOpen, setRationaleOpen] = useState(false);
+  const [knowledgeSourceId, setKnowledgeSourceId] = useState<string | null>(null);
+  const [kriOpen, setKriOpen] = useState(false);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { e.stopPropagation(); onClose(); }
+      if (e.key !== "Escape") return;
+      if (knowledgeSourceId || rationaleOpen || kriOpen) return; // child handles
+      e.stopPropagation();
+      onClose();
     };
     window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
-  }, [onClose]);
+  }, [onClose, knowledgeSourceId, rationaleOpen, kriOpen]);
 
-  useEffect(() => {
-    if (!highlightId) return;
-    const el = document.getElementById(`np-risk-row-${highlightId}`);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-  }, [highlightId]);
+  const activeSource = knowledgeSourceId
+    ? RATIONALE_SOURCES.find((s) => s.id === knowledgeSourceId) ?? null
+    : null;
+
+  return (
+    <div
+      className="np-risk-modal-backdrop"
+      onClick={(e) => {
+        if (knowledgeSourceId || rationaleOpen || kriOpen) return;
+        e.stopPropagation();
+        onClose();
+      }}
+      role="dialog"
+      aria-modal="true"
+      aria-label={risk.title}
+    >
+      <div className="np-modal np-risk-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="np-icon-btn np-risk-modal-close" onClick={onClose} aria-label="Закрыть">
+          <Icon name="close" size={18} />
+        </button>
+        <div className="np-risk-modal-scroll">
+          <div className="np-risk-modal-grid">
+            <div className="np-risk-modal-main">
+              <div className="np-risk-topchips">
+                <span className="np-risk-topchip">◆ Риск</span>
+                <span className="np-risk-topchip np-risk-topchip--active">◆ {risk.status}</span>
+              </div>
+              <h1 className="np-risk-modal-title">{risk.title}</h1>
+              <div className="np-risk-modal-subtitle">{risk.category}</div>
+
+              <div className="np-risk-tabs">
+                {[
+                  ["eval", "Оценка риска"],
+                  ["util", "Утилизация"],
+                  ["kri", "КИР"],
+                  ["factors", "Риск-факторы"],
+                  ["consequences", "Последствия"],
+                  ["measures", "Меры"],
+                ].map(([k, l]) => (
+                  <button
+                    key={k}
+                    type="button"
+                    className={`np-risk-tab ${tab === k ? "active" : ""}`}
+                    onClick={() => setTab(k as typeof tab)}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+
+              {risk.hasNewRiskAlert && risk.newRiskBrief && (
+                <div className="np-risk-alert">
+                  <div className="np-risk-alert-ic">◆</div>
+                  <div className="np-risk-alert-body">
+                    <div className="np-risk-alert-title">Обнаружен новый риск</div>
+                    <div className="np-risk-alert-text">{risk.newRiskBrief}</div>
+                    <button
+                      type="button"
+                      className="np-risk-alert-link"
+                      onClick={() => setRationaleOpen(true)}
+                    >
+                      Подробнее об оценке →
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <section className="np-risk-block">
+                <div className="np-risk-block-head">
+                  <h3>Уровень риска</h3>
+                  <span className={`np-risk-level-chip np-risk-level-chip--${risk.levelKey}`}>▼ {risk.levelLabel}</span>
+                  <span className="np-risk-block-right">
+                    Потенциальные потери <span className="np-muted">🙈</span>
+                  </span>
+                </div>
+                <div className="np-risk-lvl-row">
+                  <div className="np-risk-lvl-cell">
+                    <div className="np-risk-lvl-label">Вероятность</div>
+                    <ProbDots value={risk.probability} tone="amber" />
+                  </div>
+                  <div className="np-risk-lvl-cell">
+                    <div className="np-risk-lvl-label">Влияние на …</div>
+                    <ProbDots value={risk.impact} tone="red" />
+                  </div>
+                  <div className="np-risk-lvl-cell">
+                    <div className="np-risk-lvl-label">Стратегия реагирования</div>
+                    <span className="np-risk-strategy-pill">{risk.strategy}</span>
+                  </div>
+                </div>
+              </section>
+
+              <section className="np-risk-block">
+                <div className="np-risk-block-head">
+                  <h3>Утилизация лимита</h3>
+                  <button className="np-icon-btn" aria-label="Развернуть">⤢</button>
+                </div>
+                <div className="np-risk-util-row">
+                  {risk.utilization.map((u) => {
+                    const pct = Math.round((u.used / u.limit) * 100);
+                    return (
+                      <div key={u.kind} className={`np-risk-util-card np-risk-util-card--${u.kind}`}>
+                        <div className="np-risk-util-head">
+                          <span className="np-risk-util-label">{u.label}</span>
+                          <span className="np-risk-util-pct">{pct}%</span>
+                        </div>
+                        <div className="np-risk-util-amount">
+                          <strong>{u.usedFormatted}</strong>
+                          <span className="np-muted">{u.limitFormatted}</span>
+                        </div>
+                        <div className="np-risk-util-bar">
+                          <span className={`np-risk-util-bar-fill np-risk-util-bar-fill--${u.kind}`} style={{ width: `${Math.min(100, pct)}%` }} />
+                        </div>
+                        <div className="np-risk-util-foot">
+                          <span className={`np-risk-util-forecast np-risk-util-forecast--${u.kind}`}>Прогноз · {u.forecast}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+
+              <section className="np-risk-block">
+                <div className="np-risk-block-head"><h3>Ключевой индикатор риска</h3></div>
+                <button type="button" className="np-risk-kri-card" onClick={() => setKriOpen(true)}>
+                  <div className="np-risk-kri-top">
+                    <span className="np-risk-kri-ic">₽</span>
+                    <div className="np-risk-kri-main">
+                      <div className="np-risk-kri-name">
+                        {risk.kri.name} <span className="np-muted">ⓘ</span>
+                      </div>
+                      <div className="np-risk-kri-delta">{risk.kri.delta}</div>
+                    </div>
+                    <div className="np-risk-kri-right">
+                      <span className="np-risk-kri-value">{risk.kri.value}</span>
+                      <span className="np-kri-zone np-kri-zone--yellow">{risk.kri.zone}</span>
+                    </div>
+                  </div>
+                  <div className="np-risk-kri-comment">{risk.kri.comment}</div>
+                </button>
+              </section>
+
+              <section className="np-risk-block">
+                <h3 className="np-risk-h3">Описание риска</h3>
+                <p className="np-risk-p">{risk.description}</p>
+              </section>
+
+              <section className="np-risk-block">
+                <h3 className="np-risk-h3">Риск-факторы</h3>
+                <div className="np-risk-sub">Это причины, которые могут привести к реализации риска.</div>
+                <ul className="np-risk-item-list">
+                  {risk.factors.map((f, i) => (
+                    <li key={i} className="np-risk-item np-risk-item--factor">
+                      <span className="np-risk-item-ic">ⓘ</span>{f}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              <section className="np-risk-block">
+                <h3 className="np-risk-h3">Возможные последствия</h3>
+                <ul className="np-risk-item-list">
+                  {risk.consequences.map((c, i) => (
+                    <li key={i} className="np-risk-item np-risk-item--consequence">
+                      <span className="np-risk-item-ic">◆</span>{c}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              <section className="np-risk-block">
+                <h3 className="np-risk-h3">Рекомендации</h3>
+                <ul className="np-risk-rec-list">
+                  {risk.recommendations.map((r, i) => (
+                    <li key={i} className="np-risk-rec">
+                      <span className="np-risk-rec-ic">✨</span>
+                      <span className="np-risk-rec-text">{r}</span>
+                      <button className="np-icon-btn" aria-label="Архив">🗑</button>
+                      <button className="np-risk-rec-btn" onClick={() => onToast("Мера снижения будет добавлена позже")}>Снизить риск</button>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              <section className="np-risk-block">
+                <h3 className="np-risk-h3">Меры</h3>
+                <div className="np-risk-eff-row">
+                  <div className="np-risk-eff">
+                    <div className="np-risk-eff-label">Текущая эффективность мер <span className="np-muted">ⓘ</span></div>
+                    <span className="np-risk-eff-badge">{risk.currentEffectiveness}%</span>
+                  </div>
+                  <div className="np-risk-eff">
+                    <div className="np-risk-eff-label">Годовая эффективность мер <span className="np-muted">ⓘ</span></div>
+                    <span className="np-risk-eff-muted">Пока нет данных</span>
+                  </div>
+                </div>
+                <ul className="np-risk-measures">
+                  {risk.measures.map((m, i) => (
+                    <li key={i} className="np-risk-measure">
+                      <span className="np-risk-measure-ic">🛡</span>
+                      <div className="np-risk-measure-main">
+                        <div className="np-risk-measure-title">{m.title}</div>
+                        <div className="np-risk-measure-meta">{m.id} · {m.date}</div>
+                      </div>
+                      <span className={`np-risk-measure-status np-risk-measure-status--${m.status}`}>{m.statusLabel}</span>
+                      <button className="np-icon-btn" aria-label="Архив">🗑</button>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              <section className="np-risk-block">
+                <h3 className="np-risk-h3">Подразделение владельца риска</h3>
+                <div className="np-risk-owner">
+                  <span className="np-risk-owner-ic">👥</span>
+                  <span className="np-risk-owner-text">{risk.ownerPath}</span>
+                </div>
+              </section>
+            </div>
+
+            <aside className="np-risk-side">
+              <div className="np-risk-side-card">
+                <div className="np-risk-side-title">Информация</div>
+                <dl className="np-risk-side-list">
+                  <div><dt>Риск</dt><dd>{risk.id}</dd></div>
+                  <div><dt>Создан</dt><dd>{risk.createdAt}</dd></div>
+                  <div><dt>Обновлён</dt><dd>{risk.updatedAt}</dd></div>
+                  <div><dt>Автор</dt><dd><span className="np-risk-author">◉ {risk.author}</span></dd></div>
+                  <div><dt>Источник</dt><dd><span className="np-risk-author">◆ {risk.sourceSystem}</span></dd></div>
+                </dl>
+                <div className="np-risk-side-obj">
+                  <div className="np-risk-side-obj-label">Объект оценки</div>
+                  <div className="np-risk-side-obj-name">◉ {risk.objectLabel}</div>
+                  <div className="np-risk-side-obj-meta">{risk.objectMeta}</div>
+                </div>
+              </div>
+              <button className="np-risk-side-btn">История изменений <span>›</span></button>
+              <button className="np-risk-side-btn">Добавить меру <span>+</span></button>
+              <button className="np-risk-side-btn np-risk-side-btn--primary">
+                <span>✎</span> Редактировать
+              </button>
+            </aside>
+          </div>
+        </div>
+        <footer className="np-risk-modal-foot">
+          <button className="np-risk-foot-btn np-risk-foot-btn--danger">Удалить</button>
+          <button className="np-risk-foot-btn">В архив</button>
+        </footer>
+
+        {rationaleOpen && (
+          <RationaleModal
+            brief={risk.newRiskBrief ?? ""}
+            dimmed={!!activeSource}
+            onClose={() => setRationaleOpen(false)}
+            onOpenSource={(id) => setKnowledgeSourceId(id)}
+            onGoToProfile={() => { setKnowledgeSourceId(null); setRationaleOpen(false); onClose(); onNavigateToProfile(); }}
+          />
+        )}
+        {activeSource && (
+          <KnowledgeItemModal
+            source={activeSource}
+            onClose={() => setKnowledgeSourceId(null)}
+            onGoToProfile={() => { setKnowledgeSourceId(null); setRationaleOpen(false); onClose(); onNavigateToProfile(); }}
+          />
+        )}
+        {kriOpen && <KriDrawer kri={risk.kri} onClose={() => setKriOpen(false)} />}
+      </div>
+    </div>
+  );
+}
+
+function ProbDots({ value, tone }: { value: number; tone: "amber" | "red" }) {
+  return (
+    <span className={`np-risk-dots np-risk-dots--${tone}`}>
+      {[1,2,3,4,5].map((i) => (
+        <span key={i} className={`np-risk-dot ${i <= value ? "on" : ""}`} />
+      ))}
+    </span>
+  );
+}
+
+// ---------- Risks page ----------
+
+function RisksPage({
+  initialFilter,
+  onOpenRisk,
+}: {
+  initialFilter?: RiskFilter;
+  onOpenRisk: (row: RiskRow) => void;
+}) {
+  const [tab, setTab] = useState<"active" | "analysis" | "archive">("active");
+  const [filter, setFilter] = useState<RiskFilter>(initialFilter ?? "all");
+  useEffect(() => { if (initialFilter) setFilter(initialFilter); }, [initialFilter]);
 
   const list = RISKS_REGISTRY.filter((r) => {
     if (filter === "high") return r.level === "high";
@@ -2525,85 +3269,112 @@ function RisksModal({
     return true;
   });
 
-  const counts = {
-    all: RISKS_REGISTRY.length,
-    high: RISKS_REGISTRY.filter((r) => r.level === "high").length,
-    "no-measures": RISKS_REGISTRY.filter((r) => !r.hasEffectiveMeasures).length,
-  } as const;
-
   return (
-    <div
-      className="np-company-summary-backdrop"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Реестр рисков"
-    >
-      <div className="np-company-summary np-risks-modal" onClick={(e) => e.stopPropagation()}>
-        <header className="np-company-summary-head">
-          <div className="np-company-summary-head-main">
-            <LogoMark size={32} />
-            <div>
-              <h1 className="np-company-summary-title">Реестр рисков</h1>
-              <div className="np-company-summary-updated">Показано {list.length} из {counts.all}</div>
-            </div>
-          </div>
-          <div className="np-company-summary-head-actions">
-            <button className="np-icon-btn np-company-summary-close" onClick={onClose} aria-label="Закрыть">
-              <Icon name="close" size={18} />
-            </button>
-          </div>
-        </header>
-        <div className="np-company-summary-body">
-          <div className="np-risks-filters">
+    <div className="np-risks-page">
+      <header className="np-risks-page-head">
+        <h1 className="np-risks-page-title">
+          <span className="np-risks-page-dash">—</span> Все риски <span className="np-risks-page-count">{RISKS_REGISTRY.length.toString().padStart(4, "0")}</span> <span className="np-muted">ⓘ</span>
+        </h1>
+        <button className="np-risks-page-cta">✨ Выявить новые риски</button>
+      </header>
+
+      <div className="np-risks-page-toolbar">
+        <div className="np-risks-tabs">
+          {[
+            ["active", "Активные риски"],
+            ["analysis", "Анализ рисков"],
+            ["archive", "Архив"],
+          ].map(([k, l]) => (
             <button
-              type="button"
-              className={`np-risks-filter ${filter === "high" ? "active" : ""}`}
-              onClick={() => setFilter("high")}
+              key={k}
+              className={`np-risks-tab ${tab === k ? "active" : ""}`}
+              onClick={() => setTab(k as typeof tab)}
             >
-              Высокие · {counts.high}
+              {l}
             </button>
-            <button
-              type="button"
-              className={`np-risks-filter ${filter === "no-measures" ? "active" : ""}`}
-              onClick={() => setFilter("no-measures")}
-            >
-              Без эффективных мер · {counts["no-measures"]}
-            </button>
-            <button
-              type="button"
-              className={`np-risks-filter ${filter === "all" ? "active" : ""}`}
-              onClick={() => setFilter("all")}
-            >
-              Все · {counts.all}
-            </button>
-          </div>
-          <ul className="np-risks-list">
-            {list.map((r) => (
-              <li
-                key={r.id}
-                id={`np-risk-row-${r.id}`}
-                className={`np-risks-row ${highlightId === r.id ? "highlight" : ""}`}
-              >
-                <div className="np-risks-row-main">
-                  <div className="np-risks-row-head">
-                    <span className="np-risks-row-id">{r.id}</span>
-                    <span className={`np-risks-row-level np-risks-row-level--${r.level}`}>{r.levelLabel}</span>
-                    {!r.hasEffectiveMeasures && (
-                      <span className="np-risks-row-flag">Без эффективных мер</span>
-                    )}
-                  </div>
-                  <div className="np-risks-row-title">{r.title}</div>
-                  <div className="np-risks-row-meta">
-                    {r.area}
-                    {r.owner ? ` · ${r.owner}` : ""}
-                    {` · ${r.status}`}
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
+          ))}
         </div>
+        <div className="np-risks-tools">
+          <button className="np-icon-btn np-risks-tool" aria-label="Поиск">🔍</button>
+          <button className="np-risks-tool np-risks-tool--wide">≡ Фильтр</button>
+        </div>
+      </div>
+
+      <div className="np-risks-stats">
+        <button
+          type="button"
+          className={`np-risks-stat np-risks-stat--new ${filter === "all" ? "is-active" : ""}`}
+          onClick={() => setFilter("all")}
+        >
+          <div className="np-risks-stat-head">
+            <div className="np-risks-stat-title">Новые риски</div>
+            <span className="np-risks-stat-badge np-risks-stat-badge--blue">4</span>
+          </div>
+          <div className="np-risks-stat-text">Норм обнаружил новые риски, можешь ознакомиться с ними.</div>
+        </button>
+        <button
+          type="button"
+          className={`np-risks-stat np-risks-stat--high ${filter === "high" ? "is-active" : ""}`}
+          onClick={() => setFilter("high")}
+        >
+          <div className="np-risks-stat-head">
+            <div className="np-risks-stat-title">Высокий уровень риска</div>
+            <span className="np-risks-stat-badge np-risks-stat-badge--red">1</span>
+          </div>
+          <div className="np-risks-stat-text">Обрати внимание на рекомендации от Норма и прими решения по рискам.</div>
+        </button>
+        <button
+          type="button"
+          className={`np-risks-stat np-risks-stat--rev ${filter === "no-measures" ? "is-active" : ""}`}
+          onClick={() => setFilter("no-measures")}
+        >
+          <div className="np-risks-stat-head">
+            <div className="np-risks-stat-title">Переоценено</div>
+            <span className="np-risks-stat-badge np-risks-stat-badge--amber">2</span>
+          </div>
+          <div className="np-risks-stat-text">Норм скорректировал оценку риска на основе новых данных.</div>
+        </button>
+      </div>
+
+      <ul className="np-risks-cards">
+        {list.map((r) => (
+          <li key={r.id}>
+            <button type="button" className="np-risks-card" onClick={() => onOpenRisk(r)}>
+              <div className="np-risks-card-top">
+                <span className={`np-risks-card-level np-risks-card-level--${r.level}`}>▲ {r.levelLabel}</span>
+                <span className="np-risks-card-new">Новый</span>
+                <span className="np-risks-card-id">{r.id}</span>
+              </div>
+              <div className="np-risks-card-title">{r.title}</div>
+              <div className="np-risks-card-metrics">
+                <div>
+                  <div className="np-risks-card-metric-label">Потенциальные потери</div>
+                  <div className="np-risks-card-metric-value">1 502 620 ₽</div>
+                </div>
+                <div>
+                  <div className="np-risks-card-metric-label">Фактические потери</div>
+                  <div className="np-risks-card-metric-value">1 502 620 ₽</div>
+                </div>
+                <div>
+                  <div className="np-risks-card-metric-label">Стратегия реагирования</div>
+                  <span className="np-risks-card-strategy">Снизить</span>
+                </div>
+              </div>
+              <div className="np-risks-card-foot">
+                <div className="np-risks-card-tags">
+                  <span className="np-risks-card-tag">▸ Описание</span>
+                  <span className="np-risks-card-tag np-risks-card-tag--rec">✦ Рекомендации: 2</span>
+                  <span className="np-risks-card-tag">Меры: 2</span>
+                </div>
+                <div className="np-risks-card-owner">👥 {r.owner ?? 'ООО "Тестовая компания"'} / … / Отдел технического сопровождения</div>
+              </div>
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <div className="np-risks-page-fab">
+        <button className="np-risks-fab-btn">Зарегистрировать риск</button>
       </div>
     </div>
   );
