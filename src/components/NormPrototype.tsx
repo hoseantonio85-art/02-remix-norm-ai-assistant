@@ -131,6 +131,8 @@ const NAV = [
   { id: "kb", label: "База знаний", icon: "book" },
 ];
 
+type RiskFilter = "all" | "new" | "high" | "reassessed";
+
 interface FocusSource {
   id?: string;
   type: string;
@@ -454,6 +456,42 @@ const GAP_SOURCES: Record<string, FocusSource> = {
   },
 };
 Object.assign(SOURCES_INDEX, GAP_SOURCES);
+
+// Extra sources used by risk-level Norm verdicts that don't come from a
+// focus point. Registered into the same SOURCES_INDEX so the universal
+// SourceDrawer can resolve them.
+const RISK_VERDICT_SOURCES: Record<string, FocusSource> = {
+  "risk-gpu-product-announce": {
+    id: "risk-gpu-product-announce",
+    type: "Профиль компании",
+    title: "Анонс запуска системы AI-рекомендаций товаров",
+    date: "актуально на 24 сентября 2025",
+    excerpt:
+      "Компания анонсировала запуск системы AI-рекомендаций товаров на публичном сайте.",
+    relation:
+      "Подтверждает, что запуск AI-продукта запланирован и завязан на достаточные GPU-мощности.",
+  },
+  "risk-gpu-shortage-report": {
+    id: "risk-gpu-shortage-report",
+    type: "Отчёт",
+    title: "Отчёт по загрузке GPU-инфраструктуры на 2026",
+    date: "январь 2026",
+    excerpt:
+      "На начало 2026 года фиксируется дефицит вычислительных мощностей GPU для инференса моделей.",
+    relation:
+      "Показывает, что доступных мощностей может не хватить для запуска нового AI-продукта.",
+  },
+  "risk-gpu-key-clients": {
+    id: "risk-gpu-key-clients",
+    type: "Профиль компании",
+    title: "Ключевые клиенты AI-продукта",
+    excerpt:
+      "Ядро аудитории AI-рекомендаций — активные жители мегаполисов и офисные сотрудники, чувствительные к качеству персонализации.",
+    relation:
+      "Позволяет оценить, кого затронут сбои или задержки запуска продукта.",
+  },
+};
+Object.assign(SOURCES_INDEX, RISK_VERDICT_SOURCES);
 
 // Decorate a subset of sources with document / quote / locator so the unified
 // source card can show honest document cards or system-object cards.
@@ -2174,7 +2212,7 @@ function CompanySummaryModal({
   onOpenSource: (id: string) => void;
   onCloseSource: () => void;
   onOpenFocus: (fpId: string) => void;
-  onOpenRisks: (opts: { filter?: "high" | "no-measures"; riskId?: string }) => void;
+  onOpenRisks: (opts: { filter?: RiskFilter; riskId?: string }) => void;
   onClose: () => void;
   onDiscuss: () => void;
   onClarify: () => void;
@@ -2326,7 +2364,7 @@ function CompanySummaryModal({
                 <button
                   type="button"
                   className="np-summary-risk-chip np-summary-risk-chip--action"
-                  onClick={() => onOpenRisks({ filter: "no-measures" })}
+                  onClick={() => onOpenRisks({ filter: "reassessed" })}
                 >
                   <span className="np-summary-risk-num">{summary.meta.risksWithoutMeasures.value}</span>
                   <span className="np-summary-risk-label">{summary.meta.risksWithoutMeasures.label}</span>
@@ -2463,30 +2501,32 @@ interface RiskRow {
   status: string;
   hasEffectiveMeasures: boolean;
   owner?: string;
+  isNew?: boolean;
+  reassessed?: boolean;
 }
 
 const RISKS_REGISTRY: RiskRow[] = [
   { id: "QNR-0214", title: "Нарушение непрерывности поставок", area: "Поставки и логистика", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: false, owner: "Ирина Ковалёва" },
-  { id: "QNR-0187", title: "Снижение клиентской активности", area: "Клиенты и продукты", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: false },
-  { id: "QNR-0331", title: "Массовые сбои в системе онлайн-расчётов", area: "ИТ и инфраструктура", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: true, owner: "Наталья Гусева" },
+  { id: "QNR-0187", title: "Снижение клиентской активности", area: "Клиенты и продукты", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: false, isNew: true },
+  { id: "QNR-0331", title: "Массовые сбои в системе онлайн-расчётов", area: "ИТ и инфраструктура", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: true, owner: "Наталья Гусева", reassessed: true },
   { id: "QNR-0102", title: "Утечка персональных данных клиентов", area: "ИТ и безопасность", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: true },
-  { id: "QNR-0119", title: "Дефицит GPU для инференса моделей", area: "ИТ и инфраструктура", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: false },
+  { id: "QNR-0119", title: "Дефицит GPU для инференса моделей", area: "ИТ и инфраструктура", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: false, isNew: true },
   { id: "QNR-0203", title: "Рост валютных издержек по закупкам", area: "Финансы", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: true },
   { id: "QNR-0221", title: "Зависимость от одного логистического оператора", area: "Поставки и логистика", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: false },
   { id: "QNR-0244", title: "Отставание от новых требований регулятора", area: "Комплаенс", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: true },
   { id: "QNR-0256", title: "Уход ключевых сотрудников продуктовой команды", area: "Персонал", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: true },
   { id: "QNR-0268", title: "Снижение маржинальности категории электроники", area: "Финансы", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: true },
-  { id: "QNR-0277", title: "Ошибки в рекомендациях AI-модели", area: "Клиенты и продукты", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: false },
+  { id: "QNR-0277", title: "Ошибки в рекомендациях AI-модели", area: "Клиенты и продукты", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: false, isNew: true },
   { id: "QNR-0289", title: "Простой основного склада более 24 часов", area: "Поставки и логистика", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: true },
   { id: "QNR-0298", title: "Компрометация учётных записей администраторов", area: "ИТ и безопасность", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: true },
-  { id: "QNR-0305", title: "Задержка выпуска годовой отчётности", area: "Финансы", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: true },
+  { id: "QNR-0305", title: "Задержка выпуска годовой отчётности", area: "Финансы", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: true, reassessed: true },
   { id: "QNR-0312", title: "Рост числа возвратов после смены поставщика", area: "Клиенты и продукты", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: true },
   { id: "QNR-0324", title: "Недоступность платёжного шлюза в пиковые часы", area: "ИТ и инфраструктура", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: true },
-  { id: "QNR-0341", title: "Срыв сроков внедрения новой WMS", area: "Проекты", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: false },
+  { id: "QNR-0341", title: "Срыв сроков внедрения новой WMS", area: "Проекты", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: false, isNew: true },
   { id: "QNR-0356", title: "Штрафы за нарушение сроков доставки маркетплейса", area: "Комплаенс", level: "high", levelLabel: "Высокий", status: "Действующий", hasEffectiveMeasures: true },
 ];
 
-type RiskFilter = "all" | "high" | "no-measures";
+// (RiskFilter is declared near the top of the file)
 
 // ============ Risks page & Risk detail modal ============
 
@@ -2509,6 +2549,7 @@ interface RiskDetail {
   objectMeta: string;
   hasNewRiskAlert?: boolean;
   newRiskBrief?: string;
+  verdict?: NormVerdict;
   utilization: {
     kind: "direct" | "indirect" | "credit";
     label: string;
@@ -2526,10 +2567,10 @@ interface RiskDetail {
     zone: string;
     comment: string;
   };
-  description: string;
-  factors: string[];
-  consequences: string[];
-  recommendations: string[];
+  description?: string;
+  factors?: string[];
+  consequences?: string[];
+  recommendations?: string[];
   measures: {
     id: string;
     title: string;
@@ -2540,6 +2581,17 @@ interface RiskDetail {
   }[];
   currentEffectiveness: number; // percent
   ownerPath: string;
+}
+
+type VerdictStatus = "decision" | "check" | "improvement" | "new";
+
+interface NormVerdict {
+  status: VerdictStatus;
+  statusLabel: string;
+  title: string;
+  text: string;
+  nextAction: string;
+  sourceIds: string[];
 }
 
 const DEFAULT_RISK_DETAIL: Omit<RiskDetail, "id" | "title" | "category" | "levelKey" | "levelLabel"> = {
@@ -2592,23 +2644,6 @@ const DEFAULT_RISK_DETAIL: Omit<RiskDetail, "id" | "title" | "category" | "level
     zone: "Жёлтая зона",
     comment: "Выручка падает при стабильных потерях",
   },
-  description:
-    "Ранее сегодня было отправлено 5 предупреждений о том, что SQS службы расчёта заработной платы превысил пороговое значение. Быстрое расследование показало, что события о выплатах сотрудникам не срабатывают, а пользователи не могут войти в систему. Я определил приоритет как критический, потому что это день выплаты зарплаты.",
-  factors: [
-    "Нарушение регламентов защиты данных в условиях ужесточения требований ФЗ-420",
-    "Зависимость от стабильности работы IT-инфраструктуры",
-  ],
-  consequences: [
-    "Штраф в размере до 5 000 000 руб. или до 4% годового оборота",
-    "Репутационные потери и отток клиентов",
-    "Судебные иски от пострадавших клиентов",
-    "Временная приостановка лицензии на деятельность",
-  ],
-  recommendations: [
-    "Внедрить автоматизированную систему контроля температурного режима",
-    "Провести обучение персонала по санитарным нормам",
-    "Разработать регламент внутренних проверок",
-  ],
   measures: [
     { id: "MSR-171185", title: "Проведение тестирования на проникновение внешним подрядчиком", date: "Плановая дата: 05.03.2024", dateKind: "plan", status: "new", statusLabel: "Новая" },
     { id: "MSR-171185", title: "Обновление политики парольной защиты", date: "Фактическая дата: 15.01.2024", dateKind: "fact", status: "done", statusLabel: "Реализована" },
@@ -2622,13 +2657,59 @@ const DEFAULT_RISK_DETAIL: Omit<RiskDetail, "id" | "title" | "category" | "level
 };
 
 const RISK_DETAIL_OVERRIDES: Record<string, Partial<RiskDetail>> = {
-  "QNR-0102": {
-    id: "RSK-41242001",
-    title: "Утечка персональных данных клиентов",
-    category: "Риск информационной безопасности",
-    hasNewRiskAlert: true,
-    newRiskBrief:
-      "Компания готовит запуск нового AI-продукта, при этом уже зафиксирован дефицит GPU-мощностей. Это может привести к сбоям, задержке запуска или снижению качества работы продукта.",
+  "QNR-0214": {
+    verdict: {
+      status: "decision",
+      statusLabel: "Требует решения",
+      title: "Задержки поставщиков уже влияют на наличие товаров",
+      text:
+        "Пять из семи задержек за последний месяц связаны с тремя поставщиками. За тот же период доля отсутствующих товаров выросла с 6% до 24%. Связь подтверждается данными, но возможные финансовые потери пока не рассчитаны.",
+      nextAction:
+        "В течение трёх дней подтвердить резервных поставщиков и сроки переключения.",
+      sourceIds: ["fp-supply-s0", "fp-supply-s1", "fp-supply-s2"],
+    },
+  },
+  "QNR-0187": {
+    verdict: {
+      status: "check",
+      statusLabel: "Требует проверки",
+      title:
+        "Есть ранний сигнал возможного оттока, но снижение активности пока не подтверждено",
+      text:
+        "Конкурент запустил бесплатную доставку в 12 городах присутствия компании, а стоимость доставки уже входит в число частых причин отказа. Данных о фактическом изменении активности клиентов в этих городах пока нет.",
+      nextAction:
+        "Начать отдельный мониторинг конверсии, повторных заказов и отмен в 12 затронутых городах.",
+      sourceIds: ["fp-delivery-s0", "fp-delivery-s1", "fp-delivery-s2"],
+    },
+  },
+  "QNR-0331": {
+    verdict: {
+      status: "improvement",
+      statusLabel: "Есть улучшение",
+      title:
+        "Дополнительный мониторинг, вероятно, снижает частоту критичных сбоев",
+      text:
+        "После внедрения меры число критичных ошибок снизилось на 37%, а массовые сбои не повторялись 21 день. Это положительный ранний результат, но трёх недель пока недостаточно для снижения оценки риска.",
+      nextAction:
+        "Сохранить текущие меры и повторно оценить результат после 30 дней наблюдения при сопоставимой нагрузке.",
+      sourceIds: ["fp-it-s0", "fp-it-s1", "fp-it-s2"],
+    },
+  },
+  "QNR-0119": {
+    verdict: {
+      status: "new",
+      statusLabel: "Новый риск",
+      title: "Запуск AI-продукта под угрозой из-за дефицита GPU",
+      text:
+        "Компания готовит запуск системы AI-рекомендаций товаров, при этом уже зафиксирован дефицит GPU-мощностей. Это может привести к сбоям, задержке запуска или снижению качества работы продукта.",
+      nextAction:
+        "Согласовать план обеспечения GPU-мощностей до плановой даты запуска продукта.",
+      sourceIds: [
+        "risk-gpu-product-announce",
+        "risk-gpu-shortage-report",
+        "risk-gpu-key-clients",
+      ],
+    },
   },
 };
 
@@ -2953,13 +3034,14 @@ function RiskDetailModal({
   const [rationaleOpen, setRationaleOpen] = useState(false);
   const [knowledgeSourceId, setKnowledgeSourceId] = useState<string | null>(null);
   const [kriOpen, setKriOpen] = useState(false);
+  const [verdictSourceId, setVerdictSourceId] = useState<string | "list" | null>(null);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      if (knowledgeSourceId || rationaleOpen || kriOpen) return; // child handles
+      if (knowledgeSourceId || rationaleOpen || kriOpen || verdictSourceId !== null) return; // child handles
       e.stopPropagation();
       onClose();
     };
@@ -2968,17 +3050,22 @@ function RiskDetailModal({
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
-  }, [onClose, knowledgeSourceId, rationaleOpen, kriOpen]);
+  }, [onClose, knowledgeSourceId, rationaleOpen, kriOpen, verdictSourceId]);
 
   const activeSource = knowledgeSourceId
     ? RATIONALE_SOURCES.find((s) => s.id === knowledgeSourceId) ?? null
     : null;
 
+  const verdictUniSources = (risk.verdict?.sourceIds ?? [])
+    .map((id) => SOURCES_INDEX[id])
+    .filter((s): s is FocusSource => !!s)
+    .map((s) => focusSourceToUni(s, { supportedClaim: risk.verdict?.title ?? null }));
+
   return (
     <div
       className="np-risk-modal-backdrop"
       onClick={(e) => {
-        if (knowledgeSourceId || rationaleOpen || kriOpen) return;
+        if (knowledgeSourceId || rationaleOpen || kriOpen || verdictSourceId !== null) return;
         e.stopPropagation();
         onClose();
       }}
@@ -3020,21 +3107,11 @@ function RiskDetailModal({
                 ))}
               </div>
 
-              {risk.hasNewRiskAlert && risk.newRiskBrief && (
-                <div className="np-risk-alert">
-                  <div className="np-risk-alert-ic">◆</div>
-                  <div className="np-risk-alert-body">
-                    <div className="np-risk-alert-title">Обнаружен новый риск</div>
-                    <div className="np-risk-alert-text">{risk.newRiskBrief}</div>
-                    <button
-                      type="button"
-                      className="np-risk-alert-link"
-                      onClick={() => setRationaleOpen(true)}
-                    >
-                      Подробнее об оценке →
-                    </button>
-                  </div>
-                </div>
+              {risk.verdict && (
+                <NormVerdictBlock
+                  verdict={risk.verdict}
+                  onOpenSource={(id) => setVerdictSourceId(id)}
+                />
               )}
 
               <section className="np-risk-block">
@@ -3111,47 +3188,55 @@ function RiskDetailModal({
                 </button>
               </section>
 
-              <section className="np-risk-block">
-                <h3 className="np-risk-h3">Описание риска</h3>
-                <p className="np-risk-p">{risk.description}</p>
-              </section>
+              {risk.description && (
+                <section className="np-risk-block">
+                  <h3 className="np-risk-h3">Описание риска</h3>
+                  <p className="np-risk-p">{risk.description}</p>
+                </section>
+              )}
 
-              <section className="np-risk-block">
-                <h3 className="np-risk-h3">Риск-факторы</h3>
-                <div className="np-risk-sub">Это причины, которые могут привести к реализации риска.</div>
-                <ul className="np-risk-item-list">
-                  {risk.factors.map((f, i) => (
-                    <li key={i} className="np-risk-item np-risk-item--factor">
-                      <span className="np-risk-item-ic">ⓘ</span>{f}
-                    </li>
-                  ))}
-                </ul>
-              </section>
+              {risk.factors && risk.factors.length > 0 && (
+                <section className="np-risk-block">
+                  <h3 className="np-risk-h3">Риск-факторы</h3>
+                  <div className="np-risk-sub">Это причины, которые могут привести к реализации риска.</div>
+                  <ul className="np-risk-item-list">
+                    {risk.factors.map((f, i) => (
+                      <li key={i} className="np-risk-item np-risk-item--factor">
+                        <span className="np-risk-item-ic">ⓘ</span>{f}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
 
-              <section className="np-risk-block">
-                <h3 className="np-risk-h3">Возможные последствия</h3>
-                <ul className="np-risk-item-list">
-                  {risk.consequences.map((c, i) => (
-                    <li key={i} className="np-risk-item np-risk-item--consequence">
-                      <span className="np-risk-item-ic">◆</span>{c}
-                    </li>
-                  ))}
-                </ul>
-              </section>
+              {risk.consequences && risk.consequences.length > 0 && (
+                <section className="np-risk-block">
+                  <h3 className="np-risk-h3">Возможные последствия</h3>
+                  <ul className="np-risk-item-list">
+                    {risk.consequences.map((c, i) => (
+                      <li key={i} className="np-risk-item np-risk-item--consequence">
+                        <span className="np-risk-item-ic">◆</span>{c}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
 
-              <section className="np-risk-block">
-                <h3 className="np-risk-h3">Рекомендации</h3>
-                <ul className="np-risk-rec-list">
-                  {risk.recommendations.map((r, i) => (
-                    <li key={i} className="np-risk-rec">
-                      <span className="np-risk-rec-ic">✨</span>
-                      <span className="np-risk-rec-text">{r}</span>
-                      <button className="np-icon-btn" aria-label="Архив">🗑</button>
-                      <button className="np-risk-rec-btn" onClick={() => onToast("Мера снижения будет добавлена позже")}>Снизить риск</button>
-                    </li>
-                  ))}
-                </ul>
-              </section>
+              {risk.recommendations && risk.recommendations.length > 0 && (
+                <section className="np-risk-block">
+                  <h3 className="np-risk-h3">Рекомендации</h3>
+                  <ul className="np-risk-rec-list">
+                    {risk.recommendations.map((r, i) => (
+                      <li key={i} className="np-risk-rec">
+                        <span className="np-risk-rec-ic">✨</span>
+                        <span className="np-risk-rec-text">{r}</span>
+                        <button className="np-icon-btn" aria-label="Архив">🗑</button>
+                        <button className="np-risk-rec-btn" onClick={() => onToast("Мера снижения будет добавлена позже")}>Снизить риск</button>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
 
               <section className="np-risk-block">
                 <h3 className="np-risk-h3">Меры</h3>
@@ -3235,6 +3320,76 @@ function RiskDetailModal({
           />
         )}
         {kriOpen && <KriDrawer kri={risk.kri} onClose={() => setKriOpen(false)} />}
+        {risk.verdict && verdictSourceId !== null && (
+          <SourceDrawer
+            sources={verdictUniSources}
+            activeId={verdictSourceId}
+            mode="conclusion"
+            listTitle="Основания вывода Норма"
+            placement="modal"
+            onOpen={(id) => setVerdictSourceId(id)}
+            onClose={() => setVerdictSourceId(null)}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function NormVerdictBlock({
+  verdict,
+  onOpenSource,
+}: {
+  verdict: NormVerdict;
+  onOpenSource: (id: string | "list") => void;
+}) {
+  const sources = verdict.sourceIds
+    .map((id) => ({ id, s: SOURCES_INDEX[id] }))
+    .filter((x) => !!x.s);
+  const visible = sources.slice(0, 2);
+  const extra = sources.length - visible.length;
+  return (
+    <div className={`np-risk-alert np-verdict np-verdict--${verdict.status}`}>
+      <div className="np-risk-alert-ic">◆</div>
+      <div className="np-risk-alert-body">
+        <span className={`np-verdict-status np-verdict-status--${verdict.status}`}>
+          {verdict.statusLabel}
+        </span>
+        <div className="np-risk-alert-title np-verdict-title">{verdict.title}</div>
+        <div className="np-risk-alert-text np-verdict-text">{verdict.text}</div>
+        <div className="np-verdict-action">
+          <span className="np-verdict-action-label">Ближайшее действие</span>
+          <span className="np-verdict-action-text">{verdict.nextAction}</span>
+        </div>
+        {sources.length > 0 && (
+          <div className="np-verdict-sources">
+            <span className="np-verdict-sources-label">Основания:</span>{" "}
+            {visible.map((x, i) => (
+              <span key={x.id}>
+                <button
+                  type="button"
+                  className="np-verdict-source-link"
+                  onClick={() => onOpenSource(x.id)}
+                >
+                  {x.s.title}
+                </button>
+                {i < visible.length - 1 && <span className="np-verdict-sep"> · </span>}
+              </span>
+            ))}
+            {extra > 0 && (
+              <>
+                <span className="np-verdict-sep"> · </span>
+                <button
+                  type="button"
+                  className="np-verdict-source-link"
+                  onClick={() => onOpenSource("list")}
+                >
+                  + ещё {extra}
+                </button>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -3264,8 +3419,9 @@ function RisksPage({
   useEffect(() => { if (initialFilter) setFilter(initialFilter); }, [initialFilter]);
 
   const list = RISKS_REGISTRY.filter((r) => {
+    if (filter === "new") return !!r.isNew;
     if (filter === "high") return r.level === "high";
-    if (filter === "no-measures") return !r.hasEffectiveMeasures;
+    if (filter === "reassessed") return !!r.reassessed;
     return true;
   });
 
@@ -3303,12 +3459,12 @@ function RisksPage({
       <div className="np-risks-stats">
         <button
           type="button"
-          className={`np-risks-stat np-risks-stat--new ${filter === "all" ? "is-active" : ""}`}
-          onClick={() => setFilter("all")}
+          className={`np-risks-stat np-risks-stat--new ${filter === "new" ? "is-active" : ""}`}
+          onClick={() => setFilter("new")}
         >
           <div className="np-risks-stat-head">
             <div className="np-risks-stat-title">Новые риски</div>
-            <span className="np-risks-stat-badge np-risks-stat-badge--blue">4</span>
+            <span className="np-risks-stat-badge np-risks-stat-badge--blue">{RISKS_REGISTRY.filter(r => r.isNew).length}</span>
           </div>
           <div className="np-risks-stat-text">Норм обнаружил новые риски, можешь ознакомиться с ними.</div>
         </button>
@@ -3319,18 +3475,18 @@ function RisksPage({
         >
           <div className="np-risks-stat-head">
             <div className="np-risks-stat-title">Высокий уровень риска</div>
-            <span className="np-risks-stat-badge np-risks-stat-badge--red">1</span>
+            <span className="np-risks-stat-badge np-risks-stat-badge--red">{RISKS_REGISTRY.filter(r => r.level === "high").length}</span>
           </div>
           <div className="np-risks-stat-text">Обрати внимание на рекомендации от Норма и прими решения по рискам.</div>
         </button>
         <button
           type="button"
-          className={`np-risks-stat np-risks-stat--rev ${filter === "no-measures" ? "is-active" : ""}`}
-          onClick={() => setFilter("no-measures")}
+          className={`np-risks-stat np-risks-stat--rev ${filter === "reassessed" ? "is-active" : ""}`}
+          onClick={() => setFilter("reassessed")}
         >
           <div className="np-risks-stat-head">
             <div className="np-risks-stat-title">Переоценено</div>
-            <span className="np-risks-stat-badge np-risks-stat-badge--amber">2</span>
+            <span className="np-risks-stat-badge np-risks-stat-badge--amber">{RISKS_REGISTRY.filter(r => r.reassessed).length}</span>
           </div>
           <div className="np-risks-stat-text">Норм скорректировал оценку риска на основе новых данных.</div>
         </button>
@@ -3342,7 +3498,7 @@ function RisksPage({
             <button type="button" className="np-risks-card" onClick={() => onOpenRisk(r)}>
               <div className="np-risks-card-top">
                 <span className={`np-risks-card-level np-risks-card-level--${r.level}`}>▲ {r.levelLabel}</span>
-                <span className="np-risks-card-new">Новый</span>
+                {r.isNew && <span className="np-risks-card-new">Новый</span>}
                 <span className="np-risks-card-id">{r.id}</span>
               </div>
               <div className="np-risks-card-title">{r.title}</div>
