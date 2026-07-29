@@ -4296,7 +4296,7 @@ export default function NormPrototype() {
           onDiscuss={() => {
             setSummarySource(null);
             setSummaryOpen(false);
-            openWith(COMPANY_SUMMARY.discussQuestion);
+            openWith("__situation_triage__");
           }}
           onClarify={() => {
             setSummarySource(null);
