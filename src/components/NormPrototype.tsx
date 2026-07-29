@@ -1764,9 +1764,34 @@ function AssistantModal({ initialQuery, onClose, onToast, onOpenKnowledge }: { i
     if (l.includes("риск оттока")) return runSummaryChurn();
     if (l.includes("ит-мер") || l.includes("ит меры") || l.includes("результат ит")) return runSummaryIt();
     if (l.includes("план доработки")) return runStandardGapPlan();
-    if (l.includes("стандарт") && (l.includes("расхожден") || l.includes("групп"))) return runStandardGap();
+    if (l.includes("стандарт")) return runStandardGap();
+    if (l.includes("gpu")) return runGpu();
+    if (l.includes("отток")) return runSummaryChurn();
     onToast("Этот переход будет добавлен позже");
   }
+
+  async function runSituationTriage() {
+    setBusy(true);
+    push({ role: "status", text: "Собираю картину по направлениям" });
+    await wait(700);
+    removeStatus();
+    push({
+      role: "assistant",
+      text:
+        "За ночь ситуация ухудшилась сразу по нескольким направлениям. Часть проблем требует решения уже сейчас, остальные нужно дополнительно проверить. Какую проблему обсудим?",
+    });
+    push({
+      role: "actions",
+      actions: [
+        { label: "Поставщики и договоры", onClick: () => continueDialog("Поставщики и договоры") },
+        { label: "Стандарт компании", onClick: () => continueDialog("Стандарт компании") },
+        { label: "Дефицит GPU", onClick: () => continueDialog("Дефицит GPU") },
+        { label: "Возможный отток клиентов", onClick: () => continueDialog("Возможный отток клиентов") },
+      ],
+    });
+    setBusy(false);
+  }
+
 
   async function runSituationDiscussion() {
     setBusy(true);
@@ -1968,7 +1993,12 @@ function AssistantModal({ initialQuery, onClose, onToast, onOpenKnowledge }: { i
 
   useEffect(() => {
     if (!initialQuery) return;
+    if (initialQuery === "__situation_triage__") {
+      const t0 = setTimeout(() => runSituationTriage(), 200);
+      return () => clearTimeout(t0);
+    }
     const t = setTimeout(() => dispatch(initialQuery), 200);
+
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialQuery]);
@@ -2738,66 +2768,80 @@ function CompanySummaryModal({
 
         <div className="np-company-summary-body">
           <div className="np-summary-single">
-            <section className="np-summary-group">
+            <section className="np-summary-island">
               <h2 className="np-summary-h2">Что происходит</h2>
-              <p className="np-summary-narrative">
-                За ночь у компании сложилась связанная проблема в контрагентах и методологии. Три поставщика почти
-                одновременно попали в реестр банкротств: под угрозой договоры на 84&nbsp;млн&nbsp;₽ и непрерывность
-                поставок. Мера «Лимит на одного поставщика» сработала только частично — она не учитывает
-                совокупную зависимость от связанных контрагентов. Сверка с обновлённым Стандартом Группы подтвердила
-                этот пробел: Стандарт компании необходимо доработать. Отдельно запуск AI-продукта находится под
-                угрозой из-за дефицита GPU. Возможный отток клиентов в 12 городах пока требует проверки, а по
-                ИТ-сбоям наблюдается положительная динамика.
-              </p>
+              <div className="np-summary-narrative">
+                <p>
+                  За ночь ситуация ухудшилась сразу по нескольким направлениям. Часть проблем уже подтверждена, часть
+                  пока остаётся сигналами, но вместе они повышают вероятность перебоев в работе и финансовых потерь.
+                </p>
+                <p>
+                  Если отложить решения, последствия могут усилить друг друга: нарушение поставок способно повлиять на
+                  непрерывность работы, а дефицит ресурсов — задержать запуск нового продукта. Сначала стоит отработать
+                  подтверждённые угрозы, затем проверить гипотезы.
+                </p>
+                <p>По ИТ-сбоям ситуация, наоборот, улучшается — пока достаточно продолжить наблюдение.</p>
+              </div>
             </section>
 
-            <section className="np-summary-group">
+            <section className="np-summary-island">
               <h2 className="np-summary-h2">Проблемы</h2>
               <ul className="np-summary-problems">
                 {[
                   {
                     key: "supply",
+                    tone: "red" as const,
+                    priority: "Срочно",
                     title: "Три поставщика оказались на грани дефолта",
                     text: "Под угрозой три договора на 84 млн ₽ и непрерывность поставок.",
-                    hint: "Открыть разбор",
+                    todo: "Подготовить исковые требования и проверить остатки и альтернативных поставщиков.",
                     onOpen: () => onOpenFocus("fp-supply"),
                   },
                   {
                     key: "standard",
+                    tone: "orange" as const,
+                    priority: "Важно",
                     title: "Стандарт компании расходится с новым Стандартом Группы",
                     text: "Не учтены три обязательных требования, включая совокупную зависимость от связанных поставщиков.",
-                    hint: "Открыть документ",
+                    todo: "Назначить владельца и срок доработки Стандарта компании.",
                     onOpen: () => {
                       if (onOpenKnowledge) onOpenKnowledge("regulation_risk_signals", "risk.company_risk_standard");
                     },
                   },
                   {
                     key: "gpu",
+                    tone: "orange" as const,
+                    priority: "Важно",
                     title: "Запуск AI-продукта под угрозой из-за дефицита GPU",
                     text: "Продукт анонсирован, но подтверждённого плана обеспечения мощностей нет.",
-                    hint: "Открыть разбор",
+                    todo: "Подтвердить потребность в GPU и способ закрытия дефицита.",
                     onOpen: () => onOpenFocus("fp-gpu"),
                   },
                   {
                     key: "delivery",
+                    tone: "blue" as const,
+                    priority: "Проверить",
                     title: "Возможен отток клиентов в 12 городах",
                     text: "Сигнал обоснован, но снижение конверсии и повторных заказов пока не подтверждено.",
-                    hint: "Открыть разбор",
+                    todo: "Проверить конверсию и повторные заказы в этих городах.",
                     onOpen: () => onOpenFocus("fp-delivery"),
                   },
                 ].map((p) => (
                   <li key={p.key}>
-                    <button
-                      type="button"
-                      className="np-summary-problem"
-                      onClick={p.onOpen}
-                    >
+                    <button type="button" className="np-summary-problem" onClick={p.onOpen}>
                       <div className="np-summary-problem-body">
+                        <div className={`np-summary-problem-prio np-summary-problem-prio--${p.tone}`}>
+                          <span className="np-summary-problem-dot" aria-hidden />
+                          {p.priority}
+                        </div>
                         <div className="np-summary-problem-title">{p.title}</div>
                         <div className="np-summary-problem-text">{p.text}</div>
+                        <div className="np-summary-problem-todo">
+                          <span className="np-summary-problem-todo-label">Что можно сделать:</span> {p.todo}
+                        </div>
                       </div>
                       <span className="np-summary-problem-hint">
-                        {p.hint}
+                        Подробнее
                         <span aria-hidden> →</span>
                       </span>
                     </button>
@@ -2805,41 +2849,15 @@ function CompanySummaryModal({
                 ))}
               </ul>
             </section>
-
-            <section className="np-summary-group">
-              <h2 className="np-summary-h2">Что делать в первую очередь</h2>
-              <ol className="np-summary-actions">
-                {[
-                  {
-                    key: "supply-act",
-                    text: "Подготовить исковые требования по трём договорам и проверить остатки и альтернативных поставщиков.",
-                    onOpen: () => onOpenFocus("fp-supply"),
-                  },
-                  {
-                    key: "standard-act",
-                    text: "Назначить владельца и срок доработки Стандарта компании.",
-                    onOpen: () => {
-                      if (onOpenKnowledge) onOpenKnowledge("regulation_risk_signals", "risk.company_risk_standard");
-                    },
-                  },
-                  {
-                    key: "gpu-act",
-                    text: "Согласовать потребность в GPU и способ закрытия дефицита до запуска AI-продукта.",
-                    onOpen: () => onOpenFocus("fp-gpu"),
-                  },
-                ].map((a, i) => (
-                  <li key={a.key}>
-                    <button type="button" className="np-summary-action" onClick={a.onOpen}>
-                      <span className="np-summary-action-num" aria-hidden>{i + 1}</span>
-                      <span className="np-summary-action-text">{a.text}</span>
-                      <span className="np-summary-action-arrow" aria-hidden>→</span>
-                    </button>
-                  </li>
-                ))}
-              </ol>
-            </section>
           </div>
         </div>
+
+        <footer className="np-company-summary-foot">
+          <button type="button" className="np-btn np-btn-primary" onClick={onDiscuss}>
+            Обсудить ситуацию с Нормом
+          </button>
+        </footer>
+
 
         {activeSummarySource && activeSection && (() => {
           const uniSources = activeSection.sources
@@ -4278,7 +4296,7 @@ export default function NormPrototype() {
           onDiscuss={() => {
             setSummarySource(null);
             setSummaryOpen(false);
-            openWith(COMPANY_SUMMARY.discussQuestion);
+            openWith("__situation_triage__");
           }}
           onClarify={() => {
             setSummarySource(null);

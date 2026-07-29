@@ -4442,3 +4442,50 @@
   transform: translateX(2px);
   color: var(--np-text);
 }
+
+/* ====== Company summary — islands composition ====== */
+.np-summary-island {
+  background: #ffffff;
+  border: 1px solid var(--np-border);
+  border-radius: 16px;
+  padding: 24px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.np-summary-island .np-summary-h2 { margin: 0; }
+.np-summary-narrative { display: flex; flex-direction: column; gap: 12px; }
+.np-summary-narrative p { margin: 0; font-size: 15px; line-height: 1.65; color: var(--np-text); }
+.np-summary-island .np-summary-problems { gap: 0; }
+.np-summary-island .np-summary-problem { padding: 16px 8px; align-items: center; }
+.np-summary-island .np-summary-problems > li:first-child .np-summary-problem { border-top: 0; padding-top: 4px; }
+.np-summary-island .np-summary-problems > li:last-child .np-summary-problem { border-bottom: 0; padding-bottom: 4px; }
+.np-summary-problem-prio {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin-bottom: 6px;
+}
+.np-summary-problem-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.np-summary-problem-prio--red { color: #d92d20; }
+.np-summary-problem-prio--orange { color: #d97706; }
+.np-summary-problem-prio--blue { color: #2563eb; }
+.np-summary-problem-todo {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--np-text);
+}
+.np-summary-problem-todo-label { color: var(--np-muted); }
+.np-company-summary-foot {
+  background: #ffffff;
+  border-top: 1px solid var(--np-border);
+  padding: 14px 24px;
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+.np-company-summary-foot .np-btn { width: auto; padding: 11px 20px; font-size: 14px; font-weight: 600; }
