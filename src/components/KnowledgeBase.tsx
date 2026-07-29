@@ -143,11 +143,12 @@ function applyOverrides(k: UniversalKnowledge, ov?: SourceOverride): UniversalKn
 /* ---------- unified accordion ---------- */
 
 function KnowledgeAccordion({
-  k, defaultOpen, onOpenSources, forceOpen, flash,
+  k, defaultOpen, onOpenSources, onOpenChat, forceOpen, flash,
 }: {
   k: UniversalKnowledge;
   defaultOpen?: boolean;
   onOpenSources: (k: UniversalKnowledge) => void;
+  onOpenChat?: (q: string) => void;
   forceOpen?: boolean;
   flash?: boolean;
 }) {
