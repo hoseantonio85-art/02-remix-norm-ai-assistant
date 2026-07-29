@@ -1993,7 +1993,12 @@ function AssistantModal({ initialQuery, onClose, onToast, onOpenKnowledge }: { i
 
   useEffect(() => {
     if (!initialQuery) return;
+    if (initialQuery === "__situation_triage__") {
+      const t0 = setTimeout(() => runSituationTriage(), 200);
+      return () => clearTimeout(t0);
+    }
     const t = setTimeout(() => dispatch(initialQuery), 200);
+
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialQuery]);
