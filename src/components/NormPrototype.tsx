@@ -650,6 +650,26 @@ const RISK_VERDICT_SOURCES: Record<string, FocusSource> = {
     relation:
       "Позволяет оценить, кого затронут сбои или задержки запуска продукта.",
   },
+  "src-group-risk-standard-2026": {
+    id: "src-group-risk-standard-2026",
+    type: "Внутренний документ",
+    title: "Стандарт по управлению рисками СберГрупп · новая редакция",
+    date: "актуально на 28 июля 2026",
+    excerpt:
+      "Обновлённая редакция Стандарта Группы вводит три новых обязательных требования к системе управления рисками дочерних компаний.",
+    relation:
+      "Эталонный документ, с которым Норм сравнил Стандарт компании и нашёл критичные расхождения.",
+  },
+  "src-company-risk-standard": {
+    id: "src-company-risk-standard",
+    type: "Внутренний документ",
+    title: "Стандарт по управлению рисками компании",
+    date: "актуально на 15 марта 2025",
+    excerpt:
+      "Действующий Стандарт компании. Норм зафиксировал три критичных расхождения с новой редакцией Стандарта Группы.",
+    relation:
+      "Документ, в который нужно внести изменения для соответствия Стандарту Группы.",
+  },
 };
 
 const SOURCES_INDEX: Record<string, FocusSource> = {
@@ -734,6 +754,8 @@ const RISK_KNOWLEDGE_LINKS: Record<string, { areaId: string; knowledgeId?: strin
   "fp-it-s2":                  { areaId: "it_data_technology",      knowledgeId: "it.platform_project" },
   "fp-delivery-s0":            { areaId: "products_business_model", knowledgeId: "products.business_profile" },
   "fp-delivery-s2":            { areaId: "products_business_model", knowledgeId: "products.business_profile" },
+  "src-group-risk-standard-2026": { areaId: "regulation_risk_signals", knowledgeId: "risk.company_risk_standard" },
+  "src-company-risk-standard":    { areaId: "regulation_risk_signals", knowledgeId: "risk.company_risk_standard" },
 };
 Object.entries(RISK_KNOWLEDGE_LINKS).forEach(([id, link]) => {
   const s = SOURCES_INDEX[id];
@@ -808,9 +830,9 @@ interface SummarySourceRef {
   supportedClaim: string;
 }
 interface SummarySection {
-  id: "decision" | "check" | "watch" | "gaps";
+  id: "decision" | "check" | "watch" | "gaps" | "risk-standard-gap";
   title: string;
-  tone: "orange" | "blue" | "green" | "neutral";
+  tone: "orange" | "blue" | "green" | "neutral" | "red";
   headline: string;
   text: string;
   shortText?: string;
@@ -820,6 +842,9 @@ interface SummarySection {
   focusPointId?: string;
   focusPointLabel?: string;
   showClarifyButton?: boolean;
+  knowledgeTarget?: { areaId: string; knowledgeId?: string | null };
+  secondaryChatQuestion?: string;
+  secondaryLabel?: string;
 }
 interface CompanySummary {
   updatedAt: string;
@@ -850,7 +875,7 @@ interface CompanySummary {
 }
 
 const COMPANY_SUMMARY: CompanySummary = {
-  updatedAt: "Актуально на 22 июля 2026, 09:30",
+  updatedAt: "Актуально на 29 июля 2026, 08:10",
   discussQuestion:
     "Хочу обсудить текущую ситуацию в компании и понять, на что обратить внимание в первую очередь",
   clarificationQuestion:
@@ -858,12 +883,17 @@ const COMPANY_SUMMARY: CompanySummary = {
   leadTitle: "Главное за 30 сек",
   leadHeadline: "Два решения нужны сейчас",
   leadText:
-    "За последние четыре часа три поставщика внесены в реестр банкротств. Под угрозой три договора на 84 млн ₽, срыв поставок вероятен в ближайшие недели. У двух из трёх поставщиков незадолго до банкротства сменились собственники — возможен подготовленный вывод активов. Нужно начать подготовку исков и одновременно переключение на альтернативных поставщиков. Второй срочный сюжет связан с запуском AI-продукта: внутренний отчёт фиксирует дефицит GPU, а подтверждённого плана расширения мощностей пока нет. Возможный отток клиентов требует проверки, положительную динамику ИТ-меры продолжаем наблюдать.",
+    "За последние четыре часа три поставщика внесены в реестр банкротств. Под угрозой три договора на 84 млн ₽, срыв поставок вероятен в ближайшие недели. У двух из трёх поставщиков незадолго до банкротства сменились собственники — возможен подготовленный вывод активов. Нужно начать подготовку исков и одновременно переключение на альтернативных поставщиков. Второй срочный сюжет связан с запуском AI-продукта: внутренний отчёт фиксирует дефицит GPU, а подтверждённого плана расширения мощностей пока нет. Ночью Норм сверил Стандарт компании по управлению рисками с обновлённой редакцией Стандарта Группы и нашёл три критичных расхождения. Возможный отток клиентов требует проверки, положительную динамику ИТ-меры продолжаем наблюдать.",
   leadBullets: [
     {
       tone: "red",
       title: "Три поставщика — банкротство за 4 часа",
       text: "Под угрозой три договора на 84 млн ₽. Срыв поставок вероятен в ближайшие недели.",
+    },
+    {
+      tone: "red",
+      title: "Стандарт компании расходится с новым Стандартом Группы",
+      text: "Норм сверил документы ночью и нашёл три критичных расхождения. Требуется пересмотр действующего Стандарта компании.",
     },
     {
       tone: "orange",
@@ -882,7 +912,7 @@ const COMPANY_SUMMARY: CompanySummary = {
     },
   ],
   requiredDecision:
-    "начать подготовку исков по трём договорам, подтвердить альтернативных поставщиков и согласовать план обеспечения GPU-мощностей.",
+    "начать подготовку исков по трём договорам, подтвердить альтернативных поставщиков, согласовать план обеспечения GPU-мощностей и поручить владельцу доработку Стандарта компании под требования Группы.",
   secondaryStatuses: [
     { tone: "blue", label: "Проверить", text: "есть сигнал возможного оттока клиентов" },
     { tone: "green", label: "Наблюдать", text: "по ИТ-сбоям появилась положительная динамика" },
@@ -927,6 +957,36 @@ const COMPANY_SUMMARY: CompanySummary = {
       ],
       focusPointId: "fp-supply",
       focusPointLabel: "Три поставщика на грани дефолта",
+    },
+    {
+      id: "risk-standard-gap",
+      title: "Стандарт по рискам",
+      tone: "red",
+      headline: "Стандарт компании расходится с новым Стандартом Группы",
+      text: "Ночью Норм получил обновлённую редакцию Стандарта по управлению рисками СберГрупп и сопоставил её с действующим Стандартом компании. Найдены три критичных расхождения: отсутствуют требования по совокупной зависимости от групп связанных поставщиков, по срокам эскалации сигналов и по обязательному согласованию мер с владельцами процессов.",
+      shortText:
+        "Три критичных расхождения между Стандартом компании и новой редакцией Стандарта Группы.",
+      actionLabel: "Что нужно сделать",
+      actionText:
+        "назначить владельца доработки Стандарта компании и согласовать план изменений.",
+      sources: [
+        {
+          sourceId: "src-group-risk-standard-2026",
+          label: "Стандарт Группы · новая редакция",
+          supportedClaim:
+            "Обновлённая редакция Стандарта Группы задаёт три новых обязательных требования к системе управления рисками.",
+        },
+        {
+          sourceId: "src-company-risk-standard",
+          label: "Стандарт компании",
+          supportedClaim:
+            "Действующий Стандарт компании не содержит трёх обязательных требований новой редакции Стандарта Группы.",
+        },
+      ],
+      knowledgeTarget: { areaId: "regulation_risk_signals", knowledgeId: "risk.company_risk_standard" },
+      secondaryChatQuestion:
+        "Разобрать расхождения Стандарта Группы и Стандарта компании",
+      secondaryLabel: "Разобрать расхождения с Нормом",
     },
     {
       id: "check",
@@ -1033,7 +1093,7 @@ const COMPANY_SUMMARY: CompanySummary = {
     risksWithoutMeasures: { value: 6, label: "без эффективных мер" },
     sourcesUsed: 10,
     knowledgeGaps: 3,
-    updatedAtShort: "22 июля 2026, 09:30",
+    updatedAtShort: "29 июля 2026, 08:10",
   },
 };
 
@@ -1172,7 +1232,7 @@ const SCENARIOS = {
   products: "Какие продукты есть у компании?",
 };
 
-function AssistantModal({ initialQuery, onClose, onToast }: { initialQuery: string | null; onClose: () => void; onToast: (m: string) => void; }) {
+function AssistantModal({ initialQuery, onClose, onToast, onOpenKnowledge }: { initialQuery: string | null; onClose: () => void; onToast: (m: string) => void; onOpenKnowledge?: (areaId: string, knowledgeId?: string | null) => void; }) {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -1703,6 +1763,8 @@ function AssistantModal({ initialQuery, onClose, onToast }: { initialQuery: stri
     if (l.includes("задержки поставок") || l.includes("поставщик")) return runSummarySupplies();
     if (l.includes("риск оттока")) return runSummaryChurn();
     if (l.includes("ит-мер") || l.includes("ит меры") || l.includes("результат ит")) return runSummaryIt();
+    if (l.includes("план доработки")) return runStandardGapPlan();
+    if (l.includes("стандарт") && (l.includes("расхожден") || l.includes("групп"))) return runStandardGap();
     onToast("Этот переход будет добавлен позже");
   }
 
@@ -1798,12 +1860,104 @@ function AssistantModal({ initialQuery, onClose, onToast }: { initialQuery: stri
     setBusy(false);
   }
 
+  async function runStandardGap() {
+    setBusy(true);
+    push({ role: "status", text: "Сверяю Стандарт компании со Стандартом Группы" });
+    await wait(800);
+    replaceStatus("Собираю расхождения");
+    await wait(700);
+    removeStatus();
+    push({
+      role: "assistant",
+      rich: (
+        <>
+          <p>
+            Ночью Норм получил обновлённую редакцию Стандарта по управлению рисками СберГрупп и сопоставил её с
+            действующим Стандартом компании. Нашёл три критичных расхождения:
+          </p>
+          <ul className="np-sum-list">
+            <li>
+              <strong>Совокупная зависимость от групп связанных поставщиков.</strong> Стандарт Группы требует лимит на
+              группу связанных контрагентов, в Стандарте компании закреплён только лимит на одного поставщика.
+            </li>
+            <li>
+              <strong>Сроки эскалации ранних сигналов.</strong> Стандарт Группы задаёт срок эскалации до 4 часов,
+              в Стандарте компании эскалация не регламентирована по времени.
+            </li>
+            <li>
+              <strong>Согласование мер с владельцами процессов.</strong> Стандарт Группы вводит обязательное
+              согласование мер с владельцем процесса, в Стандарте компании требование отсутствует.
+            </li>
+          </ul>
+          <p>
+            Расхождения нужно закрыть доработкой Стандарта компании и синхронизацией связанных процедур управления
+            рисками.
+          </p>
+        </>
+      ),
+    });
+    push({
+      role: "actions",
+      actions: [
+        {
+          label: "Открыть Стандарт компании в базе знаний",
+          onClick: () => {
+            if (onOpenKnowledge) {
+              onOpenKnowledge("regulation_risk_signals", "risk.company_risk_standard");
+            } else {
+              onToast("База знаний недоступна в этом контексте");
+            }
+          },
+        },
+        {
+          label: "Открыть Стандарт Группы",
+          onClick: () => {
+            if (onOpenKnowledge) {
+              onOpenKnowledge("regulation_risk_signals", "risk.company_risk_standard");
+            } else {
+              onToast("Открытие документа в этом прототипе пока не реализовано");
+            }
+          },
+        },
+        {
+          label: "Обсудить план доработки",
+          onClick: () => continueDialog("Обсудить план доработки Стандарта компании"),
+        },
+      ],
+    });
+    setBusy(false);
+  }
+
+  async function runStandardGapPlan() {
+    setBusy(true);
+    push({ role: "status", text: "Формирую план доработки" });
+    await wait(700);
+    removeStatus();
+    push({
+      role: "assistant",
+      rich: (
+        <>
+          <p>Предлагаю следующий порядок работы над Стандартом компании:</p>
+          <ol className="np-sum-list">
+            <li>Назначить владельца доработки Стандарта и согласовать сроки.</li>
+            <li>Ввести требование по совокупной зависимости от групп связанных поставщиков и обновить лимиты.</li>
+            <li>Закрепить сроки эскалации ранних сигналов и обязательное согласование мер с владельцами процессов.</li>
+            <li>Синхронизировать связанные процедуры и обучение владельцев рисков.</li>
+          </ol>
+        </>
+      ),
+    });
+    setBusy(false);
+  }
+
   function dispatch(text: string) {
     const t = text.trim();
     push({ role: "user", text: t });
     const n = t.toLowerCase().replace(/[?!.,]/g, "").trim();
     if (n.includes("текущую ситуацию в компании")) runSituationDiscussion();
     else if (n.includes("продажах критичных товаров")) runSummaryClarify();
+    else if ((n.includes("стандарт") && (n.includes("расхожден") || n.includes("групп") || n.includes("компани"))) || n.includes("расхожден")) runStandardGap();
+    else if (n.includes("план доработки стандарт")) runStandardGapPlan();
     else if (n.includes("ген") && n.includes("директор") && n.includes("самиздат")) runDirector();
     else if (n.includes("gpu") || (n.includes("закупк") && n.includes("gpu"))) runGpu();
     else if (n.includes("что ты знаешь") || (n.includes("знаешь") && n.includes("компани"))) runCompany();
@@ -2455,6 +2609,7 @@ function CompanySummaryModal({
   onClose,
   onDiscuss,
   onClarify,
+  onOpenChat,
   onToast,
   focusOnTop,
   riskOnTop,
@@ -2469,6 +2624,7 @@ function CompanySummaryModal({
   onClose: () => void;
   onDiscuss: () => void;
   onClarify: () => void;
+  onOpenChat?: (question: string) => void;
   onToast: (m: string) => void;
   focusOnTop: boolean;
   riskOnTop: boolean;
@@ -2547,8 +2703,9 @@ function CompanySummaryModal({
 
 
   const focusSections = summary.sections.filter(
-    (s) => s.id !== "gaps" && s.focusPointId,
+    (s) => s.id !== "gaps" && s.id !== "risk-standard-gap" && s.focusPointId,
   );
+  const standardGap = summary.sections.find((s) => s.id === "risk-standard-gap");
 
   return (
     <div
@@ -2635,6 +2792,64 @@ function CompanySummaryModal({
                 </div>
               </div>
             </section>
+
+            {standardGap && (
+              <section className="np-summary-group">
+                <h2 className="np-summary-h2">Стандарт по управлению рисками</h2>
+                <div
+                  className="np-summary-island np-summary-standard-island"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => {
+                    if (standardGap.knowledgeTarget && onOpenKnowledge) {
+                      onOpenKnowledge(
+                        standardGap.knowledgeTarget.areaId,
+                        standardGap.knowledgeTarget.knowledgeId ?? null,
+                      );
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      if (standardGap.knowledgeTarget && onOpenKnowledge) {
+                        onOpenKnowledge(
+                          standardGap.knowledgeTarget.areaId,
+                          standardGap.knowledgeTarget.knowledgeId ?? null,
+                        );
+                      }
+                    }
+                  }}
+                >
+                  <div className="np-summary-standard-head">
+                    <span className="np-summary-tag np-summary-tag--red">
+                      {standardGap.title}
+                    </span>
+                    <span className="np-summary-focus-arrow" aria-hidden>→</span>
+                  </div>
+                  <h3 className="np-summary-detail-headline">{standardGap.headline}</h3>
+                  <p className="np-summary-detail-text">{standardGap.text}</p>
+                  {standardGap.actionText && (
+                    <p className="np-summary-standard-action">
+                      <strong>{standardGap.actionLabel}: </strong>
+                      {standardGap.actionText}
+                    </p>
+                  )}
+                  {renderSourceLine(standardGap)}
+                  {standardGap.secondaryChatQuestion && onOpenChat && (
+                    <button
+                      type="button"
+                      className="np-summary-standard-chat"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onOpenChat(standardGap.secondaryChatQuestion!);
+                      }}
+                    >
+                      {standardGap.secondaryLabel || "Обсудить с Нормом"}
+                    </button>
+                  )}
+                </div>
+              </section>
+            )}
 
             <section className="np-summary-group">
               <h2 className="np-summary-h2">Что сделать сейчас</h2>
@@ -2919,7 +3134,7 @@ const RISK_DETAIL_OVERRIDES: Record<string, Partial<RiskDetail>> = {
         "Три поставщика внесены в реестр банкротств за четыре часа. Под угрозой три договора на 84 млн ₽; у двух из трёх незадолго до банкротства сменились собственники. Сочетание сигналов может указывать на подготовленный вывод активов и требует одновременных действий по правовой защите и переключению поставок.",
       nextAction:
         "Начать подготовку исков по трём договорам и параллельно подтвердить альтернативных поставщиков.",
-      sourceIds: ["fp-supply-s0", "fp-supply-s1", "fp-supply-s2", "fp-supply-s3"],
+      sourceIds: ["fp-supply-s0", "fp-supply-s1", "fp-supply-s2", "fp-supply-s3", "src-group-risk-standard-2026"],
     },
   },
   "QNR-0187": {
@@ -4074,6 +4289,7 @@ export default function NormPrototype() {
           initialQuery={modalQuery}
           onClose={close}
           onToast={(m) => setToast(m)}
+          onOpenKnowledge={handleOpenKnowledge}
         />
       )}
       {focusIdx !== null && (
@@ -4133,6 +4349,11 @@ export default function NormPrototype() {
             setSummarySource(null);
             setSummaryOpen(false);
             openWith(COMPANY_SUMMARY.clarificationQuestion);
+          }}
+          onOpenChat={(q) => {
+            setSummarySource(null);
+            setSummaryOpen(false);
+            openWith(q);
           }}
           onToast={(m) => setToast(m)}
           focusOnTop={focusIdx !== null}
