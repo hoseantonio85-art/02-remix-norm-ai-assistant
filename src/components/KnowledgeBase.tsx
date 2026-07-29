@@ -143,11 +143,12 @@ function applyOverrides(k: UniversalKnowledge, ov?: SourceOverride): UniversalKn
 /* ---------- unified accordion ---------- */
 
 function KnowledgeAccordion({
-  k, defaultOpen, onOpenSources, forceOpen, flash,
+  k, defaultOpen, onOpenSources, onOpenChat, forceOpen, flash,
 }: {
   k: UniversalKnowledge;
   defaultOpen?: boolean;
   onOpenSources: (k: UniversalKnowledge) => void;
+  onOpenChat?: (q: string) => void;
   forceOpen?: boolean;
   flash?: boolean;
 }) {
@@ -224,7 +225,13 @@ function KnowledgeAccordion({
                     <button
                       type="button"
                       className="np-uv-alert-action"
-                      onClick={() => onOpenSources(k)}
+                      onClick={() => {
+                        if (a.action?.type === "open_chat" && onOpenChat) {
+                          onOpenChat(a.action.label);
+                        } else {
+                          onOpenSources(k);
+                        }
+                      }}
                     >
                       {a.action.label}
                     </button>
@@ -394,6 +401,7 @@ function AreaView({
                   k={k}
                   defaultOpen={i === 0}
                   onOpenSources={onOpenSources}
+                  onOpenChat={onOpenChat}
                   forceOpen={flashKnowledgeId === k.id}
                   flash={flashKnowledgeId === k.id}
                 />
