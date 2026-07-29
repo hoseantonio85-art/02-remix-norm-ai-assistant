@@ -401,6 +401,7 @@ function AreaView({
                   k={k}
                   defaultOpen={i === 0}
                   onOpenSources={onOpenSources}
+                  onOpenChat={onOpenChat}
                   forceOpen={flashKnowledgeId === k.id}
                   flash={flashKnowledgeId === k.id}
                 />
