@@ -225,7 +225,13 @@ function KnowledgeAccordion({
                     <button
                       type="button"
                       className="np-uv-alert-action"
-                      onClick={() => onOpenSources(k)}
+                      onClick={() => {
+                        if (a.action?.type === "open_chat" && onOpenChat) {
+                          onOpenChat(a.action.label);
+                        } else {
+                          onOpenSources(k);
+                        }
+                      }}
                     >
                       {a.action.label}
                     </button>
