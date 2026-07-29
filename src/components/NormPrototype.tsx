@@ -1764,9 +1764,34 @@ function AssistantModal({ initialQuery, onClose, onToast, onOpenKnowledge }: { i
     if (l.includes("риск оттока")) return runSummaryChurn();
     if (l.includes("ит-мер") || l.includes("ит меры") || l.includes("результат ит")) return runSummaryIt();
     if (l.includes("план доработки")) return runStandardGapPlan();
-    if (l.includes("стандарт") && (l.includes("расхожден") || l.includes("групп"))) return runStandardGap();
+    if (l.includes("стандарт")) return runStandardGap();
+    if (l.includes("gpu")) return runGpu();
+    if (l.includes("отток")) return runSummaryChurn();
     onToast("Этот переход будет добавлен позже");
   }
+
+  async function runSituationTriage() {
+    setBusy(true);
+    push({ role: "status", text: "Собираю картину по направлениям" });
+    await wait(700);
+    removeStatus();
+    push({
+      role: "assistant",
+      text:
+        "За ночь ситуация ухудшилась сразу по нескольким направлениям. Часть проблем требует решения уже сейчас, остальные нужно дополнительно проверить. Какую проблему обсудим?",
+    });
+    push({
+      role: "actions",
+      actions: [
+        { label: "Поставщики и договоры", onClick: () => continueDialog("Поставщики и договоры") },
+        { label: "Стандарт компании", onClick: () => continueDialog("Стандарт компании") },
+        { label: "Дефицит GPU", onClick: () => continueDialog("Дефицит GPU") },
+        { label: "Возможный отток клиентов", onClick: () => continueDialog("Возможный отток клиентов") },
+      ],
+    });
+    setBusy(false);
+  }
+
 
   async function runSituationDiscussion() {
     setBusy(true);
