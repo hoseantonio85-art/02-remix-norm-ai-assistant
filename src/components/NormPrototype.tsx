@@ -2749,159 +2749,104 @@ function CompanySummaryModal({
         <div className="np-company-summary-body">
           <div className="np-summary-single">
             <section className="np-summary-group">
-              <h2 className="np-summary-h2">Главное за 30 секунд</h2>
-              <div className="np-summary-island np-summary-lead-island">
-                <h3 className="np-summary-detail-headline">{summary.leadHeadline}</h3>
-                <ul className="np-summary-lead-bullets">
-                  {summary.leadBullets.map((b, i) => (
-                    <li key={i} className={`np-summary-lead-bullet np-summary-lead-bullet--${b.tone || "neutral"}`}>
-                      <span className="np-summary-lead-bullet-dot" aria-hidden />
-                      <div className="np-summary-lead-bullet-body">
-                        <div className="np-summary-lead-bullet-title">{b.title}</div>
-                        <div className="np-summary-lead-bullet-text">{b.text}</div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <h2 className="np-summary-h2">Что происходит</h2>
+              <p className="np-summary-narrative">
+                За ночь у компании сложилась связанная проблема в контрагентах и методологии. Три поставщика почти
+                одновременно попали в реестр банкротств: под угрозой договоры на 84&nbsp;млн&nbsp;₽ и непрерывность
+                поставок. Мера «Лимит на одного поставщика» сработала только частично — она не учитывает
+                совокупную зависимость от связанных контрагентов. Сверка с обновлённым Стандартом Группы подтвердила
+                этот пробел: Стандарт компании необходимо доработать. Отдельно запуск AI-продукта находится под
+                угрозой из-за дефицита GPU. Возможный отток клиентов в 12 городах пока требует проверки, а по
+                ИТ-сбоям наблюдается положительная динамика.
+              </p>
             </section>
 
             <section className="np-summary-group">
-              <h2 className="np-summary-h2">Риск-профиль</h2>
-              <div className="np-summary-island np-summary-risk-island">
-                <button
-                  type="button"
-                  className="np-summary-risk-chip np-summary-risk-chip--action"
-                  onClick={() => onOpenRisks({ filter: "high" })}
-                >
-                  <span className="np-summary-risk-num">{summary.meta.highRisks.value}</span>
-                  <span className="np-summary-risk-label">{summary.meta.highRisks.label}</span>
-                  <span className="np-summary-risk-arrow" aria-hidden>→</span>
-                </button>
-                <button
-                  type="button"
-                  className="np-summary-risk-chip np-summary-risk-chip--action"
-                  onClick={() => onOpenRisks({ filter: "withoutMeasures" })}
-                >
-                  <span className="np-summary-risk-num">{summary.meta.risksWithoutMeasures.value}</span>
-                  <span className="np-summary-risk-label">{summary.meta.risksWithoutMeasures.label}</span>
-                  <span className="np-summary-risk-arrow" aria-hidden>→</span>
-                </button>
-                <div className="np-summary-risk-chip np-summary-risk-chip--muted">
-                  <span className="np-summary-risk-label">Потери пока не рассчитаны</span>
-                </div>
-              </div>
-            </section>
-
-            {standardGap && (
-              <section className="np-summary-group">
-                <h2 className="np-summary-h2">Стандарт по управлению рисками</h2>
-                <div
-                  className="np-summary-island np-summary-standard-island"
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => {
-                    if (standardGap.knowledgeTarget && onOpenKnowledge) {
-                      onOpenKnowledge(
-                        standardGap.knowledgeTarget.areaId,
-                        standardGap.knowledgeTarget.knowledgeId ?? null,
-                      );
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      if (standardGap.knowledgeTarget && onOpenKnowledge) {
-                        onOpenKnowledge(
-                          standardGap.knowledgeTarget.areaId,
-                          standardGap.knowledgeTarget.knowledgeId ?? null,
-                        );
-                      }
-                    }
-                  }}
-                >
-                  <div className="np-summary-standard-head">
-                    <span className="np-summary-tag np-summary-tag--red">
-                      {standardGap.title}
-                    </span>
-                    <span className="np-summary-focus-arrow" aria-hidden>→</span>
-                  </div>
-                  <h3 className="np-summary-detail-headline">{standardGap.headline}</h3>
-                  <p className="np-summary-detail-text">{standardGap.text}</p>
-                  {standardGap.actionText && (
-                    <p className="np-summary-standard-action">
-                      <strong>{standardGap.actionLabel}: </strong>
-                      {standardGap.actionText}
-                    </p>
-                  )}
-                  {renderSourceLine(standardGap)}
-                  {standardGap.secondaryChatQuestion && onOpenChat && (
+              <h2 className="np-summary-h2">Проблемы</h2>
+              <ul className="np-summary-problems">
+                {[
+                  {
+                    key: "supply",
+                    title: "Три поставщика оказались на грани дефолта",
+                    text: "Под угрозой три договора на 84 млн ₽ и непрерывность поставок.",
+                    hint: "Открыть разбор",
+                    onOpen: () => onOpenFocus("fp-supply"),
+                  },
+                  {
+                    key: "standard",
+                    title: "Стандарт компании расходится с новым Стандартом Группы",
+                    text: "Не учтены три обязательных требования, включая совокупную зависимость от связанных поставщиков.",
+                    hint: "Открыть документ",
+                    onOpen: () => {
+                      if (onOpenKnowledge) onOpenKnowledge("regulation_risk_signals", "risk.company_risk_standard");
+                    },
+                  },
+                  {
+                    key: "gpu",
+                    title: "Запуск AI-продукта под угрозой из-за дефицита GPU",
+                    text: "Продукт анонсирован, но подтверждённого плана обеспечения мощностей нет.",
+                    hint: "Открыть разбор",
+                    onOpen: () => onOpenFocus("fp-gpu"),
+                  },
+                  {
+                    key: "delivery",
+                    title: "Возможен отток клиентов в 12 городах",
+                    text: "Сигнал обоснован, но снижение конверсии и повторных заказов пока не подтверждено.",
+                    hint: "Открыть разбор",
+                    onOpen: () => onOpenFocus("fp-delivery"),
+                  },
+                ].map((p) => (
+                  <li key={p.key}>
                     <button
                       type="button"
-                      className="np-summary-standard-chat"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onOpenChat(standardGap.secondaryChatQuestion!);
-                      }}
+                      className="np-summary-problem"
+                      onClick={p.onOpen}
                     >
-                      {standardGap.secondaryLabel || "Обсудить с Нормом"}
+                      <div className="np-summary-problem-body">
+                        <div className="np-summary-problem-title">{p.title}</div>
+                        <div className="np-summary-problem-text">{p.text}</div>
+                      </div>
+                      <span className="np-summary-problem-hint">
+                        {p.hint}
+                        <span aria-hidden> →</span>
+                      </span>
                     </button>
-                  )}
-                </div>
-              </section>
-            )}
-
-            <section className="np-summary-group">
-              <h2 className="np-summary-h2">Что сделать сейчас</h2>
-              <div className="np-summary-island np-summary-actions-island">
-                <ol className="np-summary-actions-list">
-                  <li>
-                    В течение трёх дней подтвердить резервных поставщиков и сроки
-                    переключения.
                   </li>
-                  <li>
-                    Получить данные о продажах, маржинальности и клиентской активности,
-                    чтобы рассчитать возможные потери.
-                  </li>
-                </ol>
-                <button
-                  type="button"
-                  className="np-focus-discuss np-summary-actions-discuss"
-                  onClick={onDiscuss}
-                >
-                  Обсудить с Нормом
-                </button>
-              </div>
+                ))}
+              </ul>
             </section>
 
             <section className="np-summary-group">
-              <h2 className="np-summary-h2">Фокусные точки</h2>
-              <div className="np-summary-focus-stack">
-                {focusSections.map((sec) => (
-                  <div
-                    key={sec.id}
-                    className={`np-summary-island np-summary-focus-island np-summary-focus-island--${sec.tone}`}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => onOpenFocus(sec.focusPointId!)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        onOpenFocus(sec.focusPointId!);
-                      }
-                    }}
-                  >
-                    <div className="np-summary-focus-head">
-                      <span className={`np-summary-tag np-summary-tag--${sec.tone}`}>
-                        {sec.title}
-                      </span>
-                      <span className="np-summary-focus-arrow" aria-hidden>→</span>
-                    </div>
-                    <p className="np-summary-detail-text">{sec.shortText || sec.text}</p>
-                    {renderSourceLine(sec)}
-                  </div>
+              <h2 className="np-summary-h2">Что делать в первую очередь</h2>
+              <ol className="np-summary-actions">
+                {[
+                  {
+                    key: "supply-act",
+                    text: "Подготовить исковые требования по трём договорам и проверить остатки и альтернативных поставщиков.",
+                    onOpen: () => onOpenFocus("fp-supply"),
+                  },
+                  {
+                    key: "standard-act",
+                    text: "Назначить владельца и срок доработки Стандарта компании.",
+                    onOpen: () => {
+                      if (onOpenKnowledge) onOpenKnowledge("regulation_risk_signals", "risk.company_risk_standard");
+                    },
+                  },
+                  {
+                    key: "gpu-act",
+                    text: "Согласовать потребность в GPU и способ закрытия дефицита до запуска AI-продукта.",
+                    onOpen: () => onOpenFocus("fp-gpu"),
+                  },
+                ].map((a, i) => (
+                  <li key={a.key}>
+                    <button type="button" className="np-summary-action" onClick={a.onOpen}>
+                      <span className="np-summary-action-num" aria-hidden>{i + 1}</span>
+                      <span className="np-summary-action-text">{a.text}</span>
+                      <span className="np-summary-action-arrow" aria-hidden>→</span>
+                    </button>
+                  </li>
                 ))}
-              </div>
+              </ol>
             </section>
           </div>
         </div>
