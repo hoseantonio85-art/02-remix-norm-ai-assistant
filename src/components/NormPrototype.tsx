@@ -3079,7 +3079,7 @@ const RISK_DETAIL_OVERRIDES: Record<string, Partial<RiskDetail>> = {
         "Три поставщика внесены в реестр банкротств за четыре часа. Под угрозой три договора на 84 млн ₽; у двух из трёх незадолго до банкротства сменились собственники. Сочетание сигналов может указывать на подготовленный вывод активов и требует одновременных действий по правовой защите и переключению поставок.",
       nextAction:
         "Начать подготовку исков по трём договорам и параллельно подтвердить альтернативных поставщиков.",
-      sourceIds: ["fp-supply-s0", "fp-supply-s1", "fp-supply-s2", "fp-supply-s3", "src-group-risk-standard-2026"],
+      sourceIds: ["fp-supply-s0", "fp-supply-s1", "fp-supply-s2", "fp-supply-s3", "src-group-risk-standard-2026", "src-company-risk-standard"],
     },
   },
   "QNR-0187": {
