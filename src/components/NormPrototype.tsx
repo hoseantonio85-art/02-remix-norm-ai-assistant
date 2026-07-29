@@ -1900,22 +1900,12 @@ function AssistantModal({ initialQuery, onClose, onToast, onOpenKnowledge }: { i
       role: "actions",
       actions: [
         {
-          label: "Открыть Стандарт компании в базе знаний",
+          label: "Открыть сравнение стандартов в базе знаний",
           onClick: () => {
             if (onOpenKnowledge) {
               onOpenKnowledge("regulation_risk_signals", "risk.company_risk_standard");
             } else {
               onToast("База знаний недоступна в этом контексте");
-            }
-          },
-        },
-        {
-          label: "Открыть Стандарт Группы",
-          onClick: () => {
-            if (onOpenKnowledge) {
-              onOpenKnowledge("regulation_risk_signals", "risk.company_risk_standard");
-            } else {
-              onToast("Открытие документа в этом прототипе пока не реализовано");
             }
           },
         },
