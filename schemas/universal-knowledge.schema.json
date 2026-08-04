@@ -1,0 +1,360 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://norm.example/schemas/universal-knowledge/2.0",
+  "title": "НОРМ — универсальный профиль знаний",
+  "description": "Единый контракт данных для девяти областей профиля компании. Входные форматы обязаны преобразовываться к этой структуре до отображения.",
+  "type": "array",
+  "minItems": 9,
+  "maxItems": 9,
+  "items": { "$ref": "#/$defs/universalArea" },
+  "allOf": [
+    { "contains": { "type": "object", "properties": { "id": { "const": "general_information" } }, "required": ["id"] } },
+    { "contains": { "type": "object", "properties": { "id": { "const": "structure_management" } }, "required": ["id"] } },
+    { "contains": { "type": "object", "properties": { "id": { "const": "owners_relations" } }, "required": ["id"] } },
+    { "contains": { "type": "object", "properties": { "id": { "const": "products_business_model" } }, "required": ["id"] } },
+    { "contains": { "type": "object", "properties": { "id": { "const": "operations" } }, "required": ["id"] } },
+    { "contains": { "type": "object", "properties": { "id": { "const": "it_data_technology" } }, "required": ["id"] } },
+    { "contains": { "type": "object", "properties": { "id": { "const": "finance" } }, "required": ["id"] } },
+    { "contains": { "type": "object", "properties": { "id": { "const": "regulation_risk_signals" } }, "required": ["id"] } },
+    { "contains": { "type": "object", "properties": { "id": { "const": "counterparties" } }, "required": ["id"] } }
+  ],
+  "$defs": {
+    "universalArea": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "knowledge"],
+      "properties": {
+        "id": {
+          "enum": [
+            "general_information",
+            "structure_management",
+            "owners_relations",
+            "products_business_model",
+            "operations",
+            "it_data_technology",
+            "finance",
+            "regulation_risk_signals",
+            "counterparties"
+          ]
+        },
+        "title": { "type": "string", "minLength": 1 },
+        "description": { "type": ["string", "null"] },
+        "knowledge": { "type": "array", "items": { "$ref": "#/$defs/universalKnowledge" } }
+      }
+    },
+    "knowledgeState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "label"],
+      "properties": {
+        "code": { "enum": ["known", "partial", "known_empty", "unknown", "not_applicable", "conflicting"] },
+        "label": { "type": "string", "minLength": 1 },
+        "reason": { "type": ["string", "null"] }
+      }
+    },
+    "format": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "enum": ["text", "identifier", "money", "percentage", "date", "datetime", "number", "duration"] },
+        "currency": { "type": ["string", "null"] },
+        "unit": { "type": ["string", "null"] },
+        "decimals": { "type": ["integer", "null"], "minimum": 0 },
+        "datePattern": { "type": ["string", "null"] },
+        "timezone": { "type": ["string", "null"] },
+        "prefix": { "type": ["string", "null"] },
+        "suffix": { "type": ["string", "null"] },
+        "trueLabel": { "type": ["string", "null"] },
+        "falseLabel": { "type": ["string", "null"] }
+      }
+    },
+    "sourceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceId"],
+      "properties": {
+        "sourceId": { "type": "string", "minLength": 1 },
+        "quote": { "type": ["string", "null"] },
+        "locator": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "page": { "type": ["integer", "null"], "minimum": 1 },
+            "section": { "type": ["string", "null"] },
+            "field": { "type": ["string", "null"] },
+            "dataset": { "type": ["string", "null"] },
+            "recordId": { "type": ["string", "null"] },
+            "sheet": { "type": ["string", "null"] },
+            "range": { "type": ["string", "null"] }
+          }
+        }
+      }
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "type": "string", "minLength": 1 },
+        "id": { "type": ["string", "null"] },
+        "name": { "type": ["string", "null"] }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "actualAt": { "type": ["string", "null"] },
+        "validFrom": { "type": ["string", "null"] },
+        "validityTo": { "type": ["string", "null"] },
+        "freshness": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["code", "label"],
+          "properties": {
+            "code": { "type": ["string", "null"] },
+            "label": { "type": ["string", "null"] },
+            "reason": { "type": ["string", "null"] }
+          }
+        },
+        "origin": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "name"],
+          "properties": {
+            "type": { "type": ["string", "null"] },
+            "name": { "type": ["string", "null"] }
+          }
+        },
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": { "type": ["string", "null"] },
+            "id": { "type": ["string", "null"] },
+            "label": { "type": ["string", "null"] }
+          }
+        },
+        "sourceEvidence": { "type": "array", "items": { "$ref": "#/$defs/sourceReference" } },
+        "confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "riskRelevanceScore": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "access": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "classification": { "type": ["string", "null"] },
+            "containsPersonalData": { "type": "boolean" }
+          }
+        },
+        "createdAt": { "type": ["string", "null"] },
+        "updatedAt": { "type": ["string", "null"] },
+        "createdBy": { "anyOf": [{ "$ref": "#/$defs/actor" }, { "type": "null" }] },
+        "updatedBy": { "anyOf": [{ "$ref": "#/$defs/actor" }, { "type": "null" }] },
+        "raw": { "type": ["object", "null"], "additionalProperties": true }
+      }
+    },
+    "status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "label"],
+      "properties": {
+        "code": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 1 },
+        "tone": { "type": ["string", "null"] }
+      }
+    },
+    "tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "label"],
+      "properties": {
+        "code": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 1 },
+        "tone": { "type": ["string", "null"] }
+      }
+    },
+    "link": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "url"],
+      "properties": {
+        "label": { "type": "string", "minLength": 1 },
+        "url": { "type": "string", "minLength": 1 }
+      }
+    },
+    "collection": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "totalCount": { "type": ["integer", "null"], "minimum": 0 },
+        "loadedCount": { "type": ["integer", "null"], "minimum": 0 },
+        "truncated": { "type": "boolean" },
+        "nextCursor": { "type": ["string", "null"] }
+      }
+    },
+    "knowledgeNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "key", "valueType"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "key": { "type": "string", "minLength": 1 },
+        "label": { "type": ["string", "null"] },
+        "semanticRole": { "enum": ["value", "summary", "attribute", "item", "group", null] },
+        "valueType": { "enum": ["string", "text", "number", "boolean", "date", "datetime", "enum", "url", "object", "array"] },
+        "value": { "type": ["string", "number", "boolean", "null"] },
+        "displayValue": { "type": ["string", "null"] },
+        "enumLabels": { "type": "object", "additionalProperties": { "type": "string" } },
+        "children": { "type": "array", "items": { "$ref": "#/$defs/knowledgeNode" } },
+        "state": { "$ref": "#/$defs/knowledgeState" },
+        "format": { "anyOf": [{ "$ref": "#/$defs/format" }, { "type": "null" }] },
+        "metadata": { "anyOf": [{ "$ref": "#/$defs/metadata" }, { "type": "null" }] },
+        "status": { "anyOf": [{ "$ref": "#/$defs/status" }, { "type": "null" }] },
+        "tags": { "type": "array", "items": { "$ref": "#/$defs/tag" } },
+        "links": { "type": "array", "items": { "$ref": "#/$defs/link" } },
+        "collection": { "anyOf": [{ "$ref": "#/$defs/collection" }, { "type": "null" }] }
+      },
+      "allOf": [
+        {
+          "if": { "type": "object", "properties": { "valueType": { "enum": ["object", "array"] } }, "required": ["valueType"] },
+          "then": {
+            "required": ["children"],
+            "properties": { "children": { "type": "array", "items": { "$ref": "#/$defs/knowledgeNode" } } }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "valueType": { "const": "array" },
+              "children": { "type": "array", "maxItems": 0 }
+            },
+            "required": ["valueType", "children"]
+          },
+          "then": {
+            "required": ["state"],
+            "properties": {
+              "state": {
+                "type": "object",
+                "properties": { "code": { "enum": ["known_empty", "unknown", "not_applicable"] } },
+                "required": ["code"]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "knowledgeSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "name"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "type": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "dataset": { "type": ["string", "null"] },
+        "documentId": { "type": ["string", "null"] },
+        "documentName": { "type": ["string", "null"] },
+        "fileName": { "type": ["string", "null"] },
+        "mimeType": { "type": ["string", "null"] },
+        "downloadUrl": { "type": ["string", "null"] },
+        "url": { "type": ["string", "null"] },
+        "official": { "type": "boolean" },
+        "actualAt": { "type": ["string", "null"] },
+        "receivedAt": { "type": ["string", "null"] }
+      }
+    },
+    "derivation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "basedOnKnowledgeIds"],
+      "properties": {
+        "method": { "type": "string", "minLength": 1 },
+        "basedOnKnowledgeIds": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "formula": { "type": ["string", "null"] },
+        "model": { "type": ["string", "null"] },
+        "generatedAt": { "type": ["string", "null"] }
+      }
+    },
+    "alert": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "code", "severity", "message"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "code": { "type": "string", "minLength": 1 },
+        "severity": { "type": "string", "minLength": 1 },
+        "message": { "type": "string", "minLength": 1 },
+        "targetItemId": { "type": ["string", "null"] },
+        "action": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["type", "label"],
+              "properties": {
+                "type": { "type": "string", "minLength": 1 },
+                "label": { "type": "string", "minLength": 1 },
+                "targetItemId": { "type": ["string", "null"] }
+              }
+            },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "id": { "type": ["string", "null"] },
+        "type": { "type": "string", "minLength": 1 },
+        "targetAreaId": { "type": ["string", "null"] },
+        "targetKnowledgeId": { "type": ["string", "null"] },
+        "targetObjectType": { "type": ["string", "null"] },
+        "targetObjectId": { "type": ["string", "null"] },
+        "label": { "type": ["string", "null"] },
+        "description": { "type": ["string", "null"] }
+      }
+    },
+    "universalKnowledge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "id", "areaId", "key", "title", "epistemicKind", "state", "content"],
+      "properties": {
+        "schemaVersion": { "const": "2.0" },
+        "id": { "type": "string", "minLength": 1 },
+        "areaId": { "type": "string", "minLength": 1 },
+        "key": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "description": { "type": ["string", "null"] },
+        "epistemicKind": { "enum": ["fact", "calculation", "observation", "conclusion", "hypothesis"] },
+        "derivation": { "anyOf": [{ "$ref": "#/$defs/derivation" }, { "type": "null" }] },
+        "state": { "$ref": "#/$defs/knowledgeState" },
+        "required": { "type": "boolean" },
+        "coverageWeight": { "type": "number", "minimum": 0 },
+        "order": { "type": "integer" },
+        "content": { "$ref": "#/$defs/knowledgeNode" },
+        "metadata": { "anyOf": [{ "$ref": "#/$defs/metadata" }, { "type": "null" }] },
+        "sources": { "type": "array", "items": { "$ref": "#/$defs/knowledgeSource" } },
+        "tags": { "type": "array", "items": { "$ref": "#/$defs/tag" } },
+        "alerts": { "type": "array", "items": { "$ref": "#/$defs/alert" } },
+        "relations": { "type": "array", "items": { "$ref": "#/$defs/relation" } }
+      },
+      "allOf": [
+        {
+          "if": {
+            "type": "object",
+            "properties": { "epistemicKind": { "enum": ["calculation", "observation", "conclusion", "hypothesis"] } },
+            "required": ["epistemicKind"]
+          },
+          "then": {
+            "required": ["derivation"],
+            "properties": { "derivation": { "$ref": "#/$defs/derivation" } }
+          }
+        }
+      ]
+    }
+  }
+}

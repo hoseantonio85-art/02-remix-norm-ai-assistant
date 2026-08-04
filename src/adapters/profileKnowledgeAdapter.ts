@@ -13,6 +13,7 @@ import type {
   UniversalKnowledgeAlert,
   UniversalKnowledgeTag,
   KnowledgeValueType,
+  UniversalArea,
 } from "../types/universalKnowledge";
 
 type StateCode =
@@ -21,13 +22,6 @@ type StateCode =
 function coerceState(s: { code: string; label: string } | undefined) {
   if (!s) return { code: "unknown" as StateCode, label: "Пока неизвестно" };
   return { code: (s.code as StateCode) || ("unknown" as StateCode), label: s.label };
-}
-
-export interface UniversalArea {
-  id: string;
-  title: string;
-  description?: string | null;
-  knowledge: UniversalKnowledge[];
 }
 
 /* ---------- audit counters (dev only) ---------- */
@@ -133,7 +127,14 @@ function attributeToNode(a: Attribute, item: KnowledgeItem): KnowledgeNode {
   };
 }
 
-function itemToNode(item: KnowledgeItem): KnowledgeNode {
+function itemToNode(item: KnowledgeItem, parentId?: string, childIndex = 0): KnowledgeNode {
+  // Some early prototype records used the universal child shape (key/label)
+  // inside the legacy item shape (id/title). Normalize both without losing data.
+  const legacyItem = item as KnowledgeItem & { key?: string; label?: string };
+  const itemKey = legacyItem.key || item.id || `item_${childIndex}`;
+  const itemId = item.id || `${parentId || "item"}.${itemKey.replace(/[^a-zа-я0-9_-]+/gi, "_")}`;
+  const itemTitle = item.title || legacyItem.label || itemKey;
+  const normalizedItem = { ...item, id: itemId, title: itemTitle };
   if (AUDIT) AUDIT.itemsConverted += 1;
   const attrs = (item.attributes || []).filter((a) => !isEmpty(a.value));
   const kids = item.children || [];
@@ -165,9 +166,9 @@ function itemToNode(item: KnowledgeItem): KnowledgeNode {
   ) {
     const v = item.value as string | number;
     return {
-      id: item.id,
-      key: item.id,
-      label: item.title,
+      id: itemId,
+      key: itemKey,
+      label: itemTitle,
       valueType: primitiveTypeFor(v),
       value: typeof v === "number" ? v : String(v),
       children: [],
@@ -185,7 +186,7 @@ function itemToNode(item: KnowledgeItem): KnowledgeNode {
   if (hasValue && !valueMatchesAttr) {
     const v = item.value as string | number;
     children.push({
-      id: `${item.id}.__value`,
+      id: `${itemId}.__value`,
       key: "value",
       label: null,
       valueType: primitiveTypeFor(v),
@@ -195,7 +196,7 @@ function itemToNode(item: KnowledgeItem): KnowledgeNode {
   }
   if (hasDescription) {
     children.push({
-      id: `${item.id}.__description`,
+      id: `${itemId}.__description`,
       key: "description",
       label: attrs.length === 0 && kids.length === 0 ? null : "Описание",
       valueType: "text",
@@ -203,13 +204,13 @@ function itemToNode(item: KnowledgeItem): KnowledgeNode {
       children: [],
     });
   }
-  for (const a of attrs) children.push(attributeToNode(a, item));
-  for (const c of kids) children.push(itemToNode(c));
+  for (const a of attrs) children.push(attributeToNode(a, normalizedItem));
+  for (const [index, child] of kids.entries()) children.push(itemToNode(child, itemId, index));
 
   return {
-    id: item.id,
-    key: item.id,
-    label: item.title,
+    id: itemId,
+    key: itemKey,
+    label: itemTitle,
     valueType: "object",
     children,
     status,
@@ -298,11 +299,13 @@ export function normalizeKnowledge(k: Knowledge): UniversalKnowledge {
   }
 
   return {
+    schemaVersion: "2.0",
     id: k.id,
     areaId: k.area_id,
     key: k.id,
     title: k.title,
     description: k.summary ?? null,
+    epistemicKind: "fact",
     state: coerceState(k.state),
     content,
     metadata: {
@@ -318,6 +321,7 @@ export function normalizeKnowledge(k: Knowledge): UniversalKnowledge {
     sources: normalizeSources(k),
     tags: collectTags(k),
     alerts: normalizeAlerts(k),
+    relations: [],
   };
 }
 

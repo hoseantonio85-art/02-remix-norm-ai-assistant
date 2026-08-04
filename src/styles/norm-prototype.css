@@ -1195,6 +1195,36 @@
 .np-uv-menu:hover { background: #f3f4f6; color: #111827; }
 
 .np-uv-value { font-weight: 500; color: #111827; }
+.np-uv-primitive { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.np-uv-own-value {
+  padding: 8px 10px;
+  border-left: 3px solid var(--np-mint-strong, #109680);
+  border-radius: 0 8px 8px 0;
+  background: #f0fdf9;
+}
+
+.np-uv-state {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+  width: fit-content; padding: 6px 10px; border-radius: 8px;
+  font-size: 13px; color: #475569; background: #f1f5f9;
+}
+.np-uv-state--known_empty { color: #166534; background: #ecfdf5; }
+.np-uv-state--unknown { color: #92400e; background: #fffbeb; }
+.np-uv-state--not_applicable { color: #64748b; background: #f8fafc; }
+.np-uv-state-reason { font-size: 12px; color: inherit; opacity: .82; }
+
+.np-uv-meta { display: inline-block; font-size: 12px; color: #64748b; }
+.np-uv-meta > summary {
+  display: inline; cursor: pointer; color: #047857; font-weight: 600;
+  list-style: none;
+}
+.np-uv-meta > summary::-webkit-details-marker { display: none; }
+.np-uv-meta-panel {
+  display: grid; gap: 5px; min-width: 220px; margin-top: 6px;
+  padding: 8px 10px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fff;
+}
+.np-uv-meta-row { display: flex; justify-content: space-between; gap: 12px; }
+.np-uv-meta-row strong { color: #334155; font-weight: 500; text-align: right; }
 
 .np-uv-text { display: flex; flex-direction: column; gap: 6px; }
 .np-uv-text-body {
@@ -1249,6 +1279,7 @@
 }
 
 .np-uv-array { display: flex; flex-direction: column; gap: 8px; }
+.np-uv-collection-status { font-size: 12px; color: #64748b; }
 .np-uv-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
 .np-uv-list-item {
   padding: 6px 0;

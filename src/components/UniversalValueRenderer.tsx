@@ -1,92 +1,145 @@
 import { useState } from "react";
-import type { KnowledgeNode, KnowledgeFormat } from "../types/universalKnowledge";
+import type {
+  KnowledgeFormat,
+  KnowledgeMetadata,
+  KnowledgeNode,
+} from "../types/universalKnowledge";
 
 const MONTHS_RU = [
   "января", "февраля", "марта", "апреля", "мая", "июня",
   "июля", "августа", "сентября", "октября", "ноября", "декабря",
 ];
 
-function formatDate(iso: string): string {
-  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
-  if (!m) return iso;
-  const d = parseInt(m[3], 10);
-  const mo = parseInt(m[2], 10) - 1;
-  if (mo < 0 || mo > 11) return iso;
-  return `${d} ${MONTHS_RU[mo]} ${m[1]}`;
+interface DateParts {
+  year: string;
+  month: string;
+  day: string;
+  hour?: string;
+  minute?: string;
+  second?: string;
 }
 
-function formatPrimitive(node: KnowledgeNode): string {
+function parseDateParts(value: string): DateParts | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})(?:[T\s](\d{2}):(\d{2})(?::(\d{2}))?)?/.exec(value);
+  if (!match) return null;
+  return {
+    year: match[1], month: match[2], day: match[3],
+    hour: match[4], minute: match[5], second: match[6],
+  };
+}
+
+function applyDatePattern(parts: DateParts, pattern: string): string {
+  const monthIndex = Number(parts.month) - 1;
+  const replacements: Record<string, string> = {
+    YYYY: parts.year,
+    MMMM: MONTHS_RU[monthIndex] || parts.month,
+    MM: parts.month,
+    DD: parts.day,
+    HH: parts.hour || "00",
+    mm: parts.minute || "00",
+    ss: parts.second || "00",
+  };
+  return Object.entries(replacements).reduce(
+    (result, [token, replacement]) => result.replaceAll(token, replacement),
+    pattern,
+  );
+}
+
+function formatDate(value: string, format?: KnowledgeFormat): string {
+  const parts = parseDateParts(value);
+  if (!parts) return value;
+  if (format?.datePattern) return applyDatePattern(parts, format.datePattern);
+  const monthIndex = Number(parts.month) - 1;
+  return `${Number(parts.day)} ${MONTHS_RU[monthIndex] || parts.month} ${parts.year}`;
+}
+
+function formatDateTime(value: string, format?: KnowledgeFormat): string {
+  const parts = parseDateParts(value);
+  if (!parts) return value;
+  if (format?.datePattern) return applyDatePattern(parts, format.datePattern);
+  const date = formatDate(value);
+  const time = parts.hour && parts.minute
+    ? `${parts.hour}:${parts.minute}${parts.second ? `:${parts.second}` : ""}`
+    : "";
+  const timezone = format?.timezone ? ` (${format.timezone})` : "";
+  return time ? `${date}, ${time}${timezone}` : date;
+}
+
+export function formatNodeValue(node: KnowledgeNode): string {
   if (node.displayValue) return node.displayValue;
-  const v = node.value;
-  if (v === null || v === undefined || v === "") return "";
-  const f: KnowledgeFormat | undefined = node.format || undefined;
-  if (typeof v === "boolean") return v ? "Да" : "Нет";
-  if (node.valueType === "date" || node.valueType === "datetime" || f?.kind === "date") {
-    return formatDate(String(v));
+  const value = node.value;
+  if (value === null || value === undefined || value === "") return "";
+  const format = node.format || undefined;
+  if (node.valueType === "enum") {
+    return node.enumLabels?.[String(value)] || String(value);
   }
-  if (f?.kind === "money" && typeof v === "number") {
+  if (typeof value === "boolean") {
+    return value
+      ? format?.trueLabel || "Да"
+      : format?.falseLabel || "Нет";
+  }
+  if (node.valueType === "datetime" || format?.kind === "datetime") {
+    return formatDateTime(String(value), format);
+  }
+  if (node.valueType === "date" || format?.kind === "date") {
+    return formatDate(String(value), format);
+  }
+  if (format?.kind === "money" && typeof value === "number") {
     try {
       return new Intl.NumberFormat("ru-RU", {
         style: "currency",
-        currency: f.currency || "RUB",
-        maximumFractionDigits: f.decimals ?? 0,
-        minimumFractionDigits: 0,
-      }).format(v);
+        currency: format.currency || "RUB",
+        maximumFractionDigits: format.decimals ?? 0,
+        minimumFractionDigits: format.decimals ?? 0,
+      }).format(value);
     } catch {
-      return String(v);
+      return String(value);
     }
   }
-  if (f?.kind === "percentage") {
-    return `${v}${f.suffix ?? "%"}`;
+  if (format?.kind === "percentage") {
+    return `${value}${format.suffix ?? "%"}`;
   }
-  if (f?.kind === "number" && typeof v === "number") {
-    const s = new Intl.NumberFormat("ru-RU", {
-      maximumFractionDigits: f.decimals ?? 0,
-    }).format(v);
-    return f.unit ? `${s} ${f.unit}` : s;
+  if (format?.kind === "number" && typeof value === "number") {
+    const formatted = new Intl.NumberFormat("ru-RU", {
+      maximumFractionDigits: format.decimals ?? 0,
+      minimumFractionDigits: format.decimals ?? 0,
+    }).format(value);
+    return format.unit ? `${formatted} ${format.unit}` : formatted;
   }
-  if (f?.kind === "identifier") return String(v);
-  let s = String(v);
-  if (f?.prefix) s = f.prefix + s;
-  if (f?.suffix) s = s + f.suffix;
-  return s;
+  let result = String(value);
+  if (format?.prefix) result = format.prefix + result;
+  if (format?.suffix) result += format.suffix;
+  return result;
+}
+
+function hasOwnValue(node: KnowledgeNode): boolean {
+  return node.displayValue != null && node.displayValue !== "" ||
+    node.value !== null && node.value !== undefined && node.value !== "";
 }
 
 function isNodeEmpty(node: KnowledgeNode): boolean {
-  const code = node.state?.code;
-  if (code === "known_empty") return false;
-  if (code === "unknown" || code === "not_applicable") return true;
-  const v = node.value;
+  if (node.state) return false;
+  if (hasOwnValue(node)) return false;
   if (node.valueType === "object" || node.valueType === "array") {
-    const kids = (node.children || []).filter((c) => !shouldHideNode(c));
-    return kids.length === 0;
+    return (node.children || []).every(shouldHideNode);
   }
-  if (v === null || v === undefined) return true;
-  if (typeof v === "string" && v.trim() === "") return true;
-  return false;
+  return true;
 }
 
+/** Explicit completeness states are visible; only truly absent untyped data is hidden. */
 export function shouldHideNode(node: KnowledgeNode): boolean {
-  const code = node.state?.code;
-  if (code === "known_empty") return false;
-  if (code === "unknown" || code === "not_applicable") return true;
   return isNodeEmpty(node);
 }
 
-/* ---------- badge selection ----------
- * Rule: at most ONE visual badge per node.
- * Priority: status (any) > meaningful tag. Classification tags are hidden.
- * When status is present, tags are hidden to avoid duplication.
- */
 const CLASSIFICATION_LABEL_RE =
   /^(юридическое лицо|физическое лицо|дочерняя компания|учредитель|руководитель|поставщик|клиент|компания|действующая?|действующий( учредитель| руководитель)?)$/i;
 
 const CLASSIFICATION_CODE_RE =
   /^(legal_entity|individual|subsidiary|founder|director|manager|supplier|client|company|active(_founder|_director|_manager|_company)?|entity_type|role_.*|kind_.*|type_.*)$/i;
 
-function isClassificationTag(t: { code: string; label: string }): boolean {
-  return CLASSIFICATION_CODE_RE.test(t.code || "") ||
-    CLASSIFICATION_LABEL_RE.test((t.label || "").trim());
+function isClassificationTag(tag: { code: string; label: string }): boolean {
+  return CLASSIFICATION_CODE_RE.test(tag.code || "") ||
+    CLASSIFICATION_LABEL_RE.test((tag.label || "").trim());
 }
 
 export function getPrimaryNodeBadge(
@@ -95,14 +148,12 @@ export function getPrimaryNodeBadge(
   if (node.status) {
     return { label: node.status.label, tone: node.status.tone || "neutral" };
   }
-  const tags = (node.tags || []).filter((t) => !isClassificationTag(t));
+  const tags = (node.tags || []).filter((tag) => !isClassificationTag(tag));
   if (tags.length > 0) return { label: tags[0].label, tone: tags[0].tone || "neutral" };
   return null;
 }
 
-/** Public type alias for parent contexts */
 export type RendererCtx = {
-  /** title of the enclosing card; if a node's label matches, skip dup label */
   parentTitle?: string | null;
 };
 
@@ -118,9 +169,7 @@ export function UniversalValueRenderer({
   suppressOwnMeta?: boolean;
 }) {
   if (shouldHideNode(node)) return null;
-  if (node.state?.code === "known_empty" && (node.valueType === "object" || node.valueType === "array")) {
-    return <div className="np-uv-empty">Не выявлено</div>;
-  }
+  if (isStateOnly(node)) return <StateNotice node={node} />;
   if (node.valueType === "object") {
     return <ObjectRenderer node={node} depth={depth} parentTitle={parentTitle} suppressOwnMeta={suppressOwnMeta} />;
   }
@@ -130,17 +179,51 @@ export function UniversalValueRenderer({
   if (node.valueType === "text") {
     return <TextRenderer node={node} />;
   }
-  // primitive — value only (label handled by parent)
-  const text = formatPrimitive(node);
-  return <span className="np-uv-value">{text || "—"}</span>;
+  return <PrimitiveRenderer node={node} />;
+}
+
+function isStateOnly(node: KnowledgeNode): boolean {
+  const code = node.state?.code;
+  if (!code || !["known_empty", "unknown", "not_applicable"].includes(code)) return false;
+  const visibleChildren = (node.children || []).filter((child) => !shouldHideNode(child));
+  return !hasOwnValue(node) && visibleChildren.length === 0;
+}
+
+function StateNotice({ node }: { node: KnowledgeNode }) {
+  const code = node.state?.code || "unknown";
+  const fallback = code === "known_empty" ? "Не выявлено"
+    : code === "not_applicable" ? "Неприменимо"
+    : "Пока неизвестно";
+  return (
+    <div className={`np-uv-state np-uv-state--${code}`}>
+      <span>{node.state?.label || fallback}</span>
+      {node.state?.reason && <span className="np-uv-state-reason">{node.state.reason}</span>}
+    </div>
+  );
+}
+
+function PrimitiveRenderer({ node }: { node: KnowledgeNode }) {
+  const text = formatNodeValue(node) || "—";
+  const value = node.value == null ? "" : String(node.value);
+  const safeUrl = node.valueType === "url" && /^https?:\/\//i.test(value);
+  return (
+    <span className="np-uv-primitive">
+      {safeUrl ? (
+        <a className="np-uv-link" href={value} target="_blank" rel="noreferrer">{text}</a>
+      ) : (
+        <span className="np-uv-value">{text}</span>
+      )}
+      <NodeMetadata metadata={node.metadata} />
+    </span>
+  );
 }
 
 function NodeBadge({ node }: { node: KnowledgeNode }) {
-  const b = getPrimaryNodeBadge(node);
-  if (!b) return null;
+  const badge = getPrimaryNodeBadge(node);
+  if (!badge) return null;
   return (
     <div className="np-uv-status-row">
-      <span className={`np-uv-status np-uv-status--${b.tone}`}>{b.label}</span>
+      <span className={`np-uv-status np-uv-status--${badge.tone}`}>{badge.label}</span>
     </div>
   );
 }
@@ -149,32 +232,79 @@ function NodeLinks({ node }: { node: KnowledgeNode }) {
   if (!node.links || node.links.length === 0) return null;
   return (
     <div className="np-uv-links">
-      {node.links.map((l, i) => (
-        <a key={i} className="np-uv-link" href={l.url} target="_blank" rel="noreferrer">
-          {l.label}
+      {node.links.map((link) => (
+        <a key={`${link.url}:${link.label}`} className="np-uv-link" href={link.url} target="_blank" rel="noreferrer">
+          {link.label}
         </a>
       ))}
     </div>
   );
 }
 
+function metadataRows(metadata?: KnowledgeMetadata | null): Array<[string, string]> {
+  if (!metadata) return [];
+  const rows: Array<[string, string]> = [];
+  if (metadata.actualAt) rows.push(["Актуально на", formatDateTime(metadata.actualAt)]);
+  if (metadata.validFrom) rows.push(["Действует с", formatDateTime(metadata.validFrom)]);
+  if (metadata.validityTo) rows.push(["Действует до", formatDateTime(metadata.validityTo)]);
+  if (metadata.origin?.name || metadata.origin?.type) {
+    rows.push(["Происхождение", metadata.origin.name || metadata.origin.type || ""]);
+  }
+  if (metadata.confidence != null) rows.push(["Уверенность", `${Math.round(metadata.confidence * 100)}%`]);
+  if (metadata.riskRelevanceScore != null) {
+    rows.push(["Значимость для риска", `${Math.round(metadata.riskRelevanceScore * 100)}%`]);
+  }
+  if (metadata.sourceEvidence?.length) {
+    rows.push(["Подтверждения", String(metadata.sourceEvidence.length)]);
+  }
+  if (metadata.access?.classification) rows.push(["Доступ", metadata.access.classification]);
+  return rows.filter(([, value]) => value !== "");
+}
+
+function NodeMetadata({ metadata }: { metadata?: KnowledgeMetadata | null }) {
+  const rows = metadataRows(metadata);
+  if (rows.length === 0) return null;
+  return (
+    <details className="np-uv-meta">
+      <summary>О данных</summary>
+      <div className="np-uv-meta-panel">
+        {rows.map(([label, value]) => (
+          <div key={label} className="np-uv-meta-row">
+            <span>{label}</span><strong>{value}</strong>
+          </div>
+        ))}
+      </div>
+    </details>
+  );
+}
+
 function TextRenderer({ node }: { node: KnowledgeNode }) {
   const [expanded, setExpanded] = useState(false);
-  const v = node.displayValue || (node.value == null ? "" : String(node.value));
-  if (!v) return null;
-  const long = v.length > 320;
+  const value = formatNodeValue(node);
+  if (!value) return <StateNotice node={node} />;
+  const long = value.length > 320;
   return (
     <div className="np-uv-text">
-      <p className={`np-uv-text-body ${long && !expanded ? "is-clamped" : ""}`}>{v}</p>
+      <p className={`np-uv-text-body ${long && !expanded ? "is-clamped" : ""}`}>{value}</p>
       {long && (
-        <button
-          type="button"
-          className="np-uv-link"
-          onClick={() => setExpanded((e) => !e)}
-        >
+        <button type="button" className="np-uv-link" onClick={() => setExpanded((current) => !current)}>
           {expanded ? "Свернуть" : "Показать полностью"}
         </button>
       )}
+      <NodeMetadata metadata={node.metadata} />
+    </div>
+  );
+}
+
+function CompositeOwnValue({ node }: { node: KnowledgeNode }) {
+  if (!hasOwnValue(node)) return null;
+  return (
+    <div className="np-uv-own-value">
+      <PrimitiveRenderer node={{
+        ...node,
+        valueType: node.valueType === "array" || node.valueType === "object" ? "string" : node.valueType,
+        metadata: null,
+      }} />
     </div>
   );
 }
@@ -182,47 +312,48 @@ function TextRenderer({ node }: { node: KnowledgeNode }) {
 function ObjectRenderer({
   node, depth, parentTitle, suppressOwnMeta,
 }: { node: KnowledgeNode; depth: number; parentTitle: string | null; suppressOwnMeta?: boolean }) {
-  const kids = (node.children || []).filter((c) => !shouldHideNode(c));
+  const children = (node.children || []).filter((child) => !shouldHideNode(child));
   const badge = suppressOwnMeta ? null : getPrimaryNodeBadge(node);
-  const hasMeta = !!badge || !!(node.links && node.links.length);
-  if (kids.length === 0 && !hasMeta) return null;
-
+  const hasMeta = !!badge || !!node.links?.length || metadataRows(node.metadata).length > 0;
+  if (children.length === 0 && !hasMeta && !hasOwnValue(node)) return null;
   const indentClass = depth >= 2 ? "np-uv-indent" : "";
 
   return (
     <div className={`np-uv-object ${indentClass}`}>
       {!suppressOwnMeta && <NodeBadge node={node} />}
-      {kids.map((c) => {
-        const isComposite = c.valueType === "object" || c.valueType === "array";
-        const isLongText = c.valueType === "text";
-        const labelText =
-          c.label && c.label !== parentTitle && c.label !== node.label ? c.label : null;
-
-        if (isComposite) {
+      <CompositeOwnValue node={node} />
+      {children.map((child) => {
+        const composite = child.valueType === "object" || child.valueType === "array";
+        const longText = child.valueType === "text";
+        const label = child.label && child.label !== parentTitle && child.label !== node.label
+          ? child.label
+          : null;
+        if (composite) {
           return (
-            <div key={c.id} className="np-uv-group">
-              {labelText && <div className="np-uv-group-title">{labelText}</div>}
-              <UniversalValueRenderer node={c} depth={depth + 1} parentTitle={labelText} />
+            <div key={child.id} className="np-uv-group">
+              {label && <div className="np-uv-group-title">{label}</div>}
+              <UniversalValueRenderer node={child} depth={depth + 1} parentTitle={label} />
             </div>
           );
         }
-        if (isLongText) {
+        if (longText) {
           return (
-            <div key={c.id} className="np-uv-block">
-              {labelText && <div className="np-uv-block-label">{labelText}</div>}
-              <UniversalValueRenderer node={c} depth={depth + 1} />
+            <div key={child.id} className="np-uv-block">
+              {label && <div className="np-uv-block-label">{label}</div>}
+              <UniversalValueRenderer node={child} depth={depth + 1} />
             </div>
           );
         }
         return (
-          <div key={c.id} className="np-uv-row">
-            <div className="np-uv-row-key">{labelText ?? ""}</div>
+          <div key={child.id} className="np-uv-row">
+            <div className="np-uv-row-key">{label ?? ""}</div>
             <div className="np-uv-row-val">
-              <UniversalValueRenderer node={c} depth={depth + 1} />
+              <UniversalValueRenderer node={child} depth={depth + 1} />
             </div>
           </div>
         );
       })}
+      {!suppressOwnMeta && <NodeMetadata metadata={node.metadata} />}
       <NodeLinks node={node} />
     </div>
   );
@@ -230,58 +361,69 @@ function ObjectRenderer({
 
 const ARRAY_LIMIT = 3;
 
+function CollectionStatus({ node, visibleCount }: { node: KnowledgeNode; visibleCount: number }) {
+  const info = node.collection;
+  if (!info) return null;
+  const loaded = info.loadedCount ?? (node.children || []).length;
+  const total = info.totalCount ?? loaded;
+  if (!info.truncated && total === loaded) return null;
+  return (
+    <div className="np-uv-collection-status">
+      Загружено {loaded} из {total}
+      {visibleCount < loaded && <span> · сейчас показано {visibleCount}</span>}
+      {info.truncated && <span> · коллекция загружена частично</span>}
+      {info.nextCursor && <span> · доступно продолжение</span>}
+    </div>
+  );
+}
+
 function ArrayRenderer({ node, depth }: { node: KnowledgeNode; depth: number }) {
   const [expanded, setExpanded] = useState(false);
-  const kids = (node.children || []).filter((c) => !shouldHideNode(c));
-  if (kids.length === 0) return null;
-
-  const visible = expanded ? kids : kids.slice(0, ARRAY_LIMIT);
-  const rest = kids.length - ARRAY_LIMIT;
-
-  const allPrimitive = kids.every(
-    (c) => c.valueType !== "object" && c.valueType !== "array" && c.valueType !== "text",
+  const children = (node.children || []).filter((child) => !shouldHideNode(child));
+  if (children.length === 0) return <StateNotice node={node} />;
+  const visible = expanded ? children : children.slice(0, ARRAY_LIMIT);
+  const rest = children.length - ARRAY_LIMIT;
+  const allPrimitive = children.every(
+    (child) => !["object", "array", "text"].includes(child.valueType),
   );
 
   return (
     <div className="np-uv-array">
+      <CompositeOwnValue node={node} />
       {allPrimitive ? (
         <ul className="np-uv-list">
-          {visible.map((c) => (
-            <li key={c.id} className="np-uv-list-item">
-              {formatPrimitive(c) || "—"}
+          {visible.map((child) => (
+            <li key={child.id} className="np-uv-list-item">
+              <UniversalValueRenderer node={child} depth={depth + 1} />
             </li>
           ))}
         </ul>
       ) : (
         <div className="np-uv-items">
-          {visible.map((c, i) => {
-            const itemTitle = c.label || `Элемент ${i + 1}`;
-            const badge = getPrimaryNodeBadge(c);
+          {visible.map((child) => {
+            const itemTitle = child.label || "Элемент";
+            const badge = getPrimaryNodeBadge(child);
             return (
-              <div key={c.id} className="np-uv-item">
+              <div key={child.id} className="np-uv-item">
                 <div className="np-uv-item-title-row">
                   <div className="np-uv-item-title">{itemTitle}</div>
                   {badge && (
-                    <span className={`np-uv-status np-uv-status--${badge.tone}`}>
-                      {badge.label}
-                    </span>
+                    <span className={`np-uv-status np-uv-status--${badge.tone}`}>{badge.label}</span>
                   )}
                 </div>
-                <UniversalValueRenderer node={c} depth={depth + 1} parentTitle={itemTitle} suppressOwnMeta />
+                <UniversalValueRenderer node={child} depth={depth + 1} parentTitle={itemTitle} suppressOwnMeta />
               </div>
             );
           })}
         </div>
       )}
+      <CollectionStatus node={node} visibleCount={visible.length} />
       {rest > 0 && (
-        <button
-          type="button"
-          className="np-uv-link"
-          onClick={() => setExpanded((e) => !e)}
-        >
+        <button type="button" className="np-uv-link" onClick={() => setExpanded((current) => !current)}>
           {expanded ? "Свернуть" : `Показать ещё ${rest}`}
         </button>
       )}
+      <NodeMetadata metadata={node.metadata} />
     </div>
   );
 }
