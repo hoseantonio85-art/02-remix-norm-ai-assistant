@@ -4,23 +4,19 @@ import coverageData from "../data/profile_coverage.json";
 import { UniversalValueRenderer } from "./UniversalValueRenderer";
 import { SourceTags } from "./SourceTags";
 import { SourceDrawer, knowledgeSourceToUni } from "./SourceDrawer";
-import { normalizeProfile } from "../adapters/profileKnowledgeAdapter";
-import type { UniversalArea } from "../adapters/profileKnowledgeAdapter";
+import { normalizeKnowledgeInput } from "../adapters/knowledgeInputAdapter";
+import type { UniversalArea } from "../types/universalKnowledge";
 import type {
   UniversalKnowledge,
   KnowledgeSource,
   KnowledgeSourceReference,
 } from "../types/universalKnowledge";
-import type { CompanyProfile } from "../types/profile";
 import { CoverageRing } from "./CoverageRing";
 import { AreaCoverageCard } from "./AreaCoverageCard";
 import { KnowledgeCountTag, SourceCountTag } from "./MetaTag";
 import { KnowledgeInsightDrawer } from "./KnowledgeInsightDrawer";
 import { insightForArea, profileInsight } from "../data/profile_insights";
 import type { ImportantSignal, AreaInsight, ProfileInsight } from "../data/profile_insights";
-
-const DATA = profileData as unknown as CompanyProfile;
-const AREAS_RAW = DATA.profile.areas;
 
 /* ---------- coverage data types ---------- */
 
@@ -114,6 +110,8 @@ function pickBadge(k: UniversalKnowledge): { label: string; tone: "warn" | "low"
   if (k.state.code === "conflicting") return { label: "Есть расхождения", tone: "warn" };
   if (k.metadata?.freshness?.code === "update_required") return { label: "Нужно обновить", tone: "warn" };
   if (k.state.code === "partial") return { label: "Известно частично", tone: "neutral" };
+  if (k.state.code === "unknown") return { label: "Нет данных", tone: "low" };
+  if (k.state.code === "not_applicable") return { label: "Неприменимо", tone: "neutral" };
   return null;
 }
 
@@ -340,9 +338,7 @@ function AreaView({
     if (onOpenChat) onOpenChat(r.chatPrompt);
   };
 
-  const visibleKnowledge = area.knowledge.filter(
-    (k) => k.state.code !== "unknown" && k.state.code !== "not_applicable",
-  );
+  const visibleKnowledge = area.knowledge;
   const needsUpd = countNeedsUpdate(area);
 
   return (
@@ -633,7 +629,7 @@ export default function KnowledgeBase({
   }, [activeAreaId]);
 
   // Normalize the full profile once; apply overrides on read.
-  const baseAreas = useMemo(() => normalizeProfile(AREAS_RAW), []);
+  const baseAreas = useMemo(() => normalizeKnowledgeInput(profileData), []);
   const areas: UniversalArea[] = useMemo(
     () =>
       baseAreas.map((a) => ({
