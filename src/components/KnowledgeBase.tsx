@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import profileData from "../data/company_profile_full.json";
-import coverageData from "../data/profile_coverage.json";
+import {
+  ANALYST_KNOWLEDGE_DATASETS,
+  type AnalystDatasetId,
+} from "../data/analystKnowledgeSources";
 import { UniversalValueRenderer } from "./UniversalValueRenderer";
 import { SourceTags } from "./SourceTags";
 import { SourceDrawer, knowledgeSourceToUni } from "./SourceDrawer";
@@ -13,10 +15,12 @@ import type {
 } from "../types/universalKnowledge";
 import { CoverageRing } from "./CoverageRing";
 import { AreaCoverageCard } from "./AreaCoverageCard";
-import { KnowledgeCountTag, SourceCountTag } from "./MetaTag";
+import { FactCountTag, KnowledgeCountTag, SourceCountTag } from "./MetaTag";
 import { KnowledgeInsightDrawer } from "./KnowledgeInsightDrawer";
-import { insightForArea, profileInsight } from "../data/profile_insights";
-import type { ImportantSignal, AreaInsight, ProfileInsight } from "../data/profile_insights";
+import {
+  composeKnowledgePresentation,
+  type KnowledgePresentationGroup,
+} from "../presentation/knowledgePresentation";
 
 /* ---------- coverage data types ---------- */
 
@@ -36,50 +40,34 @@ interface AreaCoverage {
   limitations: string;
   recommendations: CoverageRecommendation[];
 }
-interface ProfileCoverage {
-  profile: {
-    percent: number;
-    status: string;
-    areasTotal: number;
-    knowledgeTotal: number;
-    lowKnowledgeAreas: number;
-    outdatedAreas: number;
-    understanding: string;
-    canUse: string[];
-    limitations: string[];
+function coverageForArea(area: UniversalArea): AreaCoverage {
+  const total = area.knowledge.length;
+  const known = area.knowledge.filter((item) => item.state.code !== "unknown").length;
+  const percent = total === 0 ? 0 : Math.round((known / total) * 100);
+  return {
+    percent,
+    status: percent === 100 ? "Данные загружены" : percent >= 50 ? "Есть пробелы" : "Мало данных",
+    needsKnowledge: known < total || total === 0,
+    needsUpdate: area.knowledge.some((item) => item.metadata?.freshness?.code === "update_required"),
+    understanding: "Рассчитано по состояниям фактов в файле аналитиков.",
+    canUse: "",
+    limitations: "",
+    recommendations: [],
   };
-  areas: Record<string, AreaCoverage>;
 }
-const COVERAGE = coverageData as unknown as ProfileCoverage;
 
-function coverageForArea(id: string): AreaCoverage | undefined {
-  return COVERAGE.areas[id];
+function profileCoverage(areas: UniversalArea[]) {
+  const knowledge = areas.flatMap((area) => area.knowledge);
+  const known = knowledge.filter((item) => item.state.code !== "unknown").length;
+  const percent = knowledge.length === 0 ? 0 : Math.round((known / knowledge.length) * 100);
+  return {
+    percent,
+    status: percent === 100 ? "Данные загружены" : percent >= 50 ? "Есть пробелы" : "Мало данных",
+    areasTotal: areas.length,
+  };
 }
 function toneForPercent(p: number): "ok" | "warn" | "low" {
   return p >= 70 ? "ok" : p >= 40 ? "warn" : "low";
-}
-
-/* ---------- important-signals helper ---------- */
-
-type SignalTone = "conflict" | "warning" | "stale";
-
-function signalSummary(
-  insight: AreaInsight | ProfileInsight | undefined,
-): { tone: SignalTone; count: number; label: string } | null {
-  const list: ImportantSignal[] = insight?.importantSignals ?? [];
-  if (!list.length) return null;
-  const order: SignalTone[] = ["conflict", "warning", "stale"];
-  let tone: SignalTone = "stale";
-  for (const t of order) {
-    if (list.some((s) => s.type === t)) { tone = t; break; }
-  }
-  const n = list.length;
-  const mod10 = n % 10;
-  const mod100 = n % 100;
-  let word = "сигналов";
-  if (mod10 === 1 && mod100 !== 11) word = "сигнал";
-  else if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) word = "сигнала";
-  return { tone, count: n, label: `${n} ${word}` };
 }
 
 /* ---------- helpers ---------- */
@@ -183,11 +171,19 @@ function KnowledgeAccordion({
       data-knowledge-id={k.id}
       className={`np-k-acc ${open ? "is-open" : ""} ${flash ? "is-flash" : ""}`}
     >
-      <button
-        type="button"
+      <div
+        role="button"
+        tabIndex={0}
         className="np-k-acc-head"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
+        onKeyDown={(event) => {
+          if (event.target !== event.currentTarget) return;
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            setOpen((current) => !current);
+          }
+        }}
       >
         <div className="np-k-acc-main">
           <div className="np-k-acc-titleline">
@@ -208,7 +204,7 @@ function KnowledgeAccordion({
           </div>
         </div>
         <span className={`np-k-acc-chevron ${open ? "is-open" : ""}`} aria-hidden>›</span>
-      </button>
+      </div>
       {open && (
         <div className="np-k-acc-body">
           <div className="np-k-body">
@@ -244,6 +240,151 @@ function KnowledgeAccordion({
   );
 }
 
+function sourceKnowledgeForGroup(group: KnowledgePresentationGroup): UniversalKnowledge {
+  const first = group.knowledge[0];
+  const sources = [...new Map(
+    group.knowledge.flatMap((knowledge) => knowledge.sources || [])
+      .map((source) => [`${source.id}:${source.fileName || ""}`, source] as const),
+  ).values()];
+  const evidence = group.knowledge.flatMap((knowledge) => knowledge.metadata?.sourceEvidence || []);
+  return {
+    ...first,
+    title: group.title,
+    sources,
+    metadata: { ...(first.metadata || {}), sourceEvidence: evidence },
+  };
+}
+
+function KnowledgeGroupAccordion({
+  group,
+  defaultOpen,
+  onOpenSources,
+  onOpenChat,
+  flashKnowledgeId,
+}: {
+  group: KnowledgePresentationGroup;
+  defaultOpen?: boolean;
+  onOpenSources: (knowledge: UniversalKnowledge) => void;
+  onOpenChat?: (question: string) => void;
+  flashKnowledgeId?: string | null;
+}) {
+  const [open, setOpen] = useState(!!defaultOpen);
+  const ref = useRef<HTMLElement | null>(null);
+  const focused = !!flashKnowledgeId && group.knowledge.some((knowledge) => knowledge.id === flashKnowledgeId);
+  const sourceKnowledge = sourceKnowledgeForGroup(group);
+  const badgeKnowledge = group.knowledge.find((knowledge) => pickBadge(knowledge));
+  const badge = badgeKnowledge ? pickBadge(badgeKnowledge) : null;
+  const badgeClass = badge?.tone === "warn" ? "np-tag np-tag-warning"
+    : badge?.tone === "low" ? "np-tag np-tag-danger"
+    : "np-tag";
+  const actualDates = group.knowledge
+    .map((knowledge) => knowledge.metadata?.actualAt)
+    .filter((value): value is string => !!value);
+  const commonActualAt = actualDates.length > 0 && new Set(actualDates).size === 1
+    ? formatRuDate(actualDates[0])
+    : null;
+
+  useEffect(() => {
+    if (!focused) return;
+    setOpen(true);
+    requestAnimationFrame(() => {
+      const target = ref.current?.querySelector<HTMLElement>(`[data-knowledge-id="${flashKnowledgeId}"]`);
+      (target || ref.current)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  }, [flashKnowledgeId, focused]);
+
+  return (
+    <article
+      ref={ref}
+      data-presentation-group-id={group.id}
+      className={`np-k-acc np-k-group-acc ${open ? "is-open" : ""} ${focused ? "is-flash" : ""}`}
+    >
+      <div
+        role="button"
+        tabIndex={0}
+        className="np-k-acc-head"
+        aria-expanded={open}
+        onClick={() => setOpen((current) => !current)}
+        onKeyDown={(event) => {
+          if (event.target !== event.currentTarget) return;
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            setOpen((current) => !current);
+          }
+        }}
+      >
+        <div className="np-k-acc-main">
+          <div className="np-k-acc-titleline">
+            <span className="np-k-acc-title">{group.title}</span>
+            <FactCountTag count={group.knowledge.length} />
+            {badge && <span className={badgeClass}>{badge.label}</span>}
+          </div>
+          {group.description && <div className="np-k-acc-summary">{group.description}</div>}
+          <div className="np-k-acc-meta">
+            <SourceTags
+              sources={sourceKnowledge.sources || []}
+              evidence={sourceKnowledge.metadata?.sourceEvidence || []}
+              actualAt={commonActualAt ? `Данные на ${commonActualAt}` : undefined}
+              onOpen={() => onOpenSources(sourceKnowledge)}
+            />
+          </div>
+        </div>
+        <span className={`np-k-acc-chevron ${open ? "is-open" : ""}`} aria-hidden>›</span>
+      </div>
+
+      {open && (
+        <div className="np-k-acc-body np-k-group-body">
+          {group.knowledge.map((knowledge) => {
+            const factBadge = pickBadge(knowledge);
+            const composite = ["object", "array", "text"].includes(knowledge.content.valueType);
+            return (
+              <div
+                key={knowledge.id}
+                data-knowledge-id={knowledge.id}
+                className={`np-k-fact ${composite ? "np-k-fact--composite" : ""} ${flashKnowledgeId === knowledge.id ? "is-flash" : ""}`}
+              >
+                <div className="np-k-fact-label">
+                  <span>{knowledge.title}</span>
+                  {factBadge && (
+                    <span className={`np-uv-status np-uv-status--${factBadge.tone}`}>{factBadge.label}</span>
+                  )}
+                </div>
+                <div className="np-k-fact-value">
+                  <UniversalValueRenderer node={knowledge.content} parentTitle={knowledge.title} />
+                </div>
+                {knowledge.alerts && knowledge.alerts.length > 0 && (
+                  <div className="np-uv-alerts np-k-fact-alerts">
+                    {knowledge.alerts.map((alert) => (
+                      <div key={alert.id} className={`np-uv-alert np-uv-alert--${alert.severity}`}>
+                        <span>{alert.message}</span>
+                        {alert.action && (
+                          <button
+                            type="button"
+                            className="np-uv-alert-action"
+                            onClick={() => {
+                              if (alert.action?.type === "open_chat" && onOpenChat) {
+                                onOpenChat(alert.action.label);
+                              } else {
+                                onOpenSources(knowledge);
+                              }
+                            }}
+                          >
+                            {alert.action.label}
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </article>
+  );
+}
+
 /* ---------- area card / view ---------- */
 
 function uniqueSourceCount(area: UniversalArea): number {
@@ -253,12 +394,11 @@ function uniqueSourceCount(area: UniversalArea): number {
 }
 
 function AreaCard({ area, onOpen }: { area: UniversalArea; onOpen: () => void }) {
-  const cov = coverageForArea(area.id);
-  const percent = cov?.percent ?? 0;
-  const status = cov?.status ?? "";
+  const cov = coverageForArea(area);
+  const percent = cov.percent;
+  const status = cov.status;
   const tone = toneForPercent(percent);
   const srcCount = uniqueSourceCount(area);
-  const signal = signalSummary(insightForArea(area.id));
   return (
     <article
       className="np-kb-card np-kb-card-clickable"
@@ -274,14 +414,6 @@ function AreaCard({ area, onOpen }: { area: UniversalArea; onOpen: () => void })
               <span className={`np-area-card-status np-kb-card-status--${tone}`}>
                 {status}
               </span>
-            )}
-            {signal && (
-              <>
-                <span className="np-area-card-state-divider" aria-hidden>·</span>
-                <span className={`np-area-card-signals np-area-signal--${signal.tone}`}>
-                  {signal.label}
-                </span>
-              </>
             )}
           </div>
         </div>
@@ -330,15 +462,15 @@ function AreaView({
   onOpenSources: (k: UniversalKnowledge) => void;
   flashKnowledgeId?: string | null;
 }) {
-  const cov = coverageForArea(area.id);
-  const percent = cov?.percent ?? 0;
+  const cov = coverageForArea(area);
+  const percent = cov.percent;
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const handleRec = (r: CoverageRecommendation) => {
     if (onOpenChat) onOpenChat(r.chatPrompt);
   };
 
-  const visibleKnowledge = area.knowledge;
+  const presentationGroups = useMemo(() => composeKnowledgePresentation(area), [area]);
   const needsUpd = countNeedsUpdate(area);
 
   return (
@@ -348,7 +480,7 @@ function AreaView({
         <div className="np-profile-rail-list">
           {areas.map((a) => {
             const isActive = a.id === area.id;
-            const p = coverageForArea(a.id)?.percent ?? 0;
+            const p = coverageForArea(a).percent;
             const tn = toneForPercent(p);
             return (
               <button
@@ -391,18 +523,17 @@ function AreaView({
         <div className="np-area-content">
           <div className="np-area-knowledge">
             <div className="np-k-stack">
-              {visibleKnowledge.map((k, i) => (
-                <KnowledgeAccordion
-                  key={k.id}
-                  k={k}
-                  defaultOpen={i === 0}
+              {presentationGroups.map((group, index) => (
+                <KnowledgeGroupAccordion
+                  key={group.id}
+                  group={group}
+                  defaultOpen={index === 0}
                   onOpenSources={onOpenSources}
                   onOpenChat={onOpenChat}
-                  forceOpen={flashKnowledgeId === k.id}
-                  flash={flashKnowledgeId === k.id}
+                  flashKnowledgeId={flashKnowledgeId}
                 />
               ))}
-              {visibleKnowledge.length === 0 && (
+              {presentationGroups.length === 0 && (
                 <div className="np-kb-empty">В этой области пока нет знаний.</div>
               )}
             </div>
@@ -411,10 +542,10 @@ function AreaView({
           <aside className="np-area-right">
             <AreaCoverageCard
               percent={percent}
-              status={cov?.status ?? ""}
+              status={cov.status}
               knowledgeCount={area.knowledge.length}
               needsUpdateCount={needsUpd}
-              signal={signalSummary(insightForArea(area.id))}
+              signal={null}
               onOpen={() => setDrawerOpen(true)}
             />
             <ImproveBlock cov={cov} onRec={handleRec} />
@@ -427,8 +558,8 @@ function AreaView({
         <KnowledgeInsightDrawer
           title={`Как Норм понимает «${area.title}»`}
           percent={percent}
-          status={cov?.status ?? ""}
-          insight={insightForArea(area.id)}
+          status={cov.status}
+          insight={undefined}
           onClose={() => setDrawerOpen(false)}
         />
       )}
@@ -439,14 +570,15 @@ function AreaView({
 /* ---------- horizontal index widget ---------- */
 
 function IndexWidgetHorizontal({
+  areas,
   totalKnowledge,
 }: {
+  areas: UniversalArea[];
   totalKnowledge: number;
 }) {
   const [open, setOpen] = useState(false);
-  const p = COVERAGE.profile;
+  const p = profileCoverage(areas);
   const tone = toneForPercent(p.percent);
-  const signal = signalSummary(profileInsight());
   return (
     <>
       <button type="button" className="np-index-horizontal" onClick={() => setOpen(true)}>
@@ -455,14 +587,6 @@ function IndexWidgetHorizontal({
           <div className="np-idxh-title">Индекс знания</div>
           <div className="np-idxh-sub">
             {p.status} · {p.areasTotal} областей · {totalKnowledge} знаний
-            {signal && (
-              <>
-                {" · "}
-                <span className={`np-area-signal-inline np-area-signal--${signal.tone}`}>
-                  {signal.label}
-                </span>
-              </>
-            )}
           </div>
         </div>
         <div className="np-idxh-bar-wrap">
@@ -477,7 +601,7 @@ function IndexWidgetHorizontal({
           title="Как Норм понимает компанию"
           percent={p.percent}
           status={p.status}
-          insight={profileInsight()}
+          insight={undefined}
           onClose={() => setOpen(false)}
         />
       )}
@@ -528,11 +652,11 @@ function ProfileTab({
 
   const q = searchQuery.trim().toLowerCase();
   const filtered = areas.filter((a) => {
-    const c = coverageForArea(a.id);
-    if (filter === "lowKnowledge" && !c?.needsKnowledge) return false;
-    if (filter === "needsUpdate" && !c?.needsUpdate) return false;
+    const c = coverageForArea(a);
+    if (filter === "lowKnowledge" && !c.needsKnowledge) return false;
+    if (filter === "needsUpdate" && !c.needsUpdate) return false;
     if (!q) return true;
-    const hay: string[] = [a.title, a.description || "", c?.status || ""];
+    const hay: string[] = [a.title, a.description || "", c.status];
     for (const k of a.knowledge) {
       hay.push(k.title);
       for (const s of k.sources || []) hay.push(s.name || s.documentName || s.id);
@@ -568,6 +692,7 @@ export default function KnowledgeBase({
   focus?: { areaId: string; knowledgeId?: string | null; nonce: number } | null;
 }) {
   const [tab, setTab] = useState<"profile" | "docs" | "methodology">("profile");
+  const [datasetId, setDatasetId] = useState<AnalystDatasetId>(ANALYST_KNOWLEDGE_DATASETS[0].id);
   const [toast, setToast] = useState<string | null>(null);
   const [overrides, setOverrides] = useState<Overrides>({});
   const [sourcesFor, setSourcesFor] = useState<UniversalKnowledge | null>(null);
@@ -628,8 +753,17 @@ export default function KnowledgeBase({
     }
   }, [activeAreaId]);
 
-  // Normalize the full profile once; apply overrides on read.
-  const baseAreas = useMemo(() => normalizeKnowledgeInput(profileData), []);
+  const selectedDataset = ANALYST_KNOWLEDGE_DATASETS.find((dataset) => dataset.id === datasetId)
+    ?? ANALYST_KNOWLEDGE_DATASETS[0];
+
+  // The selected analyst export is the sole source of company facts.
+  const baseAreas = useMemo(
+    () => normalizeKnowledgeInput(selectedDataset.input, {
+      sourceFileName: selectedDataset.fileName,
+      sourceDataset: selectedDataset.id,
+    }),
+    [selectedDataset],
+  );
   const areas: UniversalArea[] = useMemo(
     () =>
       baseAreas.map((a) => ({
@@ -684,8 +818,17 @@ export default function KnowledgeBase({
   };
 
   const hideChrome = tab === "profile" && activeAreaId !== null;
-  const lowCount = areas.filter((a) => coverageForArea(a.id)?.needsKnowledge).length;
-  const updCount = areas.filter((a) => coverageForArea(a.id)?.needsUpdate).length;
+  const lowCount = areas.filter((a) => coverageForArea(a).needsKnowledge).length;
+  const updCount = areas.filter((a) => coverageForArea(a).needsUpdate).length;
+
+  const selectDataset = (nextId: AnalystDatasetId) => {
+    setDatasetId(nextId);
+    setActiveAreaId(null);
+    setOverrides({});
+    setSourcesFor(null);
+    setFilter("all");
+    setSearchQuery("");
+  };
 
   const toggleSearch = () => {
     setSearchOpen((v) => {
@@ -706,9 +849,23 @@ export default function KnowledgeBase({
             понимать их причины и моделировать возможные последствия.
           </p>
         </div>
+        <div className="np-kb-dataset-switch" role="group" aria-label="Компания из файлов аналитиков">
+          {ANALYST_KNOWLEDGE_DATASETS.map((dataset) => (
+            <button
+              key={dataset.id}
+              type="button"
+              className={`np-kb-dataset-option ${dataset.id === datasetId ? "active" : ""}`}
+              aria-pressed={dataset.id === datasetId}
+              onClick={() => selectDataset(dataset.id)}
+            >
+              <span>{dataset.label}</span>
+              <small>{dataset.fileName}</small>
+            </button>
+          ))}
+        </div>
         {tab === "profile" && (
           <section className="np-kb-index-group">
-            <IndexWidgetHorizontal totalKnowledge={totalKnowledge} />
+            <IndexWidgetHorizontal areas={areas} totalKnowledge={totalKnowledge} />
           </section>
         )}
         <div className="np-kb-controls">

@@ -18,6 +18,11 @@ export function KnowledgeCountTag({ count }: { count: number }) {
   return <MetaTag>{count} {word}</MetaTag>;
 }
 
+export function FactCountTag({ count }: { count: number }) {
+  const word = pluralRu(count, ["факт", "факта", "фактов"]);
+  return <MetaTag>{count} {word}</MetaTag>;
+}
+
 export function SourceCountTag({ count }: { count: number }) {
   const word = pluralRu(count, ["источник", "источника", "источников"]);
   return <MetaTag>{count} {word}</MetaTag>;

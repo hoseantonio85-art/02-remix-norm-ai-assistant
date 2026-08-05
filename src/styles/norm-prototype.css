@@ -1215,9 +1215,13 @@
 
 .np-uv-meta { display: inline-block; font-size: 12px; color: #64748b; }
 .np-uv-meta > summary {
-  display: inline; cursor: pointer; color: #047857; font-weight: 600;
-  list-style: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 17px; height: 17px; border: 1px solid #94a3b8; border-radius: 50%;
+  cursor: pointer; color: #475569; font-size: 11px; font-weight: 700; font-style: normal;
+  list-style: none; vertical-align: middle;
 }
+.np-uv-meta > summary:hover { border-color: #10b981; color: #047857; background: #ecfdf5; }
+.np-uv-meta > summary:focus-visible { outline: 2px solid #10b981; outline-offset: 2px; }
 .np-uv-meta > summary::-webkit-details-marker { display: none; }
 .np-uv-meta-panel {
   display: grid; gap: 5px; min-width: 220px; margin-top: 6px;
@@ -1287,6 +1291,15 @@
   color: #1f2937; font-size: 14px;
 }
 .np-uv-list-item:last-child { border-bottom: 0; }
+.np-uv-list-heading {
+  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+  margin-bottom: 3px;
+}
+.np-uv-list-label { font-size: 13px; font-weight: 600; color: #334155; }
+.np-uv-list-key {
+  font-size: 11px; color: #64748b; background: #f1f5f4;
+  border-radius: 5px; padding: 1px 5px;
+}
 
 .np-uv-items { display: flex; flex-direction: column; gap: 8px; }
 .np-uv-item {
@@ -1435,6 +1448,23 @@
 .np-kb-intro { margin-bottom: 40px; max-width: 720px; }
 .np-kb-intro-title { font-size: 30px; font-weight: 700; margin: 0 0 12px; letter-spacing: -0.3px; color: #0f172a; }
 .np-kb-intro-desc { font-size: 14px; line-height: 1.55; color: #475569; margin: 0; }
+.np-kb-dataset-switch {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  margin: -20px 0 24px;
+}
+.np-kb-dataset-option {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+  min-width: 220px; padding: 10px 14px;
+  border: 1px solid #dbe4e1; border-radius: 10px;
+  background: #fff; color: #334155; cursor: pointer; text-align: left;
+}
+.np-kb-dataset-option:hover { border-color: var(--np-mint); }
+.np-kb-dataset-option.active {
+  border-color: var(--np-mint); background: #f1fbf7; color: #0f513b;
+  box-shadow: 0 0 0 1px var(--np-mint);
+}
+.np-kb-dataset-option span { font-size: 13px; font-weight: 650; }
+.np-kb-dataset-option small { font-size: 11px; color: #64748b; }
 
 .np-kb-index-group { margin-bottom: 40px; }
 .np-kb-controls { margin-bottom: 24px; }
@@ -1496,6 +1526,7 @@
   background: transparent; border: 0; width: 100%; text-align: left; cursor: pointer;
 }
 .np-k-acc-head:hover { background: #fafffb; }
+.np-k-acc-head:focus-visible { outline: 2px solid var(--np-mint); outline-offset: -2px; }
 .np-k-acc-main { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .np-k-acc-titleline { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .np-k-acc-title { font-size: 15px; font-weight: 700; color: #1f2937; }
@@ -1510,6 +1541,25 @@
   padding: 4px 18px 18px;
   display: flex; flex-direction: column; gap: 12px;
   border-top: 1px solid #f1f5f4;
+}
+.np-k-group-body { gap: 0; padding-top: 0; }
+.np-k-fact {
+  display: grid; grid-template-columns: minmax(150px, 32%) minmax(0, 1fr);
+  gap: 18px; align-items: start; padding: 14px 0;
+  border-bottom: 1px solid #edf2f0;
+}
+.np-k-fact:last-child { border-bottom: 0; }
+.np-k-fact-label {
+  display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+  min-width: 0; color: #475569; font-size: 13px; line-height: 1.45; font-weight: 600;
+}
+.np-k-fact-value { min-width: 0; color: #17211d; font-size: 14px; line-height: 1.5; }
+.np-k-fact--composite { grid-template-columns: 1fr; gap: 8px; }
+.np-k-fact--composite > .np-k-fact-label { color: #263b33; font-size: 14px; }
+.np-k-fact-alerts { grid-column: 1 / -1; }
+.np-k-fact.is-flash {
+  margin: 4px -10px; padding: 12px 10px; border-radius: 10px;
+  background: #f0fbf6; box-shadow: inset 0 0 0 1px #bce8d6;
 }
 
 /* enforce single-column knowledge inside accordions */
@@ -1544,6 +1594,7 @@
   .np-area-right { order: 1; }
   .np-area-center { order: 2; }
   .np-kb-grid { grid-template-columns: 1fr; }
+  .np-k-fact { grid-template-columns: 1fr; gap: 6px; }
 }
 @media (min-width: 851px) and (max-width: 1150px) {
   .np-kb-grid { grid-template-columns: repeat(2, 1fr); }

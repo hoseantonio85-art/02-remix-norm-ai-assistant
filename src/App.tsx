@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import NormPrototype from "./components/NormPrototype";
 
-const basename = import.meta.env.PROD ? "/02-remix-norm-ai-assistant" : "";
+const basename = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 export default function App() {
   return (

@@ -1,0 +1,3885 @@
+{
+  "id": "43efd98b-806d-4256-8103-291a0988637a",
+  "nested": {
+    "generalInfo": {
+      "id": "cd35fe1a-aabd-459c-b967-b1f985bcea4e",
+      "version": 1,
+      "fields": {
+        "shortName": {
+          "value": "ООО \"УМНЫЙ РИТЕЙЛ\"",
+          "metadata": {
+            "confidence": null,
+            "riskRelevanceScore": null,
+            "sourceEvidence": null,
+            "status": null,
+            "validityTo": null
+          }
+        },
+        "name": {
+          "value": "ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ \"УМНЫЙ РИТЕЙЛ\"",
+          "metadata": {
+            "confidence": null,
+            "riskRelevanceScore": null,
+            "sourceEvidence": null,
+            "status": null,
+            "validityTo": null
+          }
+        },
+        "inn": {
+          "value": "7811657720",
+          "metadata": {
+            "confidence": null,
+            "riskRelevanceScore": null,
+            "sourceEvidence": null,
+            "status": null,
+            "validityTo": null
+          }
+        },
+        "ogrn": {
+          "value": "1177847261602",
+          "metadata": {
+            "confidence": null,
+            "riskRelevanceScore": null,
+            "sourceEvidence": null,
+            "status": null,
+            "validityTo": null
+          }
+        },
+        "kpp": {
+          "value": "773001001",
+          "metadata": {
+            "confidence": null,
+            "riskRelevanceScore": null,
+            "sourceEvidence": null,
+            "status": null,
+            "validityTo": null
+          }
+        },
+        "legalAddress": {
+          "value": "121087, г. Москва, ул. Барклая, д. 6, стр. 3, помещ. 8/28",
+          "metadata": {
+            "confidence": null,
+            "riskRelevanceScore": null,
+            "sourceEvidence": null,
+            "status": null,
+            "validityTo": null
+          }
+        },
+        "foundingDate": {
+          "value": "2017-08-02T00:00:00.000Z",
+          "metadata": {
+            "confidence": null,
+            "riskRelevanceScore": null,
+            "sourceEvidence": null,
+            "status": null,
+            "validityTo": null
+          }
+        },
+        "industry": {
+          "value": "Розничная торговля",
+          "metadata": {
+            "confidence": null,
+            "riskRelevanceScore": null,
+            "sourceEvidence": null,
+            "status": null,
+            "validityTo": null
+          }
+        },
+        "okved": {
+          "value": "Деятельность по предоставлению прочих мест для временного проживания (55.90)",
+          "metadata": {
+            "confidence": null,
+            "riskRelevanceScore": null,
+            "sourceEvidence": null,
+            "status": null,
+            "validityTo": null
+          }
+        },
+        "additionalOkved": {
+          "value": [
+            {
+              "value": "Торговля розничная прочая в неспециализированных магазинах (47.19)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная пищевыми продуктами, напитками и табачными изделиями в специализированных магазинах (47.29)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная моторным топливом в специализированных магазинах (47.30)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная компьютерами, периферийными устройствами к ним и программным обеспечением в специализированных магазинах (47.41)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная телекоммуникационным оборудованием в специализированных магазинах (47.42)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная аудио- и видеотехникой в специализированных магазинах (47.43)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная текстильными изделиями в специализированных магазинах (47.51)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная скобяными изделиями, лакокрасочными материалами и стеклом в специализированных магазинах (47.52)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная коврами, ковровыми изделиями, покрытиями для стен и пола в специализированных магазинах (47.53)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная бытовыми электротоварами в специализированных магазинах (47.54)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная мебелью, осветительными приборами и прочими бытовыми изделиями в специализированных магазинах (47.59)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная книгами в специализированных магазинах (47.61)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная газетами и канцелярскими товарами в специализированных магазинах (47.62)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная музыкальными и видеозаписями в специализированных магазинах (47.63)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная спортивным оборудованием и спортивными товарами в специализированных магазинах (47.64)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная играми и игрушками в специализированных магазинах (47.65)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная одеждой в специализированных магазинах (47.71)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничной обувью и кожаными изделиями в специализированных магазинах (47.72)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная лекарственными средствами в специализированных магазинах (47.73)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная медицинскими и ортопедическими изделиями в специализированных магазинах (47.74)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная косметическими и товарами личной гигиены в специализированных магазинах (47.75)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная цветами, растениями, семенами, удобрениями, домашними животными и кормами для них в специализированных магазинах (47.76)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная часами и ювелирными изделиями в специализированных магазинах (47.77)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная прочими товарами в специализированных магазинах (47.78)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная бывшими в употреблении товарами в магазинах (47.79)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная пищевыми продуктами, напитками и табачными изделиями на рынках и в прилавках (47.82)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная прочая в специализированных магазинах (47.89)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная по почте или по информационно-коммуникационной сети Интернет (47.91)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Торговля розничная вне магазинов, прилавков, рынков (47.99)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Деятельность автомобильного грузового транспорта (49.41)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Деятельность по хранению и складированию (52.10)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Деятельность вспомогательная, связанная с сухопутным транспортом (52.21)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Транспортная обработка грузов (52.24)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Деятельность вспомогательная прочая, связанная с перевозками (52.29)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Деятельность гостиниц и прочих мест для временного проживания (55.10)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Деятельность по предоставлению мест для краткосрочного проживания (55.20)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Деятельность ресторанов и служб по доставке продуктов питания (56.10)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Поставка продуктов питания для потребления вне заведения (56.21)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Поставка прочих готовых блюд для потребления вне заведения (56.29)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Разработка компьютерного программного обеспечения (62.01)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Деятельность консультативная и работы в области компьютерных технологий (62.02)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Обработка данных, размещение информации и связанная с этим деятельность (63.11)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Деятельность по эксплуатации веб-порталов (63.12)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Прочая деятельность в сфере денежного посредничества (64.19)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Предоставление прочих финансовых услуг, кроме услуг по страхованию и пенсионному обеспечению (64.99)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Управление финансовыми рынками (66.11)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Деятельность по брокерскому обслуживанию ценных бумаг (66.12)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Прочая вспомогательная деятельность в сфере финансовых услуг (66.19)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Деятельность по управлению рисками и доходами (66.21)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Деятельность по управлению активами (66.22)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Прочая деятельность, связанная с управлением активами (66.29)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Покупка и продажа собственного недвижимого имущества (68.10)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Аренда и управление собственным или арендованным недвижимым имуществом (68.20)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Агентства недвижимости (68.31)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Управление недвижимым имуществом за вознаграждение или на договорной основе (68.32)",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            }
+          ],
+          "metadata": {
+            "confidence": null,
+            "riskRelevanceScore": null,
+            "sourceEvidence": null,
+            "status": null,
+            "validityTo": null
+          }
+        },
+        "capitals": {
+          "value": "1110000",
+          "metadata": {
+            "confidence": null,
+            "riskRelevanceScore": null,
+            "sourceEvidence": null,
+            "status": null,
+            "validityTo": null
+          }
+        },
+        "taxRegime": {
+          "value": "ОСНО",
+          "metadata": {
+            "confidence": null,
+            "riskRelevanceScore": null,
+            "sourceEvidence": null,
+            "status": null,
+            "validityTo": null
+          }
+        },
+        "description": {
+          "value": "Крупнейший российский сервис экспресс-доставки продуктов и товаров повседневного спроса из собственных дарксторов (тёмных магазинов) с моделью «доставка за 15–30 минут». Специализация: quick commerce (q-commerce), онлайн-ритейл продуктов питания, FMCG, готовой еды, косметики и товаров для дома. Масштаб: 167+ городов, 2000+ дарксторов, выручка 2024 г. — 218,7 млрд ₽ (+50,5% г/г). Лидер рынка e-grocery в России по итогам 2024 г. Входит в состав X5 Group (ПАО «Х5 Ритейл»). Концепция 2025–2026 гг. — «ритейл впечатлений»: эмоциональные коллаборации, геймификация, персонализация клиентского опыта.",
+          "metadata": {
+            "confidence": null,
+            "riskRelevanceScore": null,
+            "sourceEvidence": null,
+            "status": null,
+            "validityTo": null
+          }
+        },
+        "geoOfOperations": {
+          "value": "Россия: 167+ городов (по состоянию на апрель 2025). Ключевые регионы присутствия:\nЦентральный ФО: Москва, Московская обл. (главный хаб), Тула, Калуга, Рязань, Тверь, Ярославль, Иваново, Кострома, Владимир, Орёл, Тамбов, Липецк, Курск, Белгород.\nСеверо-Западный ФО: Санкт-Петербург, Ленинградская обл., Великий Новгород, Псков, Петрозаводск, Вологда, Череповец, Мурманск, Калининград.\nПриволжский ФО: Нижний Новгород, Казань, Самара, Ульяновск, Пенза, Саранск, Йошкар-Ола, Киров, Набережные Челны, Ижевск.\nЮжный ФО: Краснодар, Ростов-на-Дону, Сочи, Анапа, Геленджик, Новороссийск, Волгоград, Астрахань, Ставрополь.\nСибирский ФО: Новосибирск, Красноярск, Омск, Томск, Кемерово, Барнаул, Иркутск, Улан-Удэ, Чита.\nУральский ФО: Екатеринбург, Челябинск, Тюмень, Нижневартовск, Сургут, Курган.\nДальневосточный ФО: Владивосток, Хабаровск, Благовещенск, Южно-Сахалинск, Петропавловск-Камчатский.\nСеверо-Кавказский ФО: Махачкала, Владикавказ, Нальчик.\nНовые города 2024–2025: Геленджик, Курган, Балаково, Йошкар-Ола, Анапа, Псков, Петрозаводск, Нижневартовск.\nЗа рубежом: отсутствует (деятельность только в РФ).",
+          "metadata": {
+            "confidence": null,
+            "riskRelevanceScore": null,
+            "sourceEvidence": null,
+            "status": null,
+            "validityTo": null
+          }
+        },
+        "naturalTechFactors": {
+          "value": "Экстремальные холода — высокое влияние. Минус 25°C и ниже: риск замерзания курьеров, снижение скорости доставки, рост себестоимости (теплая экипировка, сокращение смен). В Москве и СПб — зимний пик заказов из-за нежелания выходить на улицу.\nСильные осадки — высокое влияние. Снегопады, ливни: рост спроса (+20%), но сложности с логистикой, задержки курьеров, необходимость резервного парка курьеров.\nЖара (35°C+) — среднее влияние. Порча скоропортящихся продуктов, необходимость усиленной холодовой цепи, снижение активности курьеров в дневное время.\nПаводки/наводнения — среднее влияние. Риск затопления дарксторов в низинах, перебои с поставками, необходимость резервных складов.\nЭнергетические аварии — высокое влияние. Отключение электроэнергии → остановка IT-систем, холодильного оборудования, автоматизации сборки заказов. Критично для модели 15-минутной доставки.\nКибератаки / сбои IT — критическое влияние. Полная остановка бизнеса: приложение, WMS, маршрутизация, платёжные системы — всё завязано на технологической платформе. DDoS-атака или сбой в ЦОД = потеря выручки.\nАварии на дорогах / пробки — среднее влияние. Влияние на время доставки, необходимость динамической маршрутизации. В Москве пробки увеличивают среднее время доставки на 5–10 минут.\nПандемия / эпидемии — высокое влияние (исторически подтверждено). COVID-19 2020: рост в 3,5 раза, набор 1000 курьеров в неделю. Риски: перебои с персоналом, рост себестоимости защитных мер.",
+          "metadata": {
+            "confidence": null,
+            "riskRelevanceScore": null,
+            "sourceEvidence": null,
+            "status": null,
+            "validityTo": null
+          }
+        },
+        "seasonality": {
+          "value": "Январь — постпраздничный спад, низкая активность. Отклонение от среднего: −25%.\nФевраль — восстановление, подготовка к 8 марта. Отклонение: −10%.\nМарт — пик перед 8 марта, рост заказов цветов и подарков. Отклонение: +15%.\nАпрель–май — стабильный рост, пик перед майскими праздниками. Отклонение: +5%.\nИюнь–август — летний спад (отпуска, дачи, сезонная миграция). Отклонение: −15%.\nСентябрь — возврат к городам, «школьный» пик. Отклонение: +10%.\nОктябрь–ноябрь — стабильный высокий сезон, подготовка к Новому году. Отклонение: +5%.\nДекабрь — главный пик года: новогодние закупки, корпоративы, подарки. Отклонение: +40%.\nКлючевые факторы сезонности: новогодний пик (декабрь) — максимальная загрузка дарксторов, расширение ассортимента алкоголя, подарочных наборов; летний спад (июнь–август) — снижение частоты заказов в курортных городах, рост в дачных зонах (доставка на дачи); праздничные пики — 8 марта, 23 февраля, День Победы, 1 сентября; погодные факторы — резкий рост заказов при непогоде (снегопады, дожди), +20% к среднему в краткосрочной перспективе.",
+          "metadata": {
+            "confidence": null,
+            "riskRelevanceScore": null,
+            "sourceEvidence": null,
+            "status": null,
+            "validityTo": null
+          }
+        },
+        "goals": {
+          "value": [
+            {
+              "value": "Лидерство рынка e-grocery. Метрика: доля рынка e-grocery в РФ (по выручке). Целевое значение: 35%. Дедлайн: 2028.",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "География присутствия. Метрика: количество городов. Целевое значение: 250+. Дедлайн: 2029.",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Рост выручки. Метрика: годовая выручка. Целевое значение: 400 млрд ₽. Дедлайн: 2028.",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Прибыльность. Метрика: EBITDA margin. Целевое значение: 5%+. Дедлайн: 2027.",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Ритейл впечатлений. Метрика: NPS (индекс потребительской лояльности). Целевое значение: 65+. Дедлайн: 2027.",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Ассортиментное расширение. Метрика: количество SKU. Целевое значение: 50 000+. Дедлайн: 2028.",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Технологическая платформа. Метрика: автоматизация сборки заказов (роботы/автоматизация). Целевое значение: 30% заказов без участия человека. Дедлайн: 2029.",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "ESG / устойчивость. Метрика: доля электротранспорта в парке курьеров. Целевое значение: 50%. Дедлайн: 2028.",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            }
+          ],
+          "metadata": {
+            "confidence": null,
+            "riskRelevanceScore": null,
+            "sourceEvidence": null,
+            "status": null,
+            "validityTo": null
+          }
+        },
+        "keyInvestProjects": {
+          "value": [
+            {
+              "value": "Расширение сети дарксторов. Описание: открытие 500+ новых дарксторов в 40+ городах, включая малые города (100–200 тыс. жителей). Модульные форматы, роботизация складских процессов. Сумма вложений: 15–20 млрд ₽. Стадия: активная реализация. Сроки: 2025–2027.",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Интеграция с «Мегамаркет». Описание: запуск доставки товаров маркетплейса (одежда, электроника, косметика люкс) через инфраструктуру Самоката. Расширение ассортимента с 2500 до 30 000 SKU. Сумма вложений: 5 млрд ₽. Стадия: запущен (март 2025). Сроки: 2025–2026.",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Автоматизация дарксторов. Описание: внедрение роботов-сборщиков, автоматических систем хранения и выдачи (AS/RS), AI-прогнозирование спроса. Пилот в Москве. Сумма вложений: 3–5 млрд ₽. Стадия: пилот. Сроки: 2025–2027.",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Собственные ТМ (торговые марки). Описание: развитие брендов «Самокат», «Лаборатория вкусов», уходовой косметики. Цель: доля ТМ в выручке — 30%. Сумма вложений: 2 млрд ₽. Стадия: реализация. Сроки: 2024–2028.",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Детский проект «Лаборатория вкусов». Описание: игротеки в формате KidBurg (Москва, СПб, Н. Новгород, Новосибирск). Геймификация, обучение детей через кулинарные мастер-классы. Сумма вложений: 500 млн ₽. Стадия: запущен (декабрь 2024). Сроки: 2024–2026.",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Аэродоставка (пилот). Описание: тестирование доставки дронами в Нижнем Новгороде. Доставка в труднодоступные районы, сокращение времени. Сумма вложений: 200 млн ₽. Стадия: пилот. Сроки: 2025–2026.",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "IT-платформа и AI. Описание: модернизация технологической платформы: прогнозирование спроса, динамическая ценообразование, персонализация, веб-приложение. Сумма вложений: 4 млрд ₽. Стадия: реализация. Сроки: 2023–2027.",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            {
+              "value": "Логистический хаб в Москве. Описание: строительство крупного распределительного центра (РЦ) с автоматической сортировкой для обеспечения 1000+ дарксторов ЦФО. Сумма вложений: 8 млрд ₽. Стадия: проектирование. Сроки: 2026–2028.",
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            }
+          ],
+          "metadata": {
+            "confidence": null,
+            "riskRelevanceScore": null,
+            "sourceEvidence": null,
+            "status": null,
+            "validityTo": null
+          }
+        }
+      },
+      "dependents": {
+        "keyManager": [
+          {
+            "id": "e88fdb6e-2902-43da-830c-5e6770888d41",
+            "fields": {
+              "name": {
+                "value": "Попов Сергей Викторович",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "role": {
+                "value": "Генеральный директор",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "responsibilities": {
+                "value": "стратегия, P&L, инвестиции, взаимодействие с X5 Group и советом директоров.",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "level": {
+                "value": "C-level (CEO).",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "1923b691-692d-4300-9888-d37458a1f281",
+            "fields": {
+              "name": {
+                "value": "Нечаева Катерина",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "role": {
+                "value": "Директор по бренду и коммуникациям",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "responsibilities": {
+                "value": "PR, маркетинг, бренд, корпоративные коммуникации, спецпроекты.",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "level": {
+                "value": "C-level (CMO).",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "1d75a97b-c921-44f4-b4bd-d67843f841a0",
+            "fields": {
+              "name": {
+                "value": "Волков Дмитрий Андреевич",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "role": {
+                "value": "Коммерческий директор",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "responsibilities": {
+                "value": "ассортимент, закупки, ценообразование, собственные ТМ, маржинальность.",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "level": {
+                "value": "C-level (CCO).",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "6d01dd3e-71d2-4f9b-b584-3ed94a00949f",
+            "fields": {
+              "name": {
+                "value": "Сидорова Анна Павловна",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "role": {
+                "value": "Директор по операциям (COO)",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "responsibilities": {
+                "value": "дарксторы, логистика, курьерская инфраструктура, качество доставки, операционная эффективность.",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "level": {
+                "value": "C-level (COO).",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "f8e3f3f1-0b48-486f-b6dd-d0c8148afd1f",
+            "fields": {
+              "name": {
+                "value": "Козлов Игорь Сергеевич",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "role": {
+                "value": "Директор по технологиям (CTO)",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "responsibilities": {
+                "value": "IT-платформа, AI/ML, автоматизация дарксторов, мобильное приложение, инфраструктура.",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "level": {
+                "value": "C-level (CTO).",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "8a6c1d05-25e9-4198-9420-8a22d9e6b9d7",
+            "fields": {
+              "name": {
+                "value": "Морозова Елена Викторовна",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "role": {
+                "value": "Финансовый директор (CFO)",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "responsibilities": {
+                "value": "финансы, бюджетирование, инвестиционный контроль, отчётность, взаимодействие с аудиторами.",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "level": {
+                "value": "C-level (CFO).",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "0bbd324b-eb3d-45ac-8a32-ae833b8e4888",
+            "fields": {
+              "name": {
+                "value": "Петров Алексей Игоревич",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "role": {
+                "value": "Директор по персоналу (CHRO)",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "responsibilities": {
+                "value": "HR, найм, обучение, курьерская платформа, корпоративная культура.",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "level": {
+                "value": "C-level (CHRO).",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "1e8d6976-35bb-4d54-999f-b59628a35e87",
+            "fields": {
+              "name": {
+                "value": "Новиков Роман Олегович",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "role": {
+                "value": "Директор по развитию бизнеса",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "responsibilities": {
+                "value": "географическая экспансия, запуск новых городов, франшиза, партнёрства.",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "level": {
+                "value": "VP / Director.",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "392728da-378c-48cc-a1ba-8575b81c70ef",
+            "fields": {
+              "name": {
+                "value": "Федорова Мария Дмитриевна",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "role": {
+                "value": "Руководитель направления ESG и устойчивого развития",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "responsibilities": {
+                "value": "экологическая повестка, электротранспорт, упаковка, социальные проекты.",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "level": {
+                "value": "VP / Director.",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          }
+        ],
+        "extra": [
+          {
+            "id": "generalInfo-extra-dataSource",
+            "fields": {
+              "key": {
+                "value": "dataSource",
+                "metadata": {}
+              },
+              "value": {
+                "value": "датасбор-2024",
+                "metadata": {}
+              },
+              "description": {
+                "value": "Источник данных о компании",
+                "metadata": {}
+              }
+            }
+          },
+          {
+            "id": "generalInfo-extra-internalRating",
+            "fields": {
+              "key": {
+                "value": "internalRating",
+                "metadata": {}
+              },
+              "value": {
+                "value": "AAA",
+                "metadata": {}
+              },
+              "description": {
+                "value": "Внутренний рейтинг",
+                "metadata": {}
+              }
+            }
+          }
+        ]
+      }
+    },
+    "orgStructure": {
+      "id": "84f4c812-0e69-4845-95ce-874ba438857c",
+      "version": 1,
+      "fields": {
+        "personnelTotal": {
+          "value": "Численность сотрудников: 1 323 чел.\nГод данных по численности: 2020г.",
+          "metadata": {
+            "confidence": null,
+            "riskRelevanceScore": null,
+            "sourceEvidence": null,
+            "status": null,
+            "validityTo": null
+          }
+        }
+      },
+      "dependents": {
+        "founder": [
+          {
+            "id": "b8936b3a-8b76-4ffa-8c2d-3797781daffa",
+            "fields": {
+              "restricted": {
+                "value": true,
+                "metadata": {
+                  "confidence": 0.0,
+                  "riskRelevanceScore": 0.0,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "name": {
+                "value": "[Доступ к сведениям ограничен]",
+                "metadata": {
+                  "confidence": 0.0,
+                  "riskRelevanceScore": 0.0,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "inn": {
+                "value": "7705010010",
+                "metadata": {
+                  "confidence": 0.0,
+                  "riskRelevanceScore": 0.0,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "ogrn": {
+                "value": "1027700132195",
+                "metadata": {
+                  "confidence": 0.0,
+                  "riskRelevanceScore": 0.0,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "percent": {
+                "value": 51.0,
+                "metadata": {
+                  "confidence": 0.0,
+                  "riskRelevanceScore": 0.0,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "active": {
+                "value": true,
+                "metadata": {
+                  "confidence": 0.0,
+                  "riskRelevanceScore": 0.0,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "status": {
+                "value": "3 — Имеет ограничения данных от ФНС",
+                "metadata": {
+                  "confidence": 0.0,
+                  "riskRelevanceScore": 0.0,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "metadata": {
+                "value": {
+                  "confidence": 0.0,
+                  "riskRelevanceScore": 0.0,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                },
+                "metadata": {
+                  "confidence": 0.0,
+                  "riskRelevanceScore": 0.0,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "4237e395-4c31-43e4-bc08-7da3955a4196",
+            "fields": {
+              "restricted": {
+                "value": false,
+                "metadata": {
+                  "confidence": 0.0,
+                  "riskRelevanceScore": 0.0,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "name": {
+                "value": "ООО «Фудтех Инвест»",
+                "metadata": {
+                  "confidence": 0.0,
+                  "riskRelevanceScore": 0.0,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "inn": {
+                "value": "7704567892",
+                "metadata": {
+                  "confidence": 0.0,
+                  "riskRelevanceScore": 0.0,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "ogrn": {
+                "value": "1187746360852",
+                "metadata": {
+                  "confidence": 0.0,
+                  "riskRelevanceScore": 0.0,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "percent": {
+                "value": 49.0,
+                "metadata": {
+                  "confidence": 0.0,
+                  "riskRelevanceScore": 0.0,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "active": {
+                "value": true,
+                "metadata": {
+                  "confidence": 0.0,
+                  "riskRelevanceScore": 0.0,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "status": {
+                "value": "0 — Действующее предприятие",
+                "metadata": {
+                  "confidence": 0.0,
+                  "riskRelevanceScore": 0.0,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "metadata": {
+                "value": {
+                  "confidence": 0.0,
+                  "riskRelevanceScore": 0.0,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                },
+                "metadata": {
+                  "confidence": 0.0,
+                  "riskRelevanceScore": 0.0,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          }
+        ],
+        "director": [
+          {
+            "id": "340d5a9f-9842-461a-9858-0391cb0a564f",
+            "fields": {
+              "name": {
+                "value": "Попов Сергей Викторович",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "position": {
+                "value": "Генеральный директор",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "isLegalEntity": {
+                "value": false,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "effectiveDate": {
+                "value": "2025-05-19",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "status": {
+                "value": "0 — Действующее предприятие",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "fnsRestricted": {
+                "value": false,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "bd27e5e3-0cda-4145-9f9d-2a0dff29dc71",
+            "fields": {
+              "name": {
+                "value": "Лазарев Александр Михайлович",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "position": {
+                "value": "Генеральный директор",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "isLegalEntity": {
+                "value": false,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "effectiveDate": {
+                "value": "2022-05-12",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "status": {
+                "value": "0 — Действующее предприятие",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "fnsRestricted": {
+                "value": false,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          }
+        ],
+        "directorDisqualified": [
+          {
+            "id": "bf6f7b65-3a90-4b56-a63f-5172a54d4c36",
+            "fields": {
+              "name": {
+                "value": "Иванов Сергей Петрович",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "startDate": {
+                "value": "2024-01-20",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "endDate": {
+                "value": "2026-01-20",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "reason": {
+                "value": "ст. 14.25 КоАП РФ (Грубое нарушение правил учета доходов и расходов)",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "courtDecision": {
+                "value": "Мосгорсуд; Судья: Петрова Анна Владимировна; Должность судьи: Судья",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "ddf94863-56ee-45d3-9e7b-dcbb3bb93054",
+            "fields": {
+              "name": {
+                "value": "Смирнова Ольга Дмитриевна",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "startDate": {
+                "value": "2023-06-10",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "endDate": {
+                "value": "2024-12-10",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "reason": {
+                "value": "ст. 14.1 КоАП РФ (Нарушение сроков представления налоговой декларации)",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "courtDecision": {
+                "value": "Арбитражный суд г. Москвы; Судья: Кузнецов Денис Сергеевич; Должность судьи: Судья",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          }
+        ],
+        "subsidiary": [
+          {
+            "id": "02cd50d7-a578-42c5-81da-174d5b49617b",
+            "fields": {
+              "inn": {
+                "value": "1654437891",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "ogrn": {
+                "value": "1181647260832",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "name": {
+                "value": "ООО «Умный Ритейл — Казань»",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "share": {
+                "value": 100.0,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "active": {
+                "value": true,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "status": {
+                "value": "0 — Действующее предприятие",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          }
+        ],
+        "branch": [
+          {
+            "id": "a45d2c9e-fe16-410a-95f7-6f9f1d2f36b4",
+            "fields": {
+              "name": {
+                "value": "ООО «Умный Ритейл» — Филиал в г. Москва (Северный округ)",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "address": {
+                "value": "125040, г. Москва, Ленинградский проспект, д. 15, стр. 8, помещ. 301",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "type": {
+                "value": "Филиал",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "status": {
+                "value": "",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "city": {
+                "value": "Москва",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "0d41ef1d-c7bf-4c17-bd77-b6cbbe8f178d",
+            "fields": {
+              "name": {
+                "value": "ООО «Умный Ритейл» — Филиал в г. Санкт-Петербург",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "address": {
+                "value": "196006, г. Санкт-Петербург, Московский проспект, д. 212, лит. А, помещ. 15-Н",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "type": {
+                "value": "Филиал",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "status": {
+                "value": "",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "city": {
+                "value": "Санкт-Петербург",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          }
+        ],
+        "branchesCountries": [
+          {
+            "id": "c2b24c77-c736-45b0-ac6c-6e224cdac1f0",
+            "fields": {
+              "country": {
+                "value": "Российская Федерация",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "count": {
+                "value": 2,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          }
+        ],
+        "keyManager": [],
+        "extra": [
+          {
+            "id": "orgStructure-extra-legalForm",
+            "fields": {
+              "key": {
+                "value": "legalForm",
+                "metadata": {}
+              },
+              "value": {
+                "value": "ООО",
+                "metadata": {}
+              },
+              "description": {
+                "value": "Организационно-правовая форма",
+                "metadata": {}
+              }
+            }
+          }
+        ]
+      }
+    },
+    "financialProfile": {
+      "id": "48ccf079-9995-4e2a-a7dc-c3719889424b",
+      "version": 1,
+      "fields": {
+        "nonbankRevenue": {
+          "value": "20601430878",
+          "metadata": {
+            "confidence": null,
+            "riskRelevanceScore": null,
+            "sourceEvidence": null,
+            "status": null,
+            "validityTo": null
+          }
+        },
+        "operatingIncome": {
+          "value": "339636722.9",
+          "metadata": {
+            "confidence": null,
+            "riskRelevanceScore": null,
+            "sourceEvidence": null,
+            "status": null,
+            "validityTo": null
+          }
+        }
+      },
+      "dependents": {
+        "receivable": [
+          {
+            "id": "e103e6c7-8726-42b0-a2f8-57fe5556492e",
+            "fields": {
+              "counterparty": {
+                "value": "ООО «АгроПродукт Снабжение»",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "amount": {
+                "value": 98500000.0,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "share": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "dueDate": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "72bcec4b-ded0-4431-95d5-2fac7f7509b5",
+            "fields": {
+              "counterparty": {
+                "value": "ООО «Мясная Империя»",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "amount": {
+                "value": 76200000.0,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "share": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "dueDate": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "69d0a3da-131f-4686-a476-419b6d36772b",
+            "fields": {
+              "counterparty": {
+                "value": "ООО «ФрешЛогистика»",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "amount": {
+                "value": 68400000.0,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "share": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "dueDate": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "3f4ca8f6-bd43-4343-be9a-ca4d9d328924",
+            "fields": {
+              "counterparty": {
+                "value": "ООО «Молочный Совхоз»",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "amount": {
+                "value": 54800000.0,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "share": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "dueDate": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "8ee28c8f-94b5-4a5c-b481-846c96fff3ff",
+            "fields": {
+              "counterparty": {
+                "value": "ООО «ТехноСофт Девелопмент»",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "amount": {
+                "value": 52000000.0,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "share": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "dueDate": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "d4b7bc34-9118-4c31-bc3e-6b5a7e07c938",
+            "fields": {
+              "counterparty": {
+                "value": "ООО «УпаковкаПро»",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "amount": {
+                "value": 48700000.0,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "share": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "dueDate": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "6e70fe3f-fc39-40f9-82fa-7267adcf5e8d",
+            "fields": {
+              "counterparty": {
+                "value": "ООО «РыбаСевер»",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "amount": {
+                "value": 45300000.0,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "share": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "dueDate": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "a32a107c-bbec-4aa4-91c7-ff9dad74599c",
+            "fields": {
+              "counterparty": {
+                "value": "ООО «Винный Двор»",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "amount": {
+                "value": 42100000.0,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "share": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "dueDate": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "b9d005bc-9c52-49fd-b364-1979c0eee11a",
+            "fields": {
+              "counterparty": {
+                "value": "ООО «Бакалея Опт»",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "amount": {
+                "value": 38600000.0,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "share": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "dueDate": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "6ad7df8b-8648-4bea-9080-265b0a3815fc",
+            "fields": {
+              "counterparty": {
+                "value": "ООО «Хлебный Завод №3»",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "amount": {
+                "value": 35900000.0,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "share": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "dueDate": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "c988081a-4fce-4f0e-95ba-6f74f080d789",
+            "fields": {
+              "counterparty": {
+                "value": "ООО «ЛогистикПро»",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "amount": {
+                "value": 34500000.0,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "share": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "dueDate": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "4d86fed0-d8c4-4b85-9084-4641b947b353",
+            "fields": {
+              "counterparty": {
+                "value": "ООО «ЯгодыСибири»",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "amount": {
+                "value": 31200000.0,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "share": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "dueDate": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "0e6abf33-bfa9-4090-a0e0-244c707d7139",
+            "fields": {
+              "counterparty": {
+                "value": "ООО «КондитерПремиум»",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "amount": {
+                "value": 28400000.0,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "share": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "dueDate": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "51cd4af6-0202-4f11-a558-f5bdb05e61c3",
+            "fields": {
+              "counterparty": {
+                "value": "ООО «НапиткиМир»",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "amount": {
+                "value": 26800000.0,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "share": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "dueDate": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "fcaf8024-0356-461e-9709-cfed57c00d90",
+            "fields": {
+              "counterparty": {
+                "value": "ООО «ОвощиКубани»",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "amount": {
+                "value": 24600000.0,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "share": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "dueDate": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "5557dcaa-8662-422e-b260-4038d6b8ccc1",
+            "fields": {
+              "counterparty": {
+                "value": "ООО «Снэкс Групп»",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "amount": {
+                "value": 22100000.0,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "share": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "dueDate": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "e1dfe1c0-8938-4fa2-976a-4bbf87120611",
+            "fields": {
+              "counterparty": {
+                "value": "ООО «ТехникаДляКухни»",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "amount": {
+                "value": 19800000.0,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "share": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "dueDate": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "05c14268-0c5d-405f-8013-58b5ccbad193",
+            "fields": {
+              "counterparty": {
+                "value": "ООО «МороженоеПлюс»",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "amount": {
+                "value": 17500000.0,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "share": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "dueDate": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "702f3228-a018-439b-a95a-0c6f0c71d4cc",
+            "fields": {
+              "counterparty": {
+                "value": "ООО «КанцОптТорг»",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "amount": {
+                "value": 14300000.0,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "share": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "dueDate": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "ecaa1cae-bd74-4464-9ffd-ef1aa07cd923",
+            "fields": {
+              "counterparty": {
+                "value": "ООО «СыроварняТрадиция»",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "amount": {
+                "value": 12800000.0,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "share": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "dueDate": {
+                "value": null,
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          }
+        ],
+        "taxDebt": [],
+        "extra": [
+          {
+            "id": "financialProfile-extra-accountingStandard",
+            "fields": {
+              "key": {
+                "value": "accountingStandard",
+                "metadata": {}
+              },
+              "value": {
+                "value": "РСБУ",
+                "metadata": {}
+              },
+              "description": {
+                "value": "Стандарт бухгалтерской отчетности",
+                "metadata": {}
+              }
+            }
+          },
+          {
+            "id": "financialProfile-extra-auditor",
+            "fields": {
+              "key": {
+                "value": "auditor",
+                "metadata": {}
+              },
+              "value": {
+                "value": "Делойт",
+                "metadata": {}
+              },
+              "description": {
+                "value": "Наименование аудитора",
+                "metadata": {}
+              }
+            }
+          }
+        ]
+      }
+    },
+    "regulatoryProfile": {
+      "id": "4b7997a1-91c2-487b-b71f-6c3889e4b530",
+      "version": 1,
+      "fields": {
+        "status": {
+          "value": "Действующее юридическое лицо",
+          "metadata": {
+            "confidence": null,
+            "riskRelevanceScore": null,
+            "sourceEvidence": null,
+            "status": null,
+            "validityTo": null
+          }
+        }
+      },
+      "dependents": {
+        "license": [
+          {
+            "id": "ee0066a7-b9d3-4f17-bb8d-a198f677dccd",
+            "fields": {
+              "number": {
+                "value": "78АА № 1234567",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "expiryDate": {
+                "value": "2027-03-14",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "issuingAuthority": {
+                "value": "Министерство финансов Российской Федерации",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "activityType": {
+                "value": "Розничная продажа алкогольной продукции; Розничная продажа пива и пивных напитков",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "162ca83c-9085-4948-b4f8-81b46acb613b",
+            "fields": {
+              "number": {
+                "value": "ФСТЭК № 0045871",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "expiryDate": {
+                "value": "2028-08-21",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "issuingAuthority": {
+                "value": "Федеральная служба по техническому и экспортному контролю (ФСТЭК России)",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "activityType": {
+                "value": "Деятельность по технической защите конфиденциальной информации; Разработка и производство средств защиты информации",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          }
+        ],
+        "rnpRecord": [
+          {
+            "id": "c894db54-2df6-4058-b542-d602d4183a3e",
+            "fields": {
+              "rnpId": {
+                "value": "RNP-2021-7800001",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "registrationNumber": {
+                "value": "РНП.78.000001.2021",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "inclusionDate": {
+                "value": "2021-03-15",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "exclusionDate": {
+                "value": "2022-06-20",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "inclusionReason": {
+                "value": "Уклонение победителя закупки от заключения контракта",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "decisionBody": {
+                "value": "Федеральная антимонопольная служба России",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            },
+            "dependents": {
+              "founderViolation": [
+                {
+                  "id": "90d9c8ca-948e-4228-8a11-f65e90520d09",
+                  "fields": {
+                    "inn": {
+                      "value": "7704409216",
+                      "metadata": {
+                        "confidence": null,
+                        "riskRelevanceScore": null,
+                        "sourceEvidence": null,
+                        "status": null,
+                        "validityTo": null
+                      }
+                    },
+                    "ogrn": {
+                      "value": "1027700229193",
+                      "metadata": {
+                        "confidence": null,
+                        "riskRelevanceScore": null,
+                        "sourceEvidence": null,
+                        "status": null,
+                        "validityTo": null
+                      }
+                    },
+                    "name": {
+                      "value": "ООО «Самокат Технологии»",
+                      "metadata": {
+                        "confidence": null,
+                        "riskRelevanceScore": null,
+                        "sourceEvidence": null,
+                        "status": null,
+                        "validityTo": null
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "82955e44-4739-4abe-bef7-3718004f7f5f",
+                  "fields": {
+                    "inn": {
+                      "value": "7725767039",
+                      "metadata": {
+                        "confidence": null,
+                        "riskRelevanceScore": null,
+                        "sourceEvidence": null,
+                        "status": null,
+                        "validityTo": null
+                      }
+                    },
+                    "ogrn": {
+                      "value": "1157746123290",
+                      "metadata": {
+                        "confidence": null,
+                        "riskRelevanceScore": null,
+                        "sourceEvidence": null,
+                        "status": null,
+                        "validityTo": null
+                      }
+                    },
+                    "name": {
+                      "value": "ООО «Складской Комплекс»",
+                      "metadata": {
+                        "confidence": null,
+                        "riskRelevanceScore": null,
+                        "sourceEvidence": null,
+                        "status": null,
+                        "validityTo": null
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "id": "dd18ea53-39fe-43d8-b3aa-2f5b91c927fe",
+            "fields": {
+              "rnpId": {
+                "value": "RNP-2022-7800156",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "registrationNumber": {
+                "value": "РНП.78.000156.2022",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "inclusionDate": {
+                "value": "2022-08-10",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "exclusionDate": {
+                "value": "2023-11-25",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "inclusionReason": {
+                "value": "Предоставление недостоверной информации в заявке на участие в закупке",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "decisionBody": {
+                "value": "Управление Федеральной антимонопольной службы по г. Санкт-Петербургу",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            },
+            "dependents": {
+              "founderViolation": [
+                {
+                  "id": "635271f7-c9d6-4260-b2a4-aedd7c6fe47a",
+                  "fields": {
+                    "inn": {
+                      "value": "7704409216",
+                      "metadata": {
+                        "confidence": null,
+                        "riskRelevanceScore": null,
+                        "sourceEvidence": null,
+                        "status": null,
+                        "validityTo": null
+                      }
+                    },
+                    "ogrn": {
+                      "value": "1027700229193",
+                      "metadata": {
+                        "confidence": null,
+                        "riskRelevanceScore": null,
+                        "sourceEvidence": null,
+                        "status": null,
+                        "validityTo": null
+                      }
+                    },
+                    "name": {
+                      "value": "ООО «Самокат Технологии»",
+                      "metadata": {
+                        "confidence": null,
+                        "riskRelevanceScore": null,
+                        "sourceEvidence": null,
+                        "status": null,
+                        "validityTo": null
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "b17c8ba0-6485-4852-917b-d7ab720cd3d9",
+                  "fields": {
+                    "inn": {
+                      "value": "7725767039",
+                      "metadata": {
+                        "confidence": null,
+                        "riskRelevanceScore": null,
+                        "sourceEvidence": null,
+                        "status": null,
+                        "validityTo": null
+                      }
+                    },
+                    "ogrn": {
+                      "value": "1157746123290",
+                      "metadata": {
+                        "confidence": null,
+                        "riskRelevanceScore": null,
+                        "sourceEvidence": null,
+                        "status": null,
+                        "validityTo": null
+                      }
+                    },
+                    "name": {
+                      "value": "ООО «Складской Комплекс»",
+                      "metadata": {
+                        "confidence": null,
+                        "riskRelevanceScore": null,
+                        "sourceEvidence": null,
+                        "status": null,
+                        "validityTo": null
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "regulator": [
+          {
+            "id": "0339fa76-0c08-4f85-be99-169566e50f62",
+            "fields": {
+              "department": {
+                "value": "Федеральная служба по надзору в сфере связи, информационных технологий и массовых коммуникаций (Роскомнадзор)",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "lawAct": {
+                "value": "152-ФЗ О персональных данных",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "c4f6e22b-a9ab-4619-aca5-7d5e6d55c79a",
+            "fields": {
+              "department": {
+                "value": "Федеральная служба по надзору в сфере защиты прав потребителей и благополучия человека (Роспотребнадзор)",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "lawAct": {
+                "value": "2300-1 О защите прав потребителей",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          },
+          {
+            "id": "5416425d-1612-4cca-912f-614738449e68",
+            "fields": {
+              "department": {
+                "value": "Федеральная налоговая служба",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              },
+              "lawAct": {
+                "value": "54-ФЗ О применении контрольно-кассовой техники при осуществлении расчетов в Российской Федерации",
+                "metadata": {
+                  "confidence": null,
+                  "riskRelevanceScore": null,
+                  "sourceEvidence": null,
+                  "status": null,
+                  "validityTo": null
+                }
+              }
+            }
+          }
+        ],
+        "extra": [
+          {
+            "id": "regulatoryProfile-extra-supervisoryAuthority",
+            "fields": {
+              "key": {
+                "value": "supervisoryAuthority",
+                "metadata": {}
+              },
+              "value": {
+                "value": "ЦБ РФ",
+                "metadata": {}
+              },
+              "description": {
+                "value": "Ключевой надзорный орган",
+                "metadata": {}
+              }
+            }
+          }
+        ]
+      },
+      "nested": {
+        "enforcementTotal": {
+          "fields": {
+            "totalCount": {
+              "value": 22,
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            "totalSum": {
+              "value": 3445211.7,
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            }
+          },
+          "dependents": {
+            "enforcementBreakdown": [
+              {
+                "id": "e5d05972-adff-4a63-86b2-652128230f44",
+                "fields": {
+                  "type": {
+                    "value": "Налоги и сборы",
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  },
+                  "count": {
+                    "value": 10,
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  },
+                  "sum": {
+                    "value": 1908400.5,
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  }
+                }
+              },
+              {
+                "id": "3cfd16e6-bc03-42b3-a1ea-fd55902e67f4",
+                "fields": {
+                  "type": {
+                    "value": "Таможенные платежи",
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  },
+                  "count": {
+                    "value": 3,
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  },
+                  "sum": {
+                    "value": 678500.0,
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  }
+                }
+              },
+              {
+                "id": "9ca2d4a6-c573-4c6a-93e0-f866e4e6bcef",
+                "fields": {
+                  "type": {
+                    "value": "ЖКХ и связь",
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  },
+                  "count": {
+                    "value": 5,
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  },
+                  "sum": {
+                    "value": 568311.2,
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  }
+                }
+              },
+              {
+                "id": "0252d689-b338-4f7d-9690-47b98731a085",
+                "fields": {
+                  "type": {
+                    "value": "Арендные платежи",
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  },
+                  "count": {
+                    "value": 3,
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  },
+                  "sum": {
+                    "value": 280000.0,
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  }
+                }
+              },
+              {
+                "id": "876835be-a1a7-4079-a6cc-8f9c5c438f21",
+                "fields": {
+                  "type": {
+                    "value": "Страховые взносы",
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  },
+                  "count": {
+                    "value": 1,
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  },
+                  "sum": {
+                    "value": 0.0,
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "arbitrationTotal": {
+          "fields": {
+            "totalCount": {
+              "value": 22,
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            },
+            "totalSum": {
+              "value": 3445211.7,
+              "metadata": {
+                "confidence": null,
+                "riskRelevanceScore": null,
+                "sourceEvidence": null,
+                "status": null,
+                "validityTo": null
+              }
+            }
+          },
+          "dependents": {
+            "arbitrationBreakdown": [
+              {
+                "id": "e379e841-bec7-41b9-a5c9-808499a0a180",
+                "fields": {
+                  "type": {
+                    "value": "Налоги и сборы",
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  },
+                  "count": {
+                    "value": 10,
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  },
+                  "sum": {
+                    "value": 1908400.5,
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  }
+                }
+              },
+              {
+                "id": "a79dcd87-4687-4ae1-b951-f5fa5c14cb84",
+                "fields": {
+                  "type": {
+                    "value": "Таможенные платежи",
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  },
+                  "count": {
+                    "value": 3,
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  },
+                  "sum": {
+                    "value": 678500.0,
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  }
+                }
+              },
+              {
+                "id": "07b6635b-0e2b-4c60-960b-ed82904df440",
+                "fields": {
+                  "type": {
+                    "value": "ЖКХ и связь",
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  },
+                  "count": {
+                    "value": 5,
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  },
+                  "sum": {
+                    "value": 568311.2,
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  }
+                }
+              },
+              {
+                "id": "0f03a4d6-065d-4975-b8ae-e5cea0dbe289",
+                "fields": {
+                  "type": {
+                    "value": "Арендные платежи",
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  },
+                  "count": {
+                    "value": 3,
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  },
+                  "sum": {
+                    "value": 280000.0,
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  }
+                }
+              },
+              {
+                "id": "5026babe-f365-4ca1-8e61-f536df6c17f1",
+                "fields": {
+                  "type": {
+                    "value": "Страховые взносы",
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  },
+                  "count": {
+                    "value": 1,
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  },
+                  "sum": {
+                    "value": 0.0,
+                    "metadata": {
+                      "confidence": null,
+                      "riskRelevanceScore": null,
+                      "sourceEvidence": null,
+                      "status": null,
+                      "validityTo": null
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "dependents": {},
+  "version": 1,
+  "fields": {}
+}

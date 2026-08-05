@@ -261,12 +261,28 @@ function metadataRows(metadata?: KnowledgeMetadata | null): Array<[string, strin
   return rows.filter(([, value]) => value !== "");
 }
 
+function hasDistinctAtomicMetadata(metadata?: KnowledgeMetadata | null): boolean {
+  if (!metadata) return false;
+  const detailedEvidence = metadata.sourceEvidence?.some((evidence) =>
+    !!evidence.quote || (!!evidence.locator && Object.values(evidence.locator).some((value) => value != null)),
+  );
+  return !!(
+    metadata.validFrom ||
+    metadata.validityTo ||
+    metadata.confidence != null ||
+    metadata.riskRelevanceScore != null ||
+    metadata.access?.classification ||
+    detailedEvidence
+  );
+}
+
 function NodeMetadata({ metadata }: { metadata?: KnowledgeMetadata | null }) {
+  if (!hasDistinctAtomicMetadata(metadata)) return null;
   const rows = metadataRows(metadata);
   if (rows.length === 0) return null;
   return (
     <details className="np-uv-meta">
-      <summary>О данных</summary>
+      <summary aria-label="О данных" title="О данных"><span aria-hidden>i</span></summary>
       <div className="np-uv-meta-panel">
         {rows.map(([label, value]) => (
           <div key={label} className="np-uv-meta-row">
@@ -394,6 +410,14 @@ function ArrayRenderer({ node, depth }: { node: KnowledgeNode; depth: number }) 
         <ul className="np-uv-list">
           {visible.map((child) => (
             <li key={child.id} className="np-uv-list-item">
+              {child.key !== "item" && (
+                <div className="np-uv-list-heading">
+                  <span className="np-uv-list-label">{child.label || child.key}</span>
+                  {child.label && child.label !== child.key && (
+                    <span className="np-uv-list-key">{child.key}</span>
+                  )}
+                </div>
+              )}
               <UniversalValueRenderer node={child} depth={depth + 1} />
             </li>
           ))}

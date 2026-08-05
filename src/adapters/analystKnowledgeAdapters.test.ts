@@ -6,7 +6,10 @@ import { adaptProfileResultKnowledge } from "./profileResultKnowledgeAdapter";
 import { normalizeKnowledgeInput } from "./knowledgeInputAdapter";
 import { validateUniversalAreas } from "./universalKnowledgeValidation";
 import companyProfile from "../data/company_profile_full.json";
+import { ANALYST_KNOWLEDGE_DATASETS } from "../data/analystKnowledgeSources";
 import universalKnowledgeSchema from "../../schemas/universal-knowledge.schema.json";
+import type { KnowledgeNode } from "../types/universalKnowledge";
+import { composeKnowledgePresentation } from "../presentation/knowledgePresentation";
 
 const ajv = new Ajv2020({ allErrors: true, strict: true, allowUnionTypes: true });
 addFormats(ajv);
@@ -18,6 +21,30 @@ function expectUniversalSchema(value: unknown) {
 }
 
 const envelope = (value: unknown, metadata: Record<string, unknown> = {}) => ({ value, metadata });
+
+function primitiveSignature(value: unknown): string {
+  return `${typeof value}:${JSON.stringify(value)}`;
+}
+
+function sourcePrimitiveValues(value: unknown, result = new Set<string>()): Set<string> {
+  if (value === null || typeof value !== "object") {
+    result.add(primitiveSignature(value));
+    return result;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((entry) => sourcePrimitiveValues(entry, result));
+  } else {
+    Object.values(value as Record<string, unknown>).forEach((entry) => sourcePrimitiveValues(entry, result));
+  }
+  return result;
+}
+
+function expectNodeValuesInSource(node: KnowledgeNode, sourceValues: Set<string>): void {
+  if (!["object", "array"].includes(node.valueType) && node.value !== undefined) {
+    expect(sourceValues.has(primitiveSignature(node.value)), `${node.id} is absent from analyst input`).toBe(true);
+  }
+  node.children?.forEach((child) => expectNodeValuesInSource(child, sourceValues));
+}
 
 describe("business object adapter", () => {
   const input = {
@@ -142,4 +169,52 @@ describe("common validated input boundary", () => {
         ?.knowledge.some((knowledge) => knowledge.state.code === "conflicting"),
     ).toBe(true);
   });
+
+  it.each(ANALYST_KNOWLEDGE_DATASETS)(
+    "keeps every displayed value traceable to $fileName",
+    (dataset) => {
+      const areas = normalizeKnowledgeInput(dataset.input, {
+        sourceFileName: dataset.fileName,
+        sourceDataset: dataset.id,
+      });
+      const sourceValues = sourcePrimitiveValues(dataset.input);
+
+      expect(areas).toHaveLength(9);
+      expectUniversalSchema(areas);
+      for (const area of areas) {
+        for (const knowledge of area.knowledge) {
+          expect(knowledge.epistemicKind).toBe("fact");
+          expect(knowledge.sources?.every((source) => source.fileName === dataset.fileName)).toBe(true);
+          expectNodeValuesInSource(knowledge.content, sourceValues);
+        }
+      }
+    },
+  );
+
+  it("keeps analyst exports as separate company profiles", () => {
+    expect(ANALYST_KNOWLEDGE_DATASETS.map((dataset) => dataset.label)).toEqual([
+      'ООО "УМНЫЙ РИТЕЙЛ"',
+      "Звук",
+    ]);
+  });
+
+  it.each(ANALYST_KNOWLEDGE_DATASETS)(
+    "composes $fileName into semantic accordions without losing atomic facts",
+    (dataset) => {
+      const areas = normalizeKnowledgeInput(dataset.input, {
+        sourceFileName: dataset.fileName,
+        sourceDataset: dataset.id,
+      });
+
+      for (const area of areas) {
+        const groups = composeKnowledgePresentation(area);
+        expect(groups.flatMap((group) => group.knowledge.map((knowledge) => knowledge.id)).sort())
+          .toEqual(area.knowledge.map((knowledge) => knowledge.id).sort());
+        expect(groups.every((group) => group.knowledge.length > 0)).toBe(true);
+      }
+
+      const general = areas.find((area) => area.id === "general_information")!;
+      expect(composeKnowledgePresentation(general).length).toBeLessThan(general.knowledge.length);
+    },
+  );
 });

@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { formatNodeValue, shouldHideNode } from "./UniversalValueRenderer";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { formatNodeValue, shouldHideNode, UniversalValueRenderer } from "./UniversalValueRenderer";
 import type { KnowledgeNode } from "../types/universalKnowledge";
 
 function node(overrides: Partial<KnowledgeNode>): KnowledgeNode {
@@ -28,5 +30,42 @@ describe("UniversalValueRenderer value rules", () => {
 
   it("keeps a composite node's own value", () => {
     expect(shouldHideNode(node({ valueType: "object", value: "51%", children: [] }))).toBe(false);
+  });
+
+  it("shows the semantic label and key for named primitive array items", () => {
+    const array = node({
+      valueType: "array",
+      children: [node({
+        id: "extra-ebitda",
+        key: "ebitdaTurnaround",
+        label: "Достижение операционной прибыльности группы",
+        value: "EBITDA стала положительной",
+      })],
+    });
+    const html = renderToStaticMarkup(createElement(UniversalValueRenderer, { node: array }));
+
+    expect(html).toContain("Достижение операционной прибыльности группы");
+    expect(html).toContain("ebitdaTurnaround");
+    expect(html).toContain("EBITDA стала положительной");
+  });
+
+  it("hides repeated technical metadata and shows a compact info control for distinct metadata", () => {
+    const inheritedOnly = renderToStaticMarkup(createElement(UniversalValueRenderer, {
+      node: node({
+        value: "7700000000",
+        metadata: { actualAt: "2026-07-20", origin: { type: "QWEN", name: "Qwen" } },
+      }),
+    }));
+    const distinct = renderToStaticMarkup(createElement(UniversalValueRenderer, {
+      node: node({
+        value: "7700000000",
+        metadata: { confidence: 0.82, origin: { type: "QWEN", name: "Qwen" } },
+      }),
+    }));
+
+    expect(inheritedOnly).not.toContain("О данных");
+    expect(distinct).toContain('aria-label="О данных"');
+    expect(distinct).toContain("Уверенность");
+    expect(distinct).toContain("82%");
   });
 });

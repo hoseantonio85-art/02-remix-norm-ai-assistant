@@ -44,6 +44,9 @@ export interface AnalystAdapterOptions {
    */
   emptyCollectionStates?: Record<string, KnowledgeStateCode | KnowledgeState>;
   actualAt?: string | null;
+  /** Exact analyst export used as the boundary input. */
+  sourceFileName?: string | null;
+  sourceDataset?: string | null;
 }
 
 const LABELS: Record<string, string> = {
@@ -133,13 +136,14 @@ export function catalogDefinition(
   return catalog?.[objectType]?.[key] || {};
 }
 
-export function sourceFor(code = "AG", actualAt?: string | null): KnowledgeSource {
+export function sourceFor(code = "AG", options: AnalystAdapterOptions = {}): KnowledgeSource {
   return {
     id: `analyst-${code.toLowerCase()}`,
     type: "analyst_source",
     name: SOURCE_NAMES[code] || code,
-    dataset: code,
-    actualAt: actualAt ?? null,
+    dataset: options.sourceDataset || code,
+    fileName: options.sourceFileName ?? null,
+    actualAt: options.actualAt ?? null,
   };
 }
 
@@ -464,7 +468,7 @@ export function knowledgeFromNode(
   title: string,
   node: KnowledgeNode,
   sourceCode: string,
-  actualAt?: string | null,
+  options: AnalystAdapterOptions = {},
 ): UniversalKnowledge {
   const state = node.state || { code: "known", label: stateLabel("known") };
   return {
@@ -477,11 +481,11 @@ export function knowledgeFromNode(
     state,
     content: node,
     metadata: {
-      actualAt: actualAt ?? null,
+      actualAt: options.actualAt ?? null,
       origin: { type: sourceCode, name: SOURCE_NAMES[sourceCode] || sourceCode },
       sourceEvidence: [{ sourceId: `analyst-${sourceCode.toLowerCase()}` }],
     },
-    sources: [sourceFor(sourceCode, actualAt)],
+    sources: [sourceFor(sourceCode, options)],
     tags: [],
     alerts: [],
     relations: [],
@@ -499,6 +503,7 @@ export function areaFor(section: string, key: string): AnalystAreaId {
   if (["receivable", "receivablesTop20"].includes(key)) return "counterparties";
   if (section === "financialProfile") return "finance";
   if (section === "regulatoryProfile") return "regulation_risk_signals";
+  if (section === "orgStructure" && ["extra", "extras"].includes(key)) return "structure_management";
   if (["naturalTechFactors", "directorDisqualified"].includes(key)) return "regulation_risk_signals";
   if (["founder", "founders", "subsidiary", "subsidiaries"].includes(key)) return "owners_relations";
   if (["branch", "branches", "branchesCountries", "geoOfOperations", "seasonality"].includes(key)) return "operations";

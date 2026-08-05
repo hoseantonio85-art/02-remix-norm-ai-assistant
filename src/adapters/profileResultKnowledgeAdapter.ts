@@ -59,7 +59,7 @@ function convertValue(
     `${title}${areaSuffix}`,
     node,
     sourceCode,
-    options.actualAt,
+    options,
   );
 }
 
