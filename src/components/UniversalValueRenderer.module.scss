@@ -1,0 +1,60 @@
+.value { color: var(--textBaseDefault); font-weight: 500; }
+.primitive { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.ownValue {
+  padding: 8px 10px; border-left: 3px solid var(--borderFocus); border-radius: 0 8px 8px 0;
+  background: var(--surfaceAccentStatusSuccess);
+}
+.meta { display: inline-block; color: var(--textBaseSecondary); font-size: 12px; }
+.meta > summary {
+  display: inline-flex; width: 17px; height: 17px; align-items: center; justify-content: center;
+  border: 1px solid var(--borderDefault); border-radius: 50%; color: var(--textBaseSecondary);
+  font-size: 11px; font-style: normal; font-weight: 700; list-style: none; cursor: pointer;
+  vertical-align: middle;
+}
+.meta > summary:hover { border-color: var(--borderFocus); background: var(--surfaceAccentStatusSuccess); color: var(--textBrandDefault); }
+.meta > summary:focus-visible { outline: 2px solid var(--borderFocus); outline-offset: 2px; }
+.meta > summary::-webkit-details-marker { display: none; }
+.metaPanel {
+  display: grid; min-width: 220px; gap: 5px; margin-top: 6px; padding: 8px 10px;
+  border: 1px solid var(--borderDefault); border-radius: 8px; background: var(--surfaceBasicDefault);
+}
+.metaRow { display: flex; justify-content: space-between; gap: 12px; }
+.metaRow strong { color: var(--textBaseDefault); font-weight: 500; text-align: right; }
+.text { display: flex; flex-direction: column; gap: 6px; }
+.textBody { margin: 0; color: var(--textBaseDefault); font-size: 14px; line-height: 20px; white-space: pre-wrap; }
+.clamped { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 5; }
+.link { align-self: flex-start; padding: 0; border: 0; background: transparent; color: var(--textAccentInfo); font-size: 14px; font-weight: 600; cursor: pointer; }
+.link:hover { text-decoration: underline; }
+.functionalLink { align-self: flex-start; }
+.object { display: flex; flex-direction: column; gap: 8px; }
+.indent { padding-left: 10px; border-left: 2px solid var(--borderDefault); }
+.row {
+  display: grid; grid-template-columns: minmax(160px, .45fr) minmax(0, 1fr); align-items: baseline;
+  gap: 12px; padding: 6px 0; border-bottom: 1px dashed var(--borderDefault);
+}
+.row:last-child { border-bottom: 0; }
+.rowKey { color: var(--textBaseSecondary); font-size: 14px; line-height: 20px; }
+.rowValue { min-width: 0; color: var(--textBaseDefault); font-size: 14px; line-height: 20px; overflow-wrap: anywhere; }
+.block { display: flex; flex-direction: column; gap: 4px; padding: 4px 0; }
+.blockLabel { color: var(--textBaseSecondary); font-size: 14px; line-height: 20px; }
+.group, .item { display: flex; flex-direction: column; border-radius: 10px; background: var(--surfaceSecondaryDefault); }
+.group { gap: 6px; padding: 10px 12px; }
+.groupTitle { color: var(--textBaseSecondary); font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.array, .items { display: flex; flex-direction: column; gap: 8px; }
+.collectionStatus { color: var(--textBaseSecondary); font-size: 12px; }
+.list { display: flex; flex-direction: column; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.listItem { padding: 10px 0; border-bottom: 1px dashed var(--borderDefault); color: var(--textBaseDefault); font-size: 14px; }
+.listItem:last-child { border-bottom: 0; }
+.listHeading, .itemTitleRow { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; }
+.listHeading { margin-bottom: 6px; }
+.listLabel { color: var(--textBaseDefault); font-size: 14px; font-weight: 600; line-height: 20px; }
+.listKey { padding: 1px 5px; border-radius: 5px; background: var(--surfaceSecondaryDefault); color: var(--textBaseSecondary); font-size: 11px; }
+.item { gap: 6px; padding: 10px 12px; }
+.itemTitle { color: var(--textBaseDefault); font-weight: 600; }
+.statusRow { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 6px; }
+.links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.links .link { font-size: 12px; }
+
+@media (max-width: 640px) {
+  .row { grid-template-columns: 1fr; gap: 2px; }
+}

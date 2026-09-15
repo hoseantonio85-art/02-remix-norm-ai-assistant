@@ -1,43 +1,51 @@
-# Норм — сборка для GitHub Pages
+# Профиль компании / База знаний
 
-Эта папка — **полностью автономный** Vite + React + TypeScript + React Router v6 проект.
-Превью внутри Lovable работает на TanStack Start, поэтому корень репозитория его не трогает;
-вся "чистая" сборка для GitHub Pages живёт здесь.
+Локальный прототип сервиса «Профиль компании». База знаний остаётся частью
+сервиса и отображает входящие данные через универсальную модель и набор
+адаптеров.
 
+## Требования
 
-## Что внутри
+- Node.js 22 (проверено на `22.23.1`)
+- npm 10 (проверено на `10.9.8`)
 
-```
-gh-pages/
-├── .github/workflows/deploy.yml   # CI: build + deploy на Pages
-├── index.html
-├── package.json                   # react, react-dom, react-router-dom, vite
-├── tsconfig.json
-├── vite.config.ts                 # base: '/norm-ai-assistant/'
-└── src/
-    ├── main.tsx
-    ├── App.tsx                    # BrowserRouter с basename
-    ├── index.css
-    ├── components/NormPrototype.tsx
-    └── styles/norm-prototype.css
+## Установка и запуск
+
+```bash
+npm ci
+npm run dev
 ```
 
-## Деплой
+После запуска База знаний доступна по адресу:
 
-1. Создайте на GitHub пустой репозиторий `norm-ai-assistant`.
-2. Скопируйте **содержимое папки `gh-pages/`** (не саму папку) в корень нового репозитория.
-3. Локально:
-   ```
-   npm install
-   npm run dev      # http://localhost:5173
-   npm run build    # сборка в dist/
-   npm run preview
-   ```
-4. `git push` в ветку `main`.
-5. GitHub → **Settings → Pages → Source: GitHub Actions**.
-6. Сайт: `https://<user>.github.io/norm-ai-assistant/`.
+`http://127.0.0.1:5173/02-remix-norm-ai-assistant/knowledge-base`
 
-## Другое имя репозитория
+Порт может отличаться, если `5173` уже занят. Фактический адрес Vite выводит
+в терминале.
 
-Поменяйте `base` в `vite.config.ts` и `basename` в `src/App.tsx`
-на `/<имя-репозитория>/`.
+## Проверки
+
+```bash
+npm run lint
+npm run lint:ts
+npm run test
+npm run build
+npm run build:mfe
+```
+
+- `npm run build` создаёт самостоятельную сборку в `dist/`.
+- `npm run build:mfe` создаёт сборку для встраивания в `dist-mfe/`.
+
+## Локальные продуктовые библиотеки
+
+Проект не зависит от абсолютных путей на компьютере автора. Требуемые
+продуктовые пакеты находятся в `vendor/` и подключены относительными путями из
+`package.json`:
+
+- `@sber-orm/ui-kit` `0.283.0`;
+- `@sber-orm/components` `0.253.0`;
+- `@sber-orm/biome-config` `0.245.0`;
+- `@sber-orm/tsconfig-config` `0.245.0`.
+
+Папка `node_modules/` намеренно не передаётся. Для восстановления всех
+зависимостей достаточно выполнить `npm ci` в корне проекта.

@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { formatNodeValue, shouldHideNode } from "./UniversalValueRenderer";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { formatNodeValue, shouldHideNode, UniversalValueRenderer } from "./UniversalValueRenderer";
 import type { KnowledgeNode } from "../types/universalKnowledge";
 
 function node(overrides: Partial<KnowledgeNode>): KnowledgeNode {
@@ -7,6 +9,25 @@ function node(overrides: Partial<KnowledgeNode>): KnowledgeNode {
 }
 
 describe("UniversalValueRenderer value rules", () => {
+  it.each([
+    { value: 'Итого 3', children: [] },
+    { displayValue: 'Итого 3', children: [] },
+    { value: 'Итого 3', children: [node({ value: null })] },
+    { value: 0, children: [] },
+    { value: false, children: [] },
+  ])('renders array own values without visible children: %j', (data) => {
+    const array = node({ valueType: 'array', ...data });
+    const html = renderToStaticMarkup(createElement(UniversalValueRenderer, { node: array }));
+    const expected = formatNodeValue({ ...array, valueType: 'string' });
+    expect(expected.length).toBeGreaterThan(0);
+    expect(html).toContain(expected);
+    expect(html).not.toContain('<ul');
+  });
+
+  it.each(['known_empty', 'unknown', 'not_applicable'] as const)('preserves explicit empty array state %s', (code) => {
+    const array = node({ valueType: 'array', children: [], state: { code, label: 'Explicit state' } });
+    expect(renderToStaticMarkup(createElement(UniversalValueRenderer, { node: array }))).toContain('Explicit state');
+  });
   it("preserves time for datetime", () => {
     expect(formatNodeValue(node({ valueType: "datetime", value: "2026-07-20T15:25:52Z" })))
       .toContain("15:25:52");
@@ -28,5 +49,42 @@ describe("UniversalValueRenderer value rules", () => {
 
   it("keeps a composite node's own value", () => {
     expect(shouldHideNode(node({ valueType: "object", value: "51%", children: [] }))).toBe(false);
+  });
+
+  it("shows the semantic label and key for named primitive array items", () => {
+    const array = node({
+      valueType: "array",
+      children: [node({
+        id: "extra-ebitda",
+        key: "ebitdaTurnaround",
+        label: "Достижение операционной прибыльности группы",
+        value: "EBITDA стала положительной",
+      })],
+    });
+    const html = renderToStaticMarkup(createElement(UniversalValueRenderer, { node: array }));
+
+    expect(html).toContain("Достижение операционной прибыльности группы");
+    expect(html).toContain("ebitdaTurnaround");
+    expect(html).toContain("EBITDA стала положительной");
+  });
+
+  it("hides repeated technical metadata and shows a compact info control for distinct metadata", () => {
+    const inheritedOnly = renderToStaticMarkup(createElement(UniversalValueRenderer, {
+      node: node({
+        value: "7700000000",
+        metadata: { actualAt: "2026-07-20", origin: { type: "QWEN", name: "Qwen" } },
+      }),
+    }));
+    const distinct = renderToStaticMarkup(createElement(UniversalValueRenderer, {
+      node: node({
+        value: "7700000000",
+        metadata: { confidence: 0.82, origin: { type: "QWEN", name: "Qwen" } },
+      }),
+    }));
+
+    expect(inheritedOnly).not.toContain("О данных");
+    expect(distinct).toContain('aria-label="О данных"');
+    expect(distinct).toContain("Уверенность");
+    expect(distinct).toContain("82%");
   });
 });

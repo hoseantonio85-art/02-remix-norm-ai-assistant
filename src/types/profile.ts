@@ -1,4 +1,4 @@
-export type ValueType = "text" | "date" | "year" | "list" | "number" | string;
+export type ValueType = 'text' | 'date' | 'year' | 'list' | 'number' | string;
 
 export interface Attribute {
   key: string;
@@ -6,7 +6,7 @@ export interface Attribute {
   value?: string | number | string[] | null;
   value_type?: ValueType;
   format?: {
-    kind?: "text" | "identifier" | "number" | "money" | "percentage" | "date";
+    kind?: 'text' | 'identifier' | 'number' | 'money' | 'percentage' | 'date';
     currency?: string | null;
     unit?: string | null;
     decimals?: number | null;
@@ -18,7 +18,7 @@ export interface Attribute {
 export interface Tag {
   code: string;
   label: string;
-  tone?: "positive" | "neutral" | "warning" | "negative" | string;
+  tone?: 'positive' | 'neutral' | 'warning' | 'negative' | string;
 }
 
 export interface KnowledgeLink {
@@ -48,7 +48,7 @@ export interface Source {
 }
 
 export interface Freshness {
-  code: "current" | "outdated" | "update_required" | string;
+  code: 'current' | 'outdated' | 'update_required' | string;
   label: string;
   reason?: string;
 }
@@ -62,24 +62,24 @@ export interface AlertAction {
 export interface KnowledgeAlert {
   code: string;
   message: string;
-  severity: "info" | "warning" | "error" | string;
+  severity: 'info' | 'warning' | 'error' | string;
   action?: AlertAction;
   target_item_id?: string;
 }
 
 export interface Presentation {
   variant:
-    | "details"
-    | "collection"
-    | "table"
-    | "narrative"
-    | "metric"
-    | "metrics"
-    | "statistics"
-    | "map_list"
-    | "timeline"
-    | "periods"
-    | "risk_list"
+    | 'details'
+    | 'collection'
+    | 'table'
+    | 'narrative'
+    | 'metric'
+    | 'metrics'
+    | 'statistics'
+    | 'map_list'
+    | 'timeline'
+    | 'periods'
+    | 'risk_list'
     | string;
   page_size?: number;
 }

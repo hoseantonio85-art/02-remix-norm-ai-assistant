@@ -1,0 +1,32 @@
+.heading {
+  min-width: 0;
+}
+.type, .listType {
+  color: var(--textBaseSecondary); font-size: 12px; font-weight: 500;
+  line-height: 16px; letter-spacing: .06em; text-transform: uppercase;
+}
+.submeta, .listMeta { color: var(--textBaseSecondary); font-size: 12px; line-height: 16px; }
+.body {
+  flex: 1;
+  min-height: 0;
+  padding: 20px;
+  overflow-y: auto;
+  color: var(--textBaseDefault);
+}
+.context { display: flex; flex-direction: column; gap: 4px; margin-bottom: 20px; }
+.back { align-self: flex-start; margin-bottom: 4px; }
+.footer { padding-top: 0; }
+.footerActions { display: flex; flex-wrap: wrap; gap: 12px; }
+.list { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.listItem {
+  display: flex; width: 100%; align-items: center; gap: 12px; padding: 14px 4px;
+  border: 0; border-top: 1px solid var(--borderDefault);
+  background: var(--surfaceBasicDefault); color: inherit; text-align: left; cursor: pointer;
+  &:hover { background: var(--surfaceBasicHover); }
+  &:hover .listTitle { color: var(--textBrandDefault); }
+  &:focus-visible { outline: 2px solid var(--borderFocus); outline-offset: 2px; }
+}
+.list li:first-child .listItem { border-top: 0; }
+.listMain { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 2px; }
+.listTitle { color: var(--textBaseDefault); font-size: 14px; font-weight: 500; line-height: 20px; }
+.listChevron { color: var(--textBaseSecondary); }

@@ -1,5 +1,10 @@
-import type { UniversalArea, UniversalKnowledge } from "../types/universalKnowledge";
+import type {
+  UniversalArea,
+  UniversalKnowledge,
+} from '../types/universalKnowledge';
 import {
+  type AnalystAdapterOptions,
+  type AnalystAreaId,
   areaFor,
   areasFromKnowledge,
   catalogDefinition,
@@ -7,10 +12,8 @@ import {
   knowledgeFromNode,
   nodeFromValue,
   splitStrategicArray,
-  type AnalystAdapterOptions,
-  type AnalystAreaId,
-} from "./analystAdapterCore";
-import { DEFAULT_ANALYST_FIELD_CATALOG } from "./defaultAnalystFieldCatalog";
+} from './analystAdapterCore';
+import { DEFAULT_ANALYST_FIELD_CATALOG } from './defaultAnalystFieldCatalog';
 
 interface BusinessObjectSection {
   id?: string;
@@ -28,16 +31,34 @@ interface BusinessObjectTransport {
   dependents?: Record<string, unknown>;
 }
 
-export function isBusinessObjectTransport(input: unknown): input is BusinessObjectTransport {
-  if (!input || typeof input !== "object" || Array.isArray(input)) return false;
+export function isBusinessObjectTransport(
+  input: unknown,
+): input is BusinessObjectTransport {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) {
+    return false;
+  }
   const record = input as Record<string, unknown>;
-  if (!record.nested || typeof record.nested !== "object" || Array.isArray(record.nested)) return false;
+  if (
+    !record.nested ||
+    typeof record.nested !== 'object' ||
+    Array.isArray(record.nested)
+  ) {
+    return false;
+  }
   const nested = record.nested as Record<string, unknown>;
-  return ["generalInfo", "orgStructure", "financialProfile", "regulatoryProfile"]
-    .some((key) => key in nested);
+  return [
+    'generalInfo',
+    'orgStructure',
+    'financialProfile',
+    'regulatoryProfile',
+  ].some((key) => key in nested);
 }
 
-function knowledgeKey(section: string, key: string, areaId: AnalystAreaId): string {
+function knowledgeKey(
+  section: string,
+  key: string,
+  areaId: AnalystAreaId,
+): string {
   return `${section}.${key}.${areaId}`;
 }
 
@@ -45,7 +66,7 @@ function convertValue(
   sectionName: string,
   key: string,
   value: unknown,
-  branch: "fields" | "nested" | "dependents",
+  branch: 'fields' | 'nested' | 'dependents',
   options: AnalystAdapterOptions,
   forcedArea?: AnalystAreaId,
   suffix?: string,
@@ -53,7 +74,8 @@ function convertValue(
   const areaId = forcedArea || areaFor(sectionName, key);
   const definition = catalogDefinition(options.catalog, sectionName, key);
   const title = definition.title || humanizeKey(key);
-  const sourceCode = definition.source || (key === "extra" || key === "extras" ? "UI" : "ES");
+  const sourceCode =
+    definition.source || (key === 'extra' || key === 'extras' ? 'UI' : 'ES');
   const keyWithSuffix = suffix ? `${key}.${suffix}` : key;
   const canonicalKey = knowledgeKey(sectionName, keyWithSuffix, areaId);
   const path = `$.nested.${sectionName}.${branch}.${key}`;
@@ -66,16 +88,16 @@ function convertValue(
     sourceCode,
     options,
     definition,
-    semanticRole: "group",
+    semanticRole: 'group',
   });
-  const areaSuffix = suffix ? ` — ${humanizeKey(areaId)}` : "";
+  const areaSuffix = suffix ? ` — ${humanizeKey(areaId)}` : '';
   return knowledgeFromNode(
     areaId,
     canonicalKey,
     `${title}${areaSuffix}`,
     node,
     sourceCode,
-    options.actualAt,
+    options,
   );
 }
 
@@ -85,14 +107,24 @@ function convertSection(
   options: AnalystAdapterOptions,
 ): UniversalKnowledge[] {
   const result: UniversalKnowledge[] = [];
-  for (const branch of ["fields", "nested", "dependents"] as const) {
+  for (const branch of ['fields', 'nested', 'dependents'] as const) {
     const values = section[branch] || {};
     for (const [key, value] of Object.entries(values)) {
-      if (["goals", "keyInvestProjects"].includes(key)) {
-        const split = splitStrategicArray(value, "products_business_model");
+      if (['goals', 'keyInvestProjects'].includes(key)) {
+        const split = splitStrategicArray(value, 'products_business_model');
         if (split.size > 0) {
           for (const [areaId, entries] of split) {
-            result.push(convertValue(sectionName, key, entries, branch, options, areaId, areaId));
+            result.push(
+              convertValue(
+                sectionName,
+                key,
+                entries,
+                branch,
+                options,
+                areaId,
+                areaId,
+              ),
+            );
           }
           continue;
         }
@@ -113,7 +145,7 @@ export function adaptBusinessObjectKnowledge(
   options: AnalystAdapterOptions = {},
 ): UniversalArea[] {
   if (!isBusinessObjectTransport(input)) {
-    throw new TypeError("Ожидался business object с разделом nested");
+    throw new TypeError('Ожидался business object с разделом nested');
   }
   const effectiveOptions: AnalystAdapterOptions = {
     ...options,

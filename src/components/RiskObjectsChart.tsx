@@ -1,5 +1,5 @@
-import { useState, type ReactNode } from "react";
-import chartDataRaw from "../data/risk_objects_chart.json";
+import { type ReactNode, useState } from 'react';
+import chartDataRaw from '../data/risk_objects_chart.json';
 
 interface RiskObject {
   id: string;
@@ -11,32 +11,32 @@ interface RiskObject {
   potentialPath: string;
   assessmentPath: string;
   factDashes: string[];
-  tone: "critical" | "attention" | "stable";
+  tone: 'critical' | 'attention' | 'stable';
 }
 
 const RISK_OBJECTS = chartDataRaw as RiskObject[];
 
 const CHART_TONES = {
   critical: {
-    potential: "#FDF0F1",
-    assessment: "#F8DCDD",
-    fact: "#E05A5F",
-    hoverPotential: "#FAE4E6",
-    hoverAssessment: "#F3CDCF",
+    potential: '#FDF0F1',
+    assessment: '#F8DCDD',
+    fact: '#E05A5F',
+    hoverPotential: '#FAE4E6',
+    hoverAssessment: '#F3CDCF',
   },
   attention: {
-    potential: "#FFF8E7",
-    assessment: "#F8EDC8",
-    fact: "#E5A62B",
-    hoverPotential: "#FFF2D2",
-    hoverAssessment: "#F3E2A9",
+    potential: '#FFF8E7',
+    assessment: '#F8EDC8',
+    fact: '#E5A62B',
+    hoverPotential: '#FFF2D2',
+    hoverAssessment: '#F3E2A9',
   },
   stable: {
-    potential: "#EAF9F4",
-    assessment: "#D4F2E8",
-    fact: "#2BBF8A",
-    hoverPotential: "#DFF6EE",
-    hoverAssessment: "#C4EBDD",
+    potential: '#EAF9F4',
+    assessment: '#D4F2E8',
+    fact: '#2BBF8A',
+    hoverPotential: '#DFF6EE',
+    hoverAssessment: '#C4EBDD',
   },
 } as const;
 
@@ -45,51 +45,51 @@ function MiniIcon({ name }: { name: string }) {
   const p: Record<string, ReactNode> = {
     law: (
       <>
-        <path d="M12 3v18M5 8h14M8 8l-3 6a3 3 0 006 0zM16 8l-3 6a3 3 0 006 0z" />
+        <path d='M12 3v18M5 8h14M8 8l-3 6a3 3 0 006 0zM16 8l-3 6a3 3 0 006 0z' />
       </>
     ),
     box: (
       <>
-        <path d="M3 8l9-4 9 4v9l-9 4-9-4z" />
-        <path d="M3 8l9 4 9-4M12 12v9" />
+        <path d='M3 8l9-4 9 4v9l-9 4-9-4z' />
+        <path d='M3 8l9 4 9-4M12 12v9' />
       </>
     ),
     rocket: (
       <>
-        <path d="M14 4c3 0 6 3 6 6l-8 8-4-4zM8 14l-4 4 1 3 3-1 4-4" />
+        <path d='M14 4c3 0 6 3 6 6l-8 8-4-4zM8 14l-4 4 1 3 3-1 4-4' />
       </>
     ),
     globe: (
       <>
-        <circle cx="12" cy="12" r="9" />
-        <path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18" />
+        <circle cx='12' cy='12' r='9' />
+        <path d='M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18' />
       </>
     ),
     users: (
       <>
-        <circle cx="9" cy="8" r="3" />
-        <path d="M3 20c0-3 3-5 6-5s6 2 6 5" />
-        <circle cx="17" cy="9" r="2.5" />
-        <path d="M15 20c0-2.5 2-4 4-4" />
+        <circle cx='9' cy='8' r='3' />
+        <path d='M3 20c0-3 3-5 6-5s6 2 6 5' />
+        <circle cx='17' cy='9' r='2.5' />
+        <path d='M15 20c0-2.5 2-4 4-4' />
       </>
     ),
     monitor: (
       <>
-        <rect x="3" y="4" width="18" height="12" rx="2" />
-        <path d="M8 20h8M12 16v4M7 10l2 2 3-4 3 3 2-2" />
+        <rect x='3' y='4' width='18' height='12' rx='2' />
+        <path d='M8 20h8M12 16v4M7 10l2 2 3-4 3 3 2-2' />
       </>
     ),
     people: (
       <>
-        <circle cx="12" cy="8" r="3" />
-        <path d="M5 20c0-3 3-5 7-5s7 2 7 5" />
+        <circle cx='12' cy='8' r='3' />
+        <path d='M5 20c0-3 3-5 7-5s7 2 7 5' />
       </>
     ),
     server: (
       <>
-        <rect x="3" y="4" width="18" height="6" rx="1.5" />
-        <rect x="3" y="14" width="18" height="6" rx="1.5" />
-        <path d="M7 7h.01M7 17h.01" />
+        <rect x='3' y='4' width='18' height='6' rx='1.5' />
+        <rect x='3' y='14' width='18' height='6' rx='1.5' />
+        <path d='M7 7h.01M7 17h.01' />
       </>
     ),
   };
@@ -97,12 +97,12 @@ function MiniIcon({ name }: { name: string }) {
     <svg
       width={14}
       height={14}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
       strokeWidth={1.6}
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      strokeLinecap='round'
+      strokeLinejoin='round'
       aria-hidden
     >
       {p[name] ?? null}
@@ -118,15 +118,17 @@ export default function RiskObjectsChart({ rightSlot }: Props) {
   const [hovered, setHovered] = useState<string | null>(null);
 
   return (
-    <div className={`np-risk-chart-section${rightSlot ? " np-risk-chart-section--split" : ""}`}>
-      <div className="np-island np-risk-chart-island">
-        <div className="np-risk-chart-wrap">
+    <div
+      className={`np-risk-chart-section${rightSlot ? ' np-risk-chart-section--split' : ''}`}
+    >
+      <div className='np-island np-risk-chart-island'>
+        <div className='np-risk-chart-wrap'>
           <svg
-            className="np-risk-chart-svg"
-            viewBox="0 0 678 500"
-            preserveAspectRatio="xMidYMid meet"
+            className='np-risk-chart-svg'
+            viewBox='0 0 678 500'
+            preserveAspectRatio='xMidYMid meet'
           >
-            <g transform="translate(339, 250)">
+            <g transform='translate(339, 250)'>
               {RISK_OBJECTS.map((s) => {
                 const active = hovered === s.id;
                 const tone = CHART_TONES[s.tone];
@@ -135,26 +137,26 @@ export default function RiskObjectsChart({ rightSlot }: Props) {
                     key={s.id}
                     onMouseEnter={() => setHovered(s.id)}
                     onMouseLeave={() => setHovered(null)}
-                    style={{ cursor: "pointer", transition: "opacity 180ms" }}
+                    style={{ cursor: 'pointer', transition: 'opacity 180ms' }}
                   >
                     <path
                       d={s.potentialPath}
                       fill={active ? tone.hoverPotential : tone.potential}
-                      style={{ transition: "fill 180ms" }}
+                      style={{ transition: 'fill 180ms' }}
                     />
                     <path
                       d={s.assessmentPath}
                       fill={active ? tone.hoverAssessment : tone.assessment}
-                      style={{ transition: "fill 180ms" }}
+                      style={{ transition: 'fill 180ms' }}
                     />
                     {s.factDashes.map((d, i) => (
                       <path
                         key={i}
                         d={d}
-                        fill="none"
+                        fill='none'
                         stroke={tone.fact}
                         strokeWidth={1.5}
-                        strokeLinecap="round"
+                        strokeLinecap='round'
                       />
                     ))}
                   </g>
@@ -163,16 +165,24 @@ export default function RiskObjectsChart({ rightSlot }: Props) {
             </g>
 
             {/* Center label */}
-            <g transform="translate(339, 250)" textAnchor="middle" style={{ pointerEvents: "none" }}>
-              <text y={-4} fontSize={13} fill="#8a94a6">Прогноз</text>
-              <text y={20} fontSize={20} fontWeight={600} fill="#111827">4.99 млн/₽</text>
+            <g
+              transform='translate(339, 250)'
+              textAnchor='middle'
+              style={{ pointerEvents: 'none' }}
+            >
+              <text y={-4} fontSize={13} fill='#8a94a6'>
+                Прогноз
+              </text>
+              <text y={20} fontSize={20} fontWeight={600} fill='#111827'>
+                4.99 млн/₽
+              </text>
             </g>
           </svg>
 
           {RISK_OBJECTS.map((s) => (
             <div
               key={s.id}
-              className={`np-risk-label${hovered === s.id ? " is-active" : ""}`}
+              className={`np-risk-label${hovered === s.id ? ' is-active' : ''}`}
               style={{
                 left: `${s.labelPosition.leftPct}%`,
                 top: `${s.labelPosition.topPct}%`,
@@ -180,89 +190,104 @@ export default function RiskObjectsChart({ rightSlot }: Props) {
               onMouseEnter={() => setHovered(s.id)}
               onMouseLeave={() => setHovered(null)}
             >
-              <span className="np-risk-label-icon" aria-hidden>
+              <span className='np-risk-label-icon' aria-hidden>
                 <MiniIcon name={s.icon} />
               </span>
-              <div className="np-risk-label-name">{s.label}</div>
-              <div className="np-risk-label-meta">
-                <span className="np-risk-label-tag">{s.valueLabel}</span>
-                <span className="np-risk-label-dot">·</span>
-                <span className="np-risk-label-value">{s.value}</span>
+              <div className='np-risk-label-name'>{s.label}</div>
+              <div className='np-risk-label-meta'>
+                <span className='np-risk-label-tag'>{s.valueLabel}</span>
+                <span className='np-risk-label-dot'>·</span>
+                <span className='np-risk-label-value'>{s.value}</span>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="np-risk-legend">
-          <span className="np-risk-legend-item">
-            <svg width={18} height={8} aria-hidden style={{ display: "inline-block" }}>
+        <div className='np-risk-legend'>
+          <span className='np-risk-legend-item'>
+            <svg
+              width={18}
+              height={8}
+              aria-hidden
+              style={{ display: 'inline-block' }}
+            >
               <line
                 x1={1}
                 y1={4}
                 x2={17}
                 y2={4}
-                stroke="#6b8f80"
+                stroke='#6b8f80'
                 strokeWidth={1.5}
-                strokeLinecap="round"
-                strokeDasharray="3 3"
+                strokeLinecap='round'
+                strokeDasharray='3 3'
               />
             </svg>
             Факт
           </span>
-          <span className="np-risk-legend-item">
+          <span className='np-risk-legend-item'>
             <span
-              className="np-risk-legend-swatch"
-              style={{ background: "#cfe4dc" }}
+              className='np-risk-legend-swatch'
+              style={{ background: '#cfe4dc' }}
             />
             Лимит
           </span>
-          <span className="np-risk-legend-item">
+          <span className='np-risk-legend-item'>
             <span
-              className="np-risk-legend-swatch"
-              style={{ background: "#e8f1ec", border: "1px solid #d1e0d8" }}
+              className='np-risk-legend-swatch'
+              style={{ background: '#e8f1ec', border: '1px solid #d1e0d8' }}
             />
             Прогноз
           </span>
         </div>
       </div>
 
-      <aside className="np-risk-side">{rightSlot}</aside>
+      <aside className='np-risk-side'>{rightSlot}</aside>
     </div>
   );
 }
 
 interface LossMetrics {
-  actual: { value: number | null; limitUsage: number | null; limitValue: number | null };
+  actual: {
+    value: number | null;
+    limitUsage: number | null;
+    limitValue: number | null;
+  };
   forecast: { value: number | null; delta: number | null };
 }
 
 export function RiskLossCards({ metrics }: { metrics: LossMetrics }) {
-  const fmt = (v: number | null) => (v == null ? "—" : String(v));
+  const fmt = (v: number | null) => (v == null ? '—' : String(v));
   const empty = metrics.actual.value == null && metrics.forecast.value == null;
   return (
-    <div className="np-risk-side-cards">
-      <div className="np-risk-side-card">
-        <div className="np-risk-side-card-head">Факт потерь</div>
-        <div className="np-risk-side-card-value">{fmt(metrics.actual.value)}</div>
+    <div className='np-risk-side-cards'>
+      <div className='np-risk-side-card'>
+        <div className='np-risk-side-card-head'>Факт потерь</div>
+        <div className='np-risk-side-card-value'>
+          {fmt(metrics.actual.value)}
+        </div>
         {metrics.actual.limitValue != null ? (
-          <div className="np-risk-side-card-sub">
+          <div className='np-risk-side-card-sub'>
             из {metrics.actual.limitValue}
-            {metrics.actual.limitUsage != null ? ` · ${metrics.actual.limitUsage}%` : ""}
+            {metrics.actual.limitUsage != null
+              ? ` · ${metrics.actual.limitUsage}%`
+              : ''}
           </div>
         ) : empty ? (
-          <div className="np-risk-side-card-empty">Данных пока нет</div>
+          <div className='np-risk-side-card-empty'>Данных пока нет</div>
         ) : null}
       </div>
-      <div className="np-risk-side-card">
-        <div className="np-risk-side-card-head">Прогноз потерь</div>
-        <div className="np-risk-side-card-value">{fmt(metrics.forecast.value)}</div>
+      <div className='np-risk-side-card'>
+        <div className='np-risk-side-card-head'>Прогноз потерь</div>
+        <div className='np-risk-side-card-value'>
+          {fmt(metrics.forecast.value)}
+        </div>
         {metrics.forecast.delta != null ? (
-          <div className="np-risk-side-card-sub">
-            {metrics.forecast.delta > 0 ? "+" : ""}
+          <div className='np-risk-side-card-sub'>
+            {metrics.forecast.delta > 0 ? '+' : ''}
             {metrics.forecast.delta}% к текущему
           </div>
         ) : empty ? (
-          <div className="np-risk-side-card-empty">Данных пока нет</div>
+          <div className='np-risk-side-card-empty'>Данных пока нет</div>
         ) : null}
       </div>
     </div>
