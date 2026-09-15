@@ -1,11 +1,21 @@
-import raw from "./profile_insights.json";
+import raw from './profile_insights.json';
 
-export interface InsightPoint { text: string; evidenceKnowledgeIds?: string[] }
-export interface RiskImpact { area: string; explanation: string; evidenceKnowledgeIds?: string[] }
-export interface BlindSpot { text: string; relatedKnowledgeIds?: string[] }
+export interface InsightPoint {
+  text: string;
+  evidenceKnowledgeIds?: string[];
+}
+export interface RiskImpact {
+  area: string;
+  explanation: string;
+  evidenceKnowledgeIds?: string[];
+}
+export interface BlindSpot {
+  text: string;
+  relatedKnowledgeIds?: string[];
+}
 export interface ImportantSignal {
   id: string;
-  type: "conflict" | "warning" | "stale";
+  type: 'conflict' | 'warning' | 'stale';
   title: string;
   text: string;
   riskEffect?: string | null;

@@ -1,7 +1,6 @@
-import businessObject from "./rest_business_object.json";
-import profileResult from "./profile_result_qwen.json";
+import profileResult from './profile_result_qwen.json';
 
-export type AnalystDatasetId = "smart-retail" | "zvuk";
+export type AnalystDatasetId = 'zvuk';
 
 export interface AnalystKnowledgeDataset {
   id: AnalystDatasetId;
@@ -10,18 +9,12 @@ export interface AnalystKnowledgeDataset {
   input: unknown;
 }
 
-function businessObjectCompanyName(input: unknown): string {
-  const root = input as {
-    nested?: { generalInfo?: { fields?: { shortName?: { value?: unknown } } } };
-  };
-  const value = root.nested?.generalInfo?.fields?.shortName?.value;
-  return typeof value === "string" && value.trim() ? value : "Компания из Business Object";
-}
-
 function profileResultCompanyName(input: unknown): string {
   const root = input as { profile?: { generalInfo?: { shortName?: unknown } } };
   const value = root.profile?.generalInfo?.shortName;
-  return typeof value === "string" && value.trim() ? value : "Компания из Profile Result";
+  return typeof value === 'string' && value.trim()
+    ? value
+    : 'Компания из Profile Result';
 }
 
 /**
@@ -31,15 +24,9 @@ function profileResultCompanyName(input: unknown): string {
  */
 export const ANALYST_KNOWLEDGE_DATASETS: readonly AnalystKnowledgeDataset[] = [
   {
-    id: "smart-retail",
-    label: businessObjectCompanyName(businessObject),
-    fileName: "rest_business_object.json",
-    input: businessObject,
-  },
-  {
-    id: "zvuk",
+    id: 'zvuk',
     label: profileResultCompanyName(profileResult),
-    fileName: "profile_result_qwen.json",
+    fileName: 'profile_result_qwen.json',
     input: profileResult,
   },
 ];

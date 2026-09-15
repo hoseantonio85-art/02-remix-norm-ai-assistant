@@ -1,45 +1,64 @@
+import { Button, LinearProgress } from '@sber-orm/ui-kit';
+import { useTranslation } from 'react-i18next';
+import styles from './AreaCoverageCard.module.scss';
+
 export function AreaCoverageCard({
-  percent, status, knowledgeCount, signal, onOpen,
+  percent,
+  status,
+  knowledgeCount,
+  signal,
+  onOpen,
 }: {
   percent: number;
   status: string;
   knowledgeCount: number;
-  needsUpdateCount?: number;
-  signal?: { tone: "conflict" | "warning" | "stale"; label: string } | null;
+  signal?: { tone: 'conflict' | 'warning' | 'stale'; label: string } | null;
   onOpen: () => void;
 }) {
-  const tone = percent >= 70 ? "ok" : percent >= 40 ? "warn" : "low";
-  const kWord =
-    knowledgeCount === 1 ? "знание" :
-    knowledgeCount >= 2 && knowledgeCount <= 4 ? "знания" : "знаний";
+  const { t } = useTranslation();
+  const tone = percent >= 70 ? 'ok' : percent >= 40 ? 'warn' : 'low';
   return (
-    <button type="button" className="np-area-cov" onClick={onOpen}>
-      <div className="np-area-coverage-heading">
-        <span className={`np-area-coverage-title np-area-cov-status--${tone}`}>
+    <section className={styles.card}>
+      <div className={styles.heading}>
+        <span className={styles.title} data-tone={tone}>
           {status}
         </span>
-        <strong className="np-area-coverage-percent">{percent}%</strong>
+        <strong className={styles.percent}>{percent}%</strong>
       </div>
-      <div className="np-area-coverage-meta">
-        <span>{knowledgeCount} {kWord}</span>
+      <div className={styles.meta}>
+        <span>
+          {t('knowledgeBase.knowledgeCount', { count: knowledgeCount })}
+        </span>
         {signal && (
           <>
-            <span className="np-meta-divider" aria-hidden>·</span>
-            <span className={`np-area-coverage-signals np-area-signal--${signal.tone}`}>
+            <span className={styles.divider} aria-hidden>
+              ·
+            </span>
+            <span className={styles.signals} data-tone={signal.tone}>
               {signal.label}
             </span>
           </>
         )}
       </div>
-      <div className="np-area-cov-bar">
-        <div className={`np-progress np-progress--sm np-progress--${tone}`}>
-          <div className="np-progress-fill" style={{ width: `${percent}%` }} />
-        </div>
+      <div className={styles.bar}>
+        <LinearProgress
+          value={percent}
+          variant={
+            tone === 'ok' ? 'success' : tone === 'warn' ? 'warning' : 'danger'
+          }
+        />
       </div>
-      <div className="np-area-cov-foot">
-        <span>Как Норм понимает область</span>
-        <span className="np-area-cov-chev" aria-hidden>›</span>
-      </div>
-    </button>
+      <Button
+        type='button'
+        variant='function'
+        link
+        size='XS'
+        iconAfter='nextLarge'
+        className={styles.foot}
+        onClick={onOpen}
+      >
+        {t('knowledgeBase.howAreaWorks')}
+      </Button>
+    </section>
   );
 }

@@ -9,6 +9,25 @@ function node(overrides: Partial<KnowledgeNode>): KnowledgeNode {
 }
 
 describe("UniversalValueRenderer value rules", () => {
+  it.each([
+    { value: 'Итого 3', children: [] },
+    { displayValue: 'Итого 3', children: [] },
+    { value: 'Итого 3', children: [node({ value: null })] },
+    { value: 0, children: [] },
+    { value: false, children: [] },
+  ])('renders array own values without visible children: %j', (data) => {
+    const array = node({ valueType: 'array', ...data });
+    const html = renderToStaticMarkup(createElement(UniversalValueRenderer, { node: array }));
+    const expected = formatNodeValue({ ...array, valueType: 'string' });
+    expect(expected.length).toBeGreaterThan(0);
+    expect(html).toContain(expected);
+    expect(html).not.toContain('<ul');
+  });
+
+  it.each(['known_empty', 'unknown', 'not_applicable'] as const)('preserves explicit empty array state %s', (code) => {
+    const array = node({ valueType: 'array', children: [], state: { code, label: 'Explicit state' } });
+    expect(renderToStaticMarkup(createElement(UniversalValueRenderer, { node: array }))).toContain('Explicit state');
+  });
   it("preserves time for datetime", () => {
     expect(formatNodeValue(node({ valueType: "datetime", value: "2026-07-20T15:25:52Z" })))
       .toContain("15:25:52");

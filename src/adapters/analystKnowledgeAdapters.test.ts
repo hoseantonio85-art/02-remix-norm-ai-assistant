@@ -191,9 +191,8 @@ describe("common validated input boundary", () => {
     },
   );
 
-  it("keeps analyst exports as separate company profiles", () => {
+  it("exposes only the Zvuk profile in the focused knowledge base", () => {
     expect(ANALYST_KNOWLEDGE_DATASETS.map((dataset) => dataset.label)).toEqual([
-      'ООО "УМНЫЙ РИТЕЙЛ"',
       "Звук",
     ]);
   });
