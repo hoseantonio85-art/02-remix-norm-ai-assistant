@@ -1,0 +1,43 @@
+.detail { display: flex; flex-direction: column; gap: 18px; color: var(--textBaseDefault); }
+
+.file {
+  display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+  border: 1px solid var(--borderDefault); border-radius: 10px;
+  background: var(--surfaceBasicDefault); color: var(--textBaseSecondary);
+}
+
+.fileBody { display: flex; flex: 1; min-width: 0; flex-direction: column; }
+.fileName { color: var(--textBaseDefault); font-size: 14px; font-weight: 500; line-height: 20px; overflow-wrap: anywhere; }
+.fileMeta, .locator, .label { color: var(--textBaseSecondary); }
+.fileMeta { margin-top: 2px; font-size: 12px; line-height: 16px; }
+
+.actions {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: -6px;
+  &:empty { display: none; }
+}
+
+.openLink, .actionLink { color: var(--textBrandDefault); text-decoration: none; }
+.openLink {
+  display: inline-flex; align-items: center; gap: 4px; min-height: 32px;
+  padding: 6px 12px; border: 1px solid var(--borderDefault); border-radius: 8px;
+  font-size: 13px; font-weight: 500;
+  &:hover { border-color: var(--borderFocus); background: var(--surfaceBasicHover); }
+  &:focus-visible { outline: 2px solid var(--borderFocus); outline-offset: 2px; }
+}
+.openLinkIcon { color: var(--textBaseSecondary); font-weight: 400; }
+.actionLink {
+  font-size: 13px;
+  &:hover { color: var(--textBrandDefault); }
+  &:focus-visible { outline: 2px solid var(--borderFocus); outline-offset: 2px; }
+}
+
+.block { display: flex; flex-direction: column; gap: 6px; margin: 0; }
+.label { font-size: 12px; font-weight: 500; line-height: 16px; letter-spacing: .06em; text-transform: uppercase; }
+.quote, .relation, .locator { font-size: 14px; line-height: 20px; }
+.quote, .relation { color: var(--textBaseDefault); }
+.quote {
+  padding: 10px 12px; border-left: 3px solid var(--textBrandDefault);
+  border-radius: 4px; background: var(--surfaceBasicDefault);
+}
+.quoteMuted { border-left-color: var(--borderDefault); background: var(--surfaceBasicHover); color: var(--textBaseSecondary); font-style: italic; }
+.quoteClaim, .quoteGap { border-left-color: var(--textTechWarning); background: var(--surfaceAccentAlertWarning); }

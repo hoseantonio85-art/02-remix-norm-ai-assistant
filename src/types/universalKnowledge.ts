@@ -1,10 +1,10 @@
 export type KnowledgeStateCode =
-  | "known"
-  | "partial"
-  | "known_empty"
-  | "unknown"
-  | "not_applicable"
-  | "conflicting";
+  | 'known'
+  | 'partial'
+  | 'known_empty'
+  | 'unknown'
+  | 'not_applicable'
+  | 'conflicting';
 
 export interface KnowledgeState {
   code: KnowledgeStateCode;
@@ -13,27 +13,27 @@ export interface KnowledgeState {
 }
 
 export type KnowledgeValueType =
-  | "string"
-  | "text"
-  | "number"
-  | "boolean"
-  | "date"
-  | "datetime"
-  | "enum"
-  | "url"
-  | "object"
-  | "array";
+  | 'string'
+  | 'text'
+  | 'number'
+  | 'boolean'
+  | 'date'
+  | 'datetime'
+  | 'enum'
+  | 'url'
+  | 'object'
+  | 'array';
 
 export interface KnowledgeFormat {
   kind?:
-    | "text"
-    | "identifier"
-    | "money"
-    | "percentage"
-    | "date"
-    | "datetime"
-    | "number"
-    | "duration";
+    | 'text'
+    | 'identifier'
+    | 'money'
+    | 'percentage'
+    | 'date'
+    | 'datetime'
+    | 'number'
+    | 'duration';
   currency?: string | null;
   unit?: string | null;
   decimals?: number | null;
@@ -108,7 +108,7 @@ export interface KnowledgeNode {
   id: string;
   key: string;
   label?: string | null;
-  semanticRole?: "value" | "summary" | "attribute" | "item" | "group" | null;
+  semanticRole?: 'value' | 'summary' | 'attribute' | 'item' | 'group' | null;
   valueType: KnowledgeValueType;
   value?: string | number | boolean | null;
   displayValue?: string | null;
@@ -159,11 +159,11 @@ export interface UniversalKnowledgeAlert {
 }
 
 export type EpistemicKind =
-  | "fact"
-  | "calculation"
-  | "observation"
-  | "conclusion"
-  | "hypothesis";
+  | 'fact'
+  | 'calculation'
+  | 'observation'
+  | 'conclusion'
+  | 'hypothesis';
 
 export interface KnowledgeDerivation {
   method: string;
@@ -185,7 +185,7 @@ export interface UniversalKnowledgeRelation {
 }
 
 export interface UniversalKnowledge {
-  schemaVersion: "2.0";
+  schemaVersion: '2.0';
   id: string;
   areaId: string;
   key: string;

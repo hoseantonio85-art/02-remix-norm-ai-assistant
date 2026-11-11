@@ -1,8 +1,17 @@
-import type { AreaInsight, ProfileInsight } from "../data/profile_insights";
-import { CoverageRing } from "./CoverageRing";
+import { Drawer } from '@sber-orm/components';
+import { Title } from '@sber-orm/ui-kit';
+import { useTranslation } from 'react-i18next';
+import type { AreaInsight, ProfileInsight } from '@/data/profile_insights';
+import { CoverageRing } from './CoverageRing';
+import styles from './KnowledgeInsightDrawer.module.scss';
+import { useAccessibleDrawer } from './useAccessibleDrawer';
 
 export function KnowledgeInsightDrawer({
-  title, percent, status, insight, onClose,
+  title,
+  percent,
+  status,
+  insight,
+  onClose,
 }: {
   title: string;
   percent: number;
@@ -10,83 +19,98 @@ export function KnowledgeInsightDrawer({
   insight: AreaInsight | ProfileInsight | undefined;
   onClose: () => void;
 }) {
-  const fallback = "Пока недостаточно данных для содержательного вывода.";
+  const { t } = useTranslation();
+  const fallback = t('insightDrawer.fallback');
+  const drawerRef = useAccessibleDrawer(title, onClose);
+
   return (
-    <div className="np-drawer-backdrop" onClick={onClose}>
-      <div className="np-drawer" onClick={(e) => e.stopPropagation()} role="dialog">
-        <div className="np-drawer-head">
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div className="np-drawer-eyebrow">Индекс знания</div>
-            <h3 className="np-drawer-title">{title}</h3>
-            <div className="np-drawer-metrics">
-              <CoverageRing percent={percent} size={56} />
-              <div className="np-drawer-metrics-status">{status}</div>
-            </div>
-            <p className="np-drawer-summary">{insight?.summary || fallback}</p>
+    <Drawer
+      ref={drawerRef}
+      open
+      notMountIfClosed
+      fullHeight
+      headerRevert
+      width={550}
+      minWidth={360}
+      title={<Title size='H700'>{title}</Title>}
+      onClose={onClose}
+    >
+      <div className={styles.body}>
+        <div className={styles.overview}>
+          <div className={styles.eyebrow}>{t('knowledgeBase.indexTitle')}</div>
+          <div className={styles.metrics}>
+            <CoverageRing percent={percent} size={56} />
+            <div className={styles.metricsStatus}>{status}</div>
           </div>
-          <button className="np-icon-btn" onClick={onClose} aria-label="Закрыть">✕</button>
+          <p className={styles.summary}>{insight?.summary || fallback}</p>
         </div>
-        <div className="np-drawer-body">
-          {insight?.importantSignals && insight.importantSignals.length > 0 && (
-            <section className="np-drawer-section">
-              <h4>Важные сигналы</h4>
-              <ul className="np-signals">
-                {insight.importantSignals.slice(0, 3).map((s) => (
-                  <li key={s.id} className={`np-signal np-signal--${s.type}`}>
-                    <div className="np-signal-title">{s.title}</div>
-                    <div className="np-signal-text">{s.text}</div>
-                    {s.riskEffect && (
-                      <div className="np-signal-effect">Может повлиять: {s.riskEffect}</div>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-          {insight?.observations && insight.observations.length > 0 && (
-            <section className="np-drawer-section">
-              <h4>Что я вижу</h4>
-              <ul className="np-drawer-list">
-                {insight.observations.slice(0, 5).map((o, i) => <li key={i}>{o.text}</li>)}
-              </ul>
-            </section>
-          )}
-          {insight?.conclusions && insight.conclusions.length > 0 && (
-            <section className="np-drawer-section">
-              <h4>Что из этого следует</h4>
-              <ul className="np-drawer-list">
-                {insight.conclusions.slice(0, 5).map((c, i) => <li key={i}>{c.text}</li>)}
-              </ul>
-            </section>
-          )}
-          {insight?.riskImpacts && insight.riskImpacts.length > 0 && (
-            <section className="np-drawer-section">
-              <h4>На какие риски влияет</h4>
-              <ul className="np-drawer-risks">
-                {insight.riskImpacts.slice(0, 6).map((r, i) => (
-                  <li key={i}>
-                    <div className="np-drawer-risk-area">{r.area}</div>
-                    <div className="np-drawer-risk-why">{r.explanation}</div>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-          {insight?.blindSpots && insight.blindSpots.length > 0 && (
-            <section className="np-drawer-section">
-              <h4>Где не хватает контекста</h4>
-              <ul className="np-drawer-list">
-                {insight.blindSpots.slice(0, 5).map((b, i) => <li key={i}>{b.text}</li>)}
-              </ul>
-            </section>
-          )}
-          {!insight && (
-            <section className="np-drawer-section">
-              <p className="np-muted">{fallback}</p>
-            </section>
-          )}
-        </div>
+        {insight?.importantSignals && insight.importantSignals.length > 0 && (
+          <section className={styles.section}>
+            <Title size='H500'>{t('insightDrawer.importantSignals')}</Title>
+            <ul className={styles.signals}>
+              {insight.importantSignals.slice(0, 3).map((s) => (
+                <li key={s.id} className={styles.signal} data-tone={s.type}>
+                  <div className={styles.signalTitle}>{s.title}</div>
+                  <div className={styles.signalText}>{s.text}</div>
+                  {s.riskEffect && (
+                    <div className={styles.signalEffect}>
+                      {t('insightDrawer.mayAffect', { effect: s.riskEffect })}
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+        {insight?.observations && insight.observations.length > 0 && (
+          <section className={styles.section}>
+            <Title size='H500'>{t('insightDrawer.observations')}</Title>
+            <ul className={styles.list}>
+              {insight.observations.slice(0, 5).map((o, i) => (
+                <li key={i}>{o.text}</li>
+              ))}
+            </ul>
+          </section>
+        )}
+        {insight?.conclusions && insight.conclusions.length > 0 && (
+          <section className={styles.section}>
+            <Title size='H500'>{t('insightDrawer.conclusions')}</Title>
+            <ul className={styles.list}>
+              {insight.conclusions.slice(0, 5).map((c, i) => (
+                <li key={i}>{c.text}</li>
+              ))}
+            </ul>
+          </section>
+        )}
+        {insight?.riskImpacts && insight.riskImpacts.length > 0 && (
+          <section className={styles.section}>
+            <Title size='H500'>{t('insightDrawer.riskImpact')}</Title>
+            <ul className={styles.risks}>
+              {insight.riskImpacts.slice(0, 6).map((r, i) => (
+                <li key={i}>
+                  <div className={styles.riskArea}>{r.area}</div>
+                  <div className={styles.riskExplanation}>{r.explanation}</div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+        {insight?.blindSpots && insight.blindSpots.length > 0 && (
+          <section className={styles.section}>
+            <Title size='H500'>{t('insightDrawer.blindSpots')}</Title>
+            <ul className={styles.list}>
+              {insight.blindSpots.slice(0, 5).map((b, i) => (
+                <li key={i}>{b.text}</li>
+              ))}
+            </ul>
+          </section>
+        )}
+        {!insight && (
+          <section className={styles.section}>
+            <p className={styles.muted}>{fallback}</p>
+          </section>
+        )}
       </div>
-    </div>
+    </Drawer>
   );
 }

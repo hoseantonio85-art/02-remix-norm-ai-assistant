@@ -1,0 +1,3 @@
+{
+  "extends": ["@sber-orm/biome-config"]
+}

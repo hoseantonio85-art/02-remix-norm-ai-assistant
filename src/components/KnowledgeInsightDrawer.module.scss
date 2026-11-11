@@ -1,0 +1,52 @@
+.body {
+  min-height: 0;
+  padding: 0;
+  overflow: visible;
+  color: var(--textBaseDefault);
+
+  :global(.np-drawer-overview) {
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--borderDefault);
+  }
+
+  :global(.np-drawer-summary),
+  :global(.np-drawer-list),
+  :global(.np-drawer-risk-why),
+  :global(.np-signal-text),
+  :global(.np-signal-effect) {
+    color: var(--textBaseSecondary);
+  }
+
+  :global(.np-signal--conflict) {
+    background: var(--surfaceAccentAlertDanger);
+    border-left-color: var(--textTechDanger);
+  }
+
+  :global(.np-signal--warning),
+  :global(.np-signal--stale) {
+    background: var(--surfaceAccentAlertWarning);
+    border-left-color: var(--textTechWarning);
+  }
+}
+
+.overview { padding-bottom: 22px; border-bottom: 1px solid var(--borderDefault); }
+.eyebrow { color: var(--textBaseSecondary); font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.metrics { display: flex; align-items: center; gap: 12px; margin: 12px 0 8px; }
+.metricsStatus { color: var(--textBaseDefault); font-size: 14px; font-weight: 500; line-height: 20px; }
+.summary, .list, .riskExplanation, .signalText, .signalEffect, .muted { color: var(--textBaseSecondary); }
+.summary { margin: 0; font-size: 14px; line-height: 20px; }
+.section { display: flex; flex-direction: column; gap: 10px; padding-top: 20px; }
+.list, .risks, .signals { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.list { padding-left: 18px; list-style: disc; }
+.signal { padding: 10px 12px 10px 14px; border-left: 4px solid transparent; border-radius: 10px; background: var(--surfaceSecondaryDefault); }
+.signal[data-tone='conflict'] { border-left-color: var(--textTechDanger); background: var(--surfaceAccentAlertDanger); }
+.signal[data-tone='warning'], .signal[data-tone='stale'] { border-left-color: var(--textTechWarning); background: var(--surfaceAccentAlertWarning); }
+.signalTitle { margin-bottom: 4px; font-size: 12px; font-weight: 600; line-height: 16px; letter-spacing: .2px; }
+.signal[data-tone='conflict'] .signalTitle { color: var(--textTechDanger); }
+.signal[data-tone='warning'] .signalTitle, .signal[data-tone='stale'] .signalTitle { color: var(--textTechWarning); }
+.signalText { font-size: 14px; line-height: 20px; }
+.signalEffect { margin-top: 6px; font-size: 12px; line-height: 16px; }
+.risks li { padding: 10px 12px; border-radius: 10px; background: var(--surfaceSecondaryDefault); }
+.riskArea { margin-bottom: 2px; color: var(--textBaseDefault); font-size: 14px; font-weight: 600; line-height: 20px; }
+.riskExplanation { font-size: 14px; line-height: 20px; }
+.muted { margin: 0; }

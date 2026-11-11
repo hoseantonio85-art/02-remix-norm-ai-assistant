@@ -1,41 +1,38 @@
-import type { CSSProperties } from "react";
+import i18n from '@/i18n/config';
+import {
+  CircularProgress,
+  type CircularProgressVariant,
+} from './CircularProgress';
 
-function toneColor(percent: number): string {
-  if (percent >= 70) return "#16a34a";
-  if (percent >= 40) return "#eab308";
-  return "#ef4444";
+function coverageVariant(percent: number): CircularProgressVariant {
+  if (percent >= 70) {
+    return 'success';
+  }
+  if (percent >= 40) {
+    return 'warning';
+  }
+  return 'danger';
 }
 
 export function CoverageRing({
-  percent, size = 46, thickness = 5, label,
-}: { percent: number; size?: number; thickness?: number; label?: string }) {
+  percent,
+  size = 46,
+  thickness = 10,
+  label,
+}: {
+  percent: number;
+  size?: number | string;
+  thickness?: number;
+  label?: string;
+}) {
   const clamped = Math.max(0, Math.min(100, percent));
-  const color = toneColor(clamped);
-  const bg = "#eef2f0";
-  const style: CSSProperties = {
-    width: size,
-    height: size,
-    borderRadius: "50%",
-    background: `conic-gradient(${color} ${clamped * 3.6}deg, ${bg} 0)`,
-  };
-  const innerSize = size - thickness * 2;
   return (
-    <div
-      className="np-ring"
-      style={style}
-      role="img"
-      aria-label={label || `Покрытие ${clamped}%`}
-    >
-      <div
-        className="np-ring-inner"
-        style={{
-          width: innerSize,
-          height: innerSize,
-          fontSize: size <= 40 ? 11 : 12,
-        }}
-      >
-        {clamped}%
-      </div>
-    </div>
+    <CircularProgress
+      value={clamped}
+      size={size}
+      thickness={thickness}
+      variant={coverageVariant(clamped)}
+      label={label || i18n.t('knowledgeBase.coverageLabel', { value: clamped })}
+    />
   );
 }

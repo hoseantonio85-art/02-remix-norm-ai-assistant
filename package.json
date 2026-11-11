@@ -6,18 +6,32 @@
   "scripts": {
     "dev": "vite --configLoader runner",
     "build": "tsc --noEmit && vite build --configLoader runner",
+    "build:mfe": "tsc --noEmit && vite build --configLoader runner --mode mfe",
     "build:dev": "vite build --configLoader runner --mode development",
+    "format": "biome check --write ./src",
+    "lint": "biome check ./src",
+    "lint:ts": "tsc --noEmit",
     "preview": "vite preview --configLoader runner",
     "test": "vitest --configLoader runner run"
   },
   "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-router-dom": "^6.28.0"
+    "@sber-orm/components": "file:vendor/sber-orm-components-0.253.0.tgz",
+    "@sber-orm/ui-kit": "file:vendor/sber-orm-ui-kit-0.283.0.tgz",
+    "i18next": "^25.3.2",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-i18next": "^15.6.1",
+    "react-router-dom": "^6.28.0",
+    "sass-embedded": "^1.89.2",
+    "single-spa": "^6.0.3",
+    "single-spa-react": "^6.0.2"
   },
   "devDependencies": {
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
+    "@biomejs/biome": "^2.1.4",
+    "@sber-orm/biome-config": "file:vendor/sber-orm-biome-config-0.245.0.tgz",
+    "@sber-orm/tsconfig-config": "file:vendor/sber-orm-tsconfig-config-0.245.0.tgz",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
     "@vitejs/plugin-react": "^5.0.0",
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",

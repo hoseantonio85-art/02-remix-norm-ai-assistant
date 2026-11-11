@@ -1,0 +1,14 @@
+.card { display: flex; width: 100%; box-sizing: border-box; flex-direction: column; gap: 8px; padding: 14px; border: 1px solid var(--borderDefault); border-radius: 14px; background: var(--surfaceBasicDefault); }
+.heading { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.title { color: var(--textBaseSecondary); font-size: 14px; font-weight: 600; line-height: 20px; }
+.title[data-tone='ok'] { color: var(--textTechSuccess); }
+.title[data-tone='warn'] { color: var(--textTechWarning); }
+.title[data-tone='low'] { color: var(--textTechDanger); }
+.percent { color: var(--textBaseDefault); font-size: 20px; font-weight: 600; line-height: 24px; }
+.meta { display: flex; align-items: center; gap: 6px; color: var(--textBaseSecondary); font-size: 12px; }
+.divider { color: var(--borderDefault); }
+.signals { font-weight: 600; }
+.signals[data-tone='conflict'] { color: var(--textTechDanger); }
+.signals[data-tone='warning'], .signals[data-tone='stale'] { color: var(--textTechWarning); }
+.bar { margin-top: 2px; }
+.foot { width: 100%; justify-content: space-between; margin-top: 4px; padding-top: 10px; border-top: 1px solid var(--borderDefault); color: var(--textAccentInfo); }

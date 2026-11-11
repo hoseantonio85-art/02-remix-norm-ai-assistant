@@ -2,8 +2,8 @@ name: Deploy to GitHub Pages
 # Republish the site after repository visibility was restored to public.
 
 on:
-  push:
-    branches: [main]
+  # Deployment is intentionally initiated by the main-branch workflow,
+  # which checks out this feature branch to satisfy Pages environment rules.
   workflow_dispatch:
 
 permissions:
