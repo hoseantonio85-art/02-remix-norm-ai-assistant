@@ -1,8 +1,8 @@
 name: Deploy to GitHub Pages
 
 on:
-  push:
-    branches: [feature/knowledge-base-ui-review-fixes]
+  # Deployment is intentionally initiated by the main-branch workflow,
+  # which checks out this feature branch to satisfy Pages environment rules.
   workflow_dispatch:
 
 permissions:
